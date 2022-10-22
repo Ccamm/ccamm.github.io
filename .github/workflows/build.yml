@@ -13,7 +13,7 @@ permissions:
 
 concurrency:
   group: "build"
-  cancel-in-progess: true
+  cancel-in-progress: true
 
 jobs:
   build:
