@@ -1,5 +1,7 @@
 # How Did I Trick Myself in the first place?
 
+Testing to see if this auto build works
+
 All I wanted to do was make a cool looking personal website that I can post my rants and ramblings up to.
 
 It started off with a static website, then I wanted password locking on my HackTheBox articles, which eventuated to developing a Content Management System (CMS) that self organises these articles, renders markdown to a sexy template for Flask that has a fancy network animation in the background. All hosted by Azure. Yeah I went down a bit of a slippery slope when adding features for this project.
