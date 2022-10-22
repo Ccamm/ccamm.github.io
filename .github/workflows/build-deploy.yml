@@ -1,5 +1,5 @@
 # Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+name: Build and Deploy My Website
 
 on:
   # Runs on pushes targeting the default branch
@@ -21,7 +21,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Single deploy job since we're just deploying
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python_version: '3.10'
+      - name: Install Packages
+        run: |
+          pip install -r requirements.txt
+      - name: Build HTML Files
+        run: |
+          python -m sitebuilder.build
   deploy:
     environment:
       name: github-pages
