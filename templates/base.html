@@ -1,0 +1,64 @@
+<html>
+	<head>
+		<title>GhostCcamm's Cyber Misadventures</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="/assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Page Wrapper -->
+			<div id="page-wrapper">
+
+			<!-- Header -->
+				<header id="header" class="alt">
+					<h1><a href="index.html">GhostCcamm's Cyber Misadventures</a></h1>
+					<nav>
+						<a href="#menu">Menu</a>
+					</nav>
+				</header>
+
+			<!-- Menu -->
+				<nav id="menu">
+					<div class="inner">
+						<h2>Menu</h2>
+						<ul class="links">
+							<li><a href="/">Home</a></li>
+							<li><a href="/blog">Blog</a></li>
+							<li><a href="/writeups">Write Ups</a></li>
+						</ul>
+						<a href="#" class="close">Close</a>
+					</div>
+				</nav>
+
+			<!-- Banner -->
+		    <section id="banner">
+		      <div class="inner">
+		        <div class="logo"><div class="image"><img src="/images/logo.png" alt="" width="75" height="75" /></div></div>
+		        <h2>{% block page_name %}{% endblock %}</h2>
+						<p class="date">{% block release_date %}{% endblock %}</p>
+		        <p>{% block desc %}{% endblock %}</p>
+		      </div>
+		    </section>
+
+      {% block content %}{% endblock %}
+    	</div>
+
+    <!-- Footer -->
+      {% include 'footer.html' %}
+
+		<!-- Particles -->
+			<div id="particles-js"></div>
+
+		<!-- Scripts -->
+			<script src="/assets/js/jquery.min.js"></script>
+			<script src="/assets/js/jquery.scrollex.min.js"></script>
+			<script src="/assets/js/browser.min.js"></script>
+			<script src="/assets/js/breakpoints.min.js"></script>
+			<script src="/assets/js/util.js"></script>
+			<script src="/assets/js/particles.min.js"></script>
+			<script src="/assets/js/main.js"></script>
+      {% block scripts %}{% endblock %}
+	</body>
+</html>

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block page_name %}{{ section_name }}{% endblock %}
+{% block desc %}{{ section_desc }}{% endblock %}
+
+{% block content %}
+
+  <!-- Wrapper -->
+    <section id="wrapper">
+      <!-- One -->
+        <section id="one" class="wrapper spotlight style1">
+          <div class="inner">
+            {% if most_recent_article["main_image"] is defined %}
+              <div class="main_image"><img src={{ most_recent_article["main_image"] }} alt="" /></div>
+            {% endif %}
+            <div class="content">
+              <h2 class="major">Latest Article: {{ most_recent_article["page_name"] }}</h2>
+              <p>{{ most_recent_article["desc"] }}</p>
+              <a href={{ most_recent_article['url_loc'] }} class="special">Read Article</a>
+            </div>
+          </div>
+        </section>
+
+          {% for cat_dict in page_lists %}
+            <section class="wrapper {{ alt_list[loop.index-1] }} {{ style_list[loop.index-1] }}">
+              <div class="inner">
+                {% for category, pages in cat_dict.items() %}
+                  <h2 class="major">{{ category }}</h2>
+                  <section class="features">
+                    {% for page_details in pages %}
+                      <article>
+                        <h3 class="major">{{ page_details["page_name"] }}</h3>
+                        <p>{{ page_details["desc"] }}</p>
+                        <a href={{ page_details['url_loc'] }} class="special">Read Article</a>
+                      </article>
+                    {% endfor %}
+                  </section>
+                {% endfor %}
+              </div>
+            </section>
+          {% endfor %}
+      </section>
+{% endblock %}

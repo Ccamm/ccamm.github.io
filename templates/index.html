@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block page_name %}GhostCcamm's Cyber Misadventures{% endblock %}
+{% block desc %}My Blog About Cyber Security and Computer Science Shenanigans{% endblock %}
+
+{% block content %}
+
+  <!-- Wrapper -->
+    <section id="wrapper">
+      <!-- One -->
+        <section id="one" class="wrapper spotlight style1">
+          <div class="inner">
+            <div class="main_image"><img src="/images/logo.png" alt="" /></div>
+            <div class="content">
+              <h2 class="major">About Me</h2>
+              <p>I am a broke ass Masters of Software Engineering student that has nothing better to do than to complain about guessy CTF challenges and rant about nerdy stuff that only a small demographic actually cares about.</p>
+              <p>If you came here for a good time I cannot make any guarantees, but I will give it shot with my ramblings!</p>
+            </div>
+          </div>
+        </section>
+
+      <!-- Two -->
+        <section id="two" class="wrapper spotlight alt style2">
+          <div class="inner">
+            {% if latest_writeup["main_image"] is defined %}
+              <a class="main_image" href={{ latest_writeup["url_loc"] }}><img src={{ latest_writeup["main_image"] }} alt="" /></a>
+            {% endif %}
+            <div class="content">
+              <a href={{ latest_writeup["url_loc"] }}><h2 class="major">Latest Writeup: {{ latest_writeup["page_name"] }}</h2></a>
+              <p>{{ latest_writeup["desc"] }}</p>
+              <a href="/writeups" class="special">Browse Other Writeups</a>
+            </div>
+          </div>
+        </section>
+
+      <!-- Three -->
+        <section id="three" class="wrapper spotlight style3">
+          <div class="inner">
+            {% if latest_blog["main_image"] is defined %}
+              <a class="main_image" href={{ latest_blog["url_loc"] }}><img src={{ latest_blog["main_image"] }} alt="" /></a>
+            {% endif %}
+            <div class="content">
+              <a href={{ latest_blog["url_loc"] }}><h2 class="major">Latest Blog: {{ latest_blog["page_name"] }}</h2></a>
+              <p>{{ latest_blog["desc"] }}</p>
+              <a href="/blog" class="special">Browse Other Articles</a>
+            </div>
+          </div>
+        </section>
+      </section>
+{% endblock %}
