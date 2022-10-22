@@ -1,0 +1,40 @@
+name: Build HTML Files on Pull Request
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+  workflow_dispatch:
+
+permissions:
+  contents: read|write
+
+concurrency:
+  group: "build"
+  cancel-in-progess: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python_version: '3.10'
+      - name: Install Packages
+        run: |
+          pip install -r requirements.txt
+      - name: Build HTML Files
+        run: |
+          python -m sitebuilder.build
+      - name: Commit Build
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git commit -m "Build HTML" -a
+          git push
