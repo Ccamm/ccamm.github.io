@@ -12,7 +12,7 @@ permissions:
   contents: ["read", "write"]
 
 concurrency:
-  group: ${{ github.head_ref || github.run_id }}
+  group: "build"
   cancel-in-progess: true
 
 jobs:
