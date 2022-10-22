@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block page_name %}{{ name|safe }}{% endblock %}
+{% block desc %}{{ description|safe }}{% endblock %}
+{% block release_date %}{{ date|safe }}{% endblock %}
+
+{% block content %}{{ body|safe }}{% endblock %}}

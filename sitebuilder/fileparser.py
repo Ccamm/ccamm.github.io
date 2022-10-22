@@ -37,31 +37,6 @@ def _is_md_folder(path):
 
     return True
 
-def _should_compile_md(path, compiled_folder):
-    try:
-        if not _is_md_folder(path):
-            return False
-        md_file = os.path.join(path, "content.md")
-
-        html_file = os.path.join(compiled_folder, "page.html")
-
-        if not os.path.exists(html_file):
-            return True
-
-        md_mod_time = os.path.getmtime(md_file)
-        html_mod_time = os.path.getmtime(html_file)
-
-        if md_mod_time > html_mod_time:
-            return True
-
-        prop_yaml_time = os.path.getmtime(os.path.join(path, "prop.yaml"))
-        if prop_yaml_time > html_mod_time:
-            return True
-
-    except Exception as e:
-        print(e)
-    return False
-
 def _should_copy_image(name, path, image_loc):
     try:
         new_img_loc = os.path.join(image_loc, name)
@@ -133,10 +108,7 @@ def parse_pages(group_name, markdown_folder):
 
         publish_images(group_name, name, path)
 
-        if _should_compile_md(path, compiled_folder):
-            markdownparser.compile_markdown(name, path, group_name, compiled_folder)
-
-        pg_config = load_page_config(name, path, group_name)
+        pg_config = markdownparser.compile_markdown(name, path, group_name, compiled_folder)
         page_configs[name] = pg_config
 
     return page_configs

@@ -24,11 +24,17 @@ class PageControl:
 
     def render_pages(self, jinja_env: Environment, html_folder):
         for path in self.published_pages:
+            page_config = self.page_configs[path]
             html_page_folder = os.path.join(html_folder, path)
             os.makedirs(html_page_folder, exist_ok=True)
             html_path = os.path.join(html_page_folder, "index.html")
-            template = jinja_env.get_template(self.published_pages[path])
-            template_str = template.render()
+            template = jinja_env.get_template("article.html")
+            template_str = template.render(
+                name = page_config["name"],
+                description = page_config["desc"],
+                date = page_config["release_date"],
+                body = page_config["html"]
+            )
             with open(html_path, "w") as f:
                 f.write(template_str)
 

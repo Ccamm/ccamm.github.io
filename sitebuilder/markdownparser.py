@@ -11,25 +11,10 @@ SECTION_STYLES = [
     "style6"
 ]
 
-TEMPLATE = """{{% extends 'base.html' %}}
-{{% block page_name %}}{}{{% endblock %}}
-{{% block desc %}}{}{{% endblock %}}
-{{% block release_date %}}{}{{% endblock %}}
-
-{{% block content %}}{}{{% endblock %}}
-"""
-
 BASE_HTML_LOC = os.path.join('.', 'templates', 'base.html')
 
 def _wrap_body(html_processed):
     return '<section id="wrapper">\r\n' + html_processed + '</section>\r\n'
-
-def _escape_code(processed_html):
-    soup = BeautifulSoup(processed_html, features="html.parser")
-    code_tags = soup.find_all("code")
-    for ct in code_tags:
-        ct.string = "{% raw %}" + ct.string + "{% endraw %}"
-    return soup.prettify()
 
 def _create_sections(soup, prop_dict):
     section_list = soup.prettify().split("<hr/>")
@@ -60,7 +45,7 @@ def _create_sections(soup, prop_dict):
 
         section_list[i] = new_section
 
-    return _escape_code(_wrap_body(''.join(section_list)))
+    return _wrap_body(''.join(section_list))
 
 def _modify_attrs(tag_name, attrs, soup):
     for tag in soup.find_all(tag_name):
@@ -90,16 +75,6 @@ def compile_markdown(name, path, group_name, compiled_folder):
 
     prop_dict = fileparser.load_page_config(name, path, group_name)
 
-    release_date = prop_dict.get("release_date").strftime("%Y-%m-%d") if prop_dict.get("release_date", False) else ""
-
-    content_template = TEMPLATE.format(prop_dict.get("page_name"),
-                                        prop_dict.get("desc"),
-                                        release_date,
-                                        _create_sections(soup, prop_dict))
-
-    template_loc = os.path.join(compiled_folder, "page.html")
-
-    with open(template_loc, 'w') as f:
-        f.write(content_template)
+    prop_dict["html"] = _create_sections(soup, prop_dict)
 
     return prop_dict
