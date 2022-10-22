@@ -37,4 +37,4 @@ jobs:
           git config --local user.name "GitHub Action"
           git add -A
           git commit -m "Build HTML" -a
-          git push origin HEAD:${{ github.ref_name }}
+          git push origin HEAD:${GITHUB_REF#refs/heads/}
