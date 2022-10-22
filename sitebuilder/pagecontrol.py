@@ -77,7 +77,7 @@ class PageControl:
                     "page_name" : page_config["page_name"],
                     "desc" : page_config["desc"],
                     "release_date" : page_config["release_date"],
-                    "url_loc" : "/" + self.page_group_name + "/" + page_config["name"]
+                    "url_loc" : "/" + self.page_group_name + "/" + page_config["name"] + "/index.html"
                 }
                 if page_config.get("main_image", False):
                     page_details["main_image"] = page_config["main_image"]
