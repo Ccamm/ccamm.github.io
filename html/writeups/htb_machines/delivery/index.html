@@ -4,6 +4,7 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="/assets/css/main.css" />
+		<link rel="stylesheet" href="/assets/css/main.css" />
 		<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
 	</head>
 	<body class="is-preload">
@@ -71,7 +72,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style2 alt">
+<section class="wrapper style1 alt">
 <div class="inner">
 <div class="content">
 
@@ -85,80 +86,82 @@
  </code>
  for network enumeration, I fired up Nmap to see what services were running on the box.
 </p>
-<pre class="codehilite"><code>Starting Nmap 7.91 ( https://nmap.org ) at 2021-01-10 08:26 AWST
-Nmap scan report for delivery.htb (10.10.10.222)
-Host is up (0.061s latency).
+<div class="codehilite">
+ <pre><span></span><code><span class="nv">Starting</span> <span class="nv">Nmap</span> <span class="mf">7.91</span> <span class="p">(</span> <span class="s s-Atom">https</span><span class="p">:</span><span class="o">//</span><span class="s s-Atom">nmap</span><span class="p">.</span><span class="s s-Atom">org</span> <span class="p">)</span> <span class="s s-Atom">at</span> <span class="mi">2021</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">10</span> <span class="mi">08</span><span class="o">:</span><span class="mi">26</span> <span class="nv">AWST</span>
+<span class="nv">Nmap</span> <span class="s s-Atom">scan</span> <span class="s s-Atom">report</span> <span class="s s-Atom">for</span> <span class="s s-Atom">delivery</span><span class="p">.</span><span class="nf">htb</span> <span class="p">(</span><span class="mf">10.10.10.222</span><span class="p">)</span>
+<span class="nv">Host</span> <span class="o">is</span> <span class="nf">up</span> <span class="p">(</span><span class="mf">0.061</span><span class="s s-Atom">s</span> <span class="s s-Atom">latency</span><span class="p">).</span>
 
-PORT     STATE SERVICE VERSION
-22/tcp   open  ssh     OpenSSH 7.9p1 Debian 10+deb10u2 (protocol 2.0)
-| ssh-hostkey:
-|   2048 9c:40:fa:85:9b:01:ac:ac:0e:bc:0c:19:51:8a:ee:27 (RSA)
-|   256 5a:0c:c0:3b:9b:76:55:2e:6e:c4:f4:b9:5d:76:17:09 (ECDSA)
-|_  256 b7:9d:f7:48:9d:a2:f2:76:30:fd:42:d3:35:3a:80:8c (ED25519)
-80/tcp   open  http    nginx 1.14.2
-|_http-server-header: nginx/1.14.2
-|_http-title: Welcome
-8065/tcp open  unknown
-| fingerprint-strings:
-|   GenericLines, Help, RTSPRequest, SSLSessionReq, TerminalServerCookie:
-|     HTTP/1.1 400 Bad Request
-|     Content-Type: text/plain; charset=utf-8
-|     Connection: close
-|     Request
-|   GetRequest:
-|     HTTP/1.0 200 OK
-|     Accept-Ranges: bytes
-|     Cache-Control: no-cache, max-age=31556926, public
-|     Content-Length: 3108
-|     Content-Security-Policy: frame-ancestors 'self'; script-src 'self' cdn.rudderlabs.com
-|     Content-Type: text/html; charset=utf-8
-|     Last-Modified: Sat, 09 Jan 2021 19:00:51 GMT
-|     X-Frame-Options: SAMEORIGIN
-|     X-Request-Id: i3xa8qsmtiyoum5gfzo5bp6h8c
-|     X-Version-Id: 5.30.0.5.30.1.57fb31b889bf81d99d8af8176d4bbaaa.false
-|     Date: Sun, 10 Jan 2021 00:26:57 GMT
-|     &lt;!doctype html&gt;&lt;html lang="en"&gt;&lt;head&gt;&lt;meta charset="utf-8"&gt;&lt;meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0"&gt;&lt;meta name="robots" content="noindex, nofollow"&gt;&lt;meta name="referrer" content="no-referrer"&gt;&lt;title&gt;Mattermost&lt;/title&gt;&lt;meta name="mobile-web-app-capable" content="yes"&gt;&lt;meta name="application-name" content="Mattermost"&gt;&lt;meta name="format-detection" content="telephone=no"&gt;&lt;link re
-|   HTTPOptions:
-|     HTTP/1.0 405 Method Not Allowed
-|     Date: Sun, 10 Jan 2021 00:26:57 GMT
-|_    Content-Length: 0
-1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
-SF-Port8065-TCP:V=7.91%I=7%D=1/10%Time=5FFA49B4%P=x86_64-pc-linux-gnu%r(Ge
-SF:nericLines,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Type:\x20t
-SF:ext/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\n400\x20Bad\x
-SF:20Request")%r(GetRequest,DF3,"HTTP/1\.0\x20200\x20OK\r\nAccept-Ranges:\
-SF:x20bytes\r\nCache-Control:\x20no-cache,\x20max-age=31556926,\x20public\
-SF:r\nContent-Length:\x203108\r\nContent-Security-Policy:\x20frame-ancesto
-SF:rs\x20'self';\x20script-src\x20'self'\x20cdn\.rudderlabs\.com\r\nConten
-SF:t-Type:\x20text/html;\x20charset=utf-8\r\nLast-Modified:\x20Sat,\x2009\
-SF:x20Jan\x202021\x2019:00:51\x20GMT\r\nX-Frame-Options:\x20SAMEORIGIN\r\n
-SF:X-Request-Id:\x20i3xa8qsmtiyoum5gfzo5bp6h8c\r\nX-Version-Id:\x205\.30\.
-SF:0\.5\.30\.1\.57fb31b889bf81d99d8af8176d4bbaaa\.false\r\nDate:\x20Sun,\x
-SF:2010\x20Jan\x202021\x2000:26:57\x20GMT\r\n\r\n&lt;!doctype\x20html&gt;&lt;html\x
-SF:20lang=\"en\"&gt;&lt;head&gt;&lt;meta\x20charset=\"utf-8\"&gt;&lt;meta\x20name=\"viewport
-SF:\"\x20content=\"width=device-width,initial-scale=1,maximum-scale=1,user
-SF:-scalable=0\"&gt;&lt;meta\x20name=\"robots\"\x20content=\"noindex,\x20nofollo
-SF:w\"&gt;&lt;meta\x20name=\"referrer\"\x20content=\"no-referrer\"&gt;&lt;title&gt;Matter
-SF:most&lt;/title&gt;&lt;meta\x20name=\"mobile-web-app-capable\"\x20content=\"yes\"
-SF:&gt;&lt;meta\x20name=\"application-name\"\x20content=\"Mattermost\"&gt;&lt;meta\x20
-SF:name=\"format-detection\"\x20content=\"telephone=no\"&gt;&lt;link\x20re")%r(H
-SF:TTPOptions,5B,"HTTP/1\.0\x20405\x20Method\x20Not\x20Allowed\r\nDate:\x2
-SF:0Sun,\x2010\x20Jan\x202021\x2000:26:57\x20GMT\r\nContent-Length:\x200\r
-SF:\n\r\n")%r(RTSPRequest,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nConten
-SF:t-Type:\x20text/plain;\x20charset=utf-8\r\nConnection:\x20close\r\n\r\n
-SF:400\x20Bad\x20Request")%r(Help,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r
-SF:\nContent-Type:\x20text/plain;\x20charset=utf-8\r\nConnection:\x20close
-SF:\r\n\r\n400\x20Bad\x20Request")%r(SSLSessionReq,67,"HTTP/1\.1\x20400\x2
-SF:0Bad\x20Request\r\nContent-Type:\x20text/plain;\x20charset=utf-8\r\nCon
-SF:nection:\x20close\r\n\r\n400\x20Bad\x20Request")%r(TerminalServerCookie
-SF:,67,"HTTP/1\.1\x20400\x20Bad\x20Request\r\nContent-Type:\x20text/plain;
-SF:\x20charset=utf-8\r\nConnection:\x20close\r\n\r\n400\x20Bad\x20Request"
-SF:);
-Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+<span class="nv">PORT</span>     <span class="nv">STATE</span> <span class="nv">SERVICE</span> <span class="nv">VERSION</span>
+<span class="mi">22</span><span class="o">/</span><span class="s s-Atom">tcp</span>   <span class="s s-Atom">open</span>  <span class="s s-Atom">ssh</span>     <span class="nv">OpenSSH</span> <span class="mf">7.9</span><span class="s s-Atom">p1</span> <span class="nv">Debian</span> <span class="mi">10</span><span class="o">+</span><span class="nf">deb10u2</span> <span class="p">(</span><span class="s s-Atom">protocol</span> <span class="mf">2.0</span><span class="p">)</span>
+<span class="p">|</span> <span class="s s-Atom">ssh</span><span class="o">-</span><span class="s s-Atom">hostkey</span><span class="p">:</span>
+<span class="p">|</span>   <span class="mi">2048</span> <span class="mi">9</span><span class="s s-Atom">c</span><span class="p">:</span><span class="mi">40</span><span class="o">:</span><span class="s s-Atom">fa</span><span class="p">:</span><span class="mi">85</span><span class="o">:</span><span class="mi">9</span><span class="s s-Atom">b</span><span class="p">:</span><span class="mi">01</span><span class="o">:</span><span class="s s-Atom">ac</span><span class="p">:</span><span class="s s-Atom">ac</span><span class="p">:</span><span class="mi">0</span><span class="s s-Atom">e</span><span class="p">:</span><span class="s s-Atom">bc</span><span class="p">:</span><span class="mi">0</span><span class="s s-Atom">c</span><span class="p">:</span><span class="mi">19</span><span class="o">:</span><span class="mi">51</span><span class="o">:</span><span class="mi">8</span><span class="s s-Atom">a</span><span class="p">:</span><span class="s s-Atom">ee</span><span class="p">:</span><span class="mi">27</span> <span class="p">(</span><span class="nv">RSA</span><span class="p">)</span>
+<span class="p">|</span>   <span class="mi">256</span> <span class="mi">5</span><span class="s s-Atom">a</span><span class="p">:</span><span class="mi">0</span><span class="s s-Atom">c</span><span class="p">:</span><span class="s s-Atom">c0</span><span class="o">:</span><span class="mi">3</span><span class="s s-Atom">b</span><span class="p">:</span><span class="mi">9</span><span class="s s-Atom">b</span><span class="p">:</span><span class="mi">76</span><span class="o">:</span><span class="mi">55</span><span class="o">:</span><span class="mi">2</span><span class="s s-Atom">e</span><span class="p">:</span><span class="mi">6</span><span class="s s-Atom">e</span><span class="p">:</span><span class="s s-Atom">c4</span><span class="o">:</span><span class="s s-Atom">f4</span><span class="o">:</span><span class="s s-Atom">b9</span><span class="o">:</span><span class="mi">5</span><span class="s s-Atom">d</span><span class="p">:</span><span class="mi">76</span><span class="o">:</span><span class="mi">17</span><span class="o">:</span><span class="mi">09</span> <span class="p">(</span><span class="nv">ECDSA</span><span class="p">)</span>
+<span class="p">|</span><span class="k">_</span>  <span class="mi">256</span> <span class="s s-Atom">b7</span><span class="o">:</span><span class="mi">9</span><span class="s s-Atom">d</span><span class="p">:</span><span class="s s-Atom">f7</span><span class="o">:</span><span class="mi">48</span><span class="o">:</span><span class="mi">9</span><span class="s s-Atom">d</span><span class="p">:</span><span class="s s-Atom">a2</span><span class="o">:</span><span class="s s-Atom">f2</span><span class="o">:</span><span class="mi">76</span><span class="o">:</span><span class="mi">30</span><span class="o">:</span><span class="s s-Atom">fd</span><span class="p">:</span><span class="mi">42</span><span class="o">:</span><span class="s s-Atom">d3</span><span class="o">:</span><span class="mi">35</span><span class="o">:</span><span class="mi">3</span><span class="s s-Atom">a</span><span class="p">:</span><span class="mi">80</span><span class="o">:</span><span class="mi">8</span><span class="nf">c</span> <span class="p">(</span><span class="nv">ED25519</span><span class="p">)</span>
+<span class="mi">80</span><span class="o">/</span><span class="s s-Atom">tcp</span>   <span class="s s-Atom">open</span>  <span class="s s-Atom">http</span>    <span class="s s-Atom">nginx</span> <span class="mf">1.14.2</span>
+<span class="p">|</span><span class="k">_</span><span class="s s-Atom">http</span><span class="o">-</span><span class="s s-Atom">server</span><span class="o">-</span><span class="s s-Atom">header</span><span class="p">:</span> <span class="s s-Atom">nginx</span><span class="o">/</span><span class="mf">1.14.2</span>
+<span class="p">|</span><span class="k">_</span><span class="s s-Atom">http</span><span class="o">-</span><span class="s s-Atom">title</span><span class="p">:</span> <span class="nv">Welcome</span>
+<span class="mi">8065</span><span class="o">/</span><span class="s s-Atom">tcp</span> <span class="s s-Atom">open</span>  <span class="s s-Atom">unknown</span>
+<span class="p">|</span> <span class="s s-Atom">fingerprint</span><span class="o">-</span><span class="s s-Atom">strings</span><span class="p">:</span>
+<span class="p">|</span>   <span class="nv">GenericLines</span><span class="p">,</span> <span class="nv">Help</span><span class="p">,</span> <span class="nv">RTSPRequest</span><span class="p">,</span> <span class="nv">SSLSessionReq</span><span class="p">,</span> <span class="nv">TerminalServerCookie</span><span class="o">:</span>
+<span class="p">|</span>     <span class="nv">HTTP</span><span class="o">/</span><span class="mf">1.1</span> <span class="mi">400</span> <span class="nv">Bad</span> <span class="nv">Request</span>
+<span class="p">|</span>     <span class="nv">Content</span><span class="o">-</span><span class="nv">Type</span><span class="o">:</span> <span class="s s-Atom">text</span><span class="o">/</span><span class="s s-Atom">plain</span><span class="p">;</span> <span class="s s-Atom">charset</span><span class="o">=</span><span class="s s-Atom">utf</span><span class="o">-</span><span class="mi">8</span>
+<span class="p">|</span>     <span class="nv">Connection</span><span class="o">:</span> <span class="s s-Atom">close</span>
+<span class="p">|</span>     <span class="nv">Request</span>
+<span class="p">|</span>   <span class="nv">GetRequest</span><span class="o">:</span>
+<span class="p">|</span>     <span class="nv">HTTP</span><span class="o">/</span><span class="mf">1.0</span> <span class="mi">200</span> <span class="nv">OK</span>
+<span class="p">|</span>     <span class="nv">Accept</span><span class="o">-</span><span class="nv">Ranges</span><span class="o">:</span> <span class="s s-Atom">bytes</span>
+<span class="p">|</span>     <span class="nv">Cache</span><span class="o">-</span><span class="nv">Control</span><span class="o">:</span> <span class="s s-Atom">no</span><span class="o">-</span><span class="s s-Atom">cache</span><span class="p">,</span> <span class="s s-Atom">max</span><span class="o">-</span><span class="s s-Atom">age</span><span class="o">=</span><span class="mi">31556926</span><span class="p">,</span> <span class="s s-Atom">public</span>
+<span class="p">|</span>     <span class="nv">Content</span><span class="o">-</span><span class="nv">Length</span><span class="o">:</span> <span class="mi">3108</span>
+<span class="p">|</span>     <span class="nv">Content</span><span class="o">-</span><span class="nv">Security</span><span class="o">-</span><span class="nv">Policy</span><span class="o">:</span> <span class="s s-Atom">frame</span><span class="o">-</span><span class="s s-Atom">ancestors</span> <span class="s s-Atom">'self'</span><span class="p">;</span> <span class="s s-Atom">script</span><span class="o">-</span><span class="s s-Atom">src</span> <span class="s s-Atom">'self'</span> <span class="s s-Atom">cdn</span><span class="p">.</span><span class="s s-Atom">rudderlabs</span><span class="p">.</span><span class="s s-Atom">com</span>
+<span class="p">|</span>     <span class="nv">Content</span><span class="o">-</span><span class="nv">Type</span><span class="o">:</span> <span class="s s-Atom">text</span><span class="o">/</span><span class="s s-Atom">html</span><span class="p">;</span> <span class="s s-Atom">charset</span><span class="o">=</span><span class="s s-Atom">utf</span><span class="o">-</span><span class="mi">8</span>
+<span class="p">|</span>     <span class="nv">Last</span><span class="o">-</span><span class="nv">Modified</span><span class="o">:</span> <span class="nv">Sat</span><span class="p">,</span> <span class="mi">09</span> <span class="nv">Jan</span> <span class="mi">2021</span> <span class="mi">19</span><span class="o">:</span><span class="mi">00</span><span class="o">:</span><span class="mi">51</span> <span class="nv">GMT</span>
+<span class="p">|</span>     <span class="nv">X</span><span class="o">-</span><span class="nv">Frame</span><span class="o">-</span><span class="nv">Options</span><span class="o">:</span> <span class="nv">SAMEORIGIN</span>
+<span class="p">|</span>     <span class="nv">X</span><span class="o">-</span><span class="nv">Request</span><span class="o">-</span><span class="nv">Id</span><span class="o">:</span> <span class="s s-Atom">i3xa8qsmtiyoum5gfzo5bp6h8c</span>
+<span class="p">|</span>     <span class="nv">X</span><span class="o">-</span><span class="nv">Version</span><span class="o">-</span><span class="nv">Id</span><span class="o">:</span> <span class="mf">5.30.0.5.30.1.57</span><span class="s s-Atom">fb31b889bf81d99d8af8176d4bbaaa</span><span class="p">.</span><span class="s s-Atom">false</span>
+<span class="p">|</span>     <span class="nv">Date</span><span class="o">:</span> <span class="nv">Sun</span><span class="p">,</span> <span class="mi">10</span> <span class="nv">Jan</span> <span class="mi">2021</span> <span class="mi">00</span><span class="o">:</span><span class="mi">26</span><span class="o">:</span><span class="mi">57</span> <span class="nv">GMT</span>
+<span class="p">|</span>     <span class="s s-Atom">&lt;</span><span class="p">!</span><span class="s s-Atom">doctype</span> <span class="s s-Atom">html&gt;&lt;html</span> <span class="s s-Atom">lang=</span><span class="s2">"en"</span><span class="s s-Atom">&gt;&lt;head&gt;&lt;meta</span> <span class="s s-Atom">charset=</span><span class="s2">"utf-8"</span><span class="s s-Atom">&gt;&lt;meta</span> <span class="s s-Atom">name=</span><span class="s2">"viewport"</span> <span class="s s-Atom">content=</span><span class="s2">"width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0"</span><span class="s s-Atom">&gt;&lt;meta</span> <span class="s s-Atom">name=</span><span class="s2">"robots"</span> <span class="s s-Atom">content=</span><span class="s2">"noindex, nofollow"</span><span class="s s-Atom">&gt;&lt;meta</span> <span class="s s-Atom">name=</span><span class="s2">"referrer"</span> <span class="s s-Atom">content=</span><span class="s2">"no-referrer"</span><span class="s s-Atom">&gt;&lt;title</span><span class="o">&gt;</span><span class="nv">Mattermost</span><span class="s s-Atom">&lt;/title&gt;&lt;meta</span> <span class="s s-Atom">name=</span><span class="s2">"mobile-web-app-capable"</span> <span class="s s-Atom">content=</span><span class="s2">"yes"</span><span class="s s-Atom">&gt;&lt;meta</span> <span class="s s-Atom">name=</span><span class="s2">"application-name"</span> <span class="s s-Atom">content=</span><span class="s2">"Mattermost"</span><span class="s s-Atom">&gt;&lt;meta</span> <span class="s s-Atom">name=</span><span class="s2">"format-detection"</span> <span class="s s-Atom">content=</span><span class="s2">"telephone=no"</span><span class="s s-Atom">&gt;&lt;link</span> <span class="s s-Atom">re</span>
+<span class="p">|</span>   <span class="nv">HTTPOptions</span><span class="o">:</span>
+<span class="p">|</span>     <span class="nv">HTTP</span><span class="o">/</span><span class="mf">1.0</span> <span class="mi">405</span> <span class="nv">Method</span> <span class="nv">Not</span> <span class="nv">Allowed</span>
+<span class="p">|</span>     <span class="nv">Date</span><span class="o">:</span> <span class="nv">Sun</span><span class="p">,</span> <span class="mi">10</span> <span class="nv">Jan</span> <span class="mi">2021</span> <span class="mi">00</span><span class="o">:</span><span class="mi">26</span><span class="o">:</span><span class="mi">57</span> <span class="nv">GMT</span>
+<span class="p">|</span><span class="k">_</span>    <span class="nv">Content</span><span class="o">-</span><span class="nv">Length</span><span class="o">:</span> <span class="mi">0</span>
+<span class="mi">1</span> <span class="s s-Atom">service</span> <span class="s s-Atom">unrecognized</span> <span class="s s-Atom">despite</span> <span class="s s-Atom">returning</span> <span class="s s-Atom">data</span><span class="p">.</span> <span class="nv">If</span> <span class="s s-Atom">you</span> <span class="s s-Atom">know</span> <span class="s s-Atom">the</span> <span class="s s-Atom">service</span><span class="o">/</span><span class="s s-Atom">version</span><span class="p">,</span> <span class="s s-Atom">please</span> <span class="s s-Atom">submit</span> <span class="s s-Atom">the</span> <span class="s s-Atom">following</span> <span class="s s-Atom">fingerprint</span> <span class="s s-Atom">at</span> <span class="s s-Atom">https</span><span class="p">:</span><span class="o">//</span><span class="s s-Atom">nmap</span><span class="p">.</span><span class="s s-Atom">org</span><span class="o">/</span><span class="s s-Atom">cgi</span><span class="o">-</span><span class="s s-Atom">bin</span><span class="o">/</span><span class="s s-Atom">submit</span><span class="p">.</span><span class="s s-Atom">cgi</span><span class="nb">?</span><span class="s s-Atom">new</span><span class="o">-</span><span class="s s-Atom">service</span> <span class="o">:</span>
+<span class="nv">SF</span><span class="o">-</span><span class="nv">Port8065</span><span class="o">-</span><span class="nv">TCP</span><span class="o">:</span><span class="nv">V</span><span class="o">=</span><span class="mf">7.91</span><span class="c1">%I=7%D=1/10%Time=5FFA49B4%P=x86_64-pc-linux-gnu%r(Ge</span>
+<span class="nv">SF</span><span class="o">:</span><span class="s s-Atom">nericLines</span><span class="p">,</span><span class="mi">67</span><span class="p">,</span><span class="err">"</span><span class="nv">HTTP</span><span class="o">/</span><span class="mi">1</span><span class="s s-Atom">\.</span><span class="mi">1</span><span class="s s-Atom">\x20400\x20Bad\x20Request\r\nContent</span><span class="o">-</span><span class="nv">Type</span><span class="o">:</span><span class="s s-Atom">\x20t</span>
+<span class="nv">SF</span><span class="o">:</span><span class="s s-Atom">ext</span><span class="o">/</span><span class="s s-Atom">plain</span><span class="p">;</span><span class="s s-Atom">\x20charset</span><span class="o">=</span><span class="s s-Atom">utf</span><span class="o">-</span><span class="mi">8</span><span class="s s-Atom">\r\nConnection</span><span class="o">:</span><span class="s s-Atom">\x20close\r\n\r\n400\x20Bad\x</span>
+<span class="nv">SF</span><span class="o">:</span><span class="mi">20</span><span class="nv">Request</span><span class="s2">")%r(GetRequest,DF3,"</span><span class="nv">HTTP</span><span class="o">/</span><span class="mi">1</span><span class="s s-Atom">\.</span><span class="mi">0</span><span class="s s-Atom">\x20200\x20OK\r\nAccept</span><span class="o">-</span><span class="nv">Ranges</span><span class="o">:</span><span class="s s-Atom">\</span>
+<span class="nv">SF</span><span class="o">:</span><span class="s s-Atom">x20bytes\r\nCache</span><span class="o">-</span><span class="nv">Control</span><span class="o">:</span><span class="s s-Atom">\x20no</span><span class="o">-</span><span class="s s-Atom">cache</span><span class="p">,</span><span class="s s-Atom">\x20max</span><span class="o">-</span><span class="s s-Atom">age</span><span class="o">=</span><span class="mi">31556926</span><span class="p">,</span><span class="s s-Atom">\x20public\</span>
+<span class="nv">SF</span><span class="o">:</span><span class="s s-Atom">r\nContent</span><span class="o">-</span><span class="nv">Length</span><span class="o">:</span><span class="s s-Atom">\x203108\r\nContent</span><span class="o">-</span><span class="nv">Security</span><span class="o">-</span><span class="nv">Policy</span><span class="o">:</span><span class="s s-Atom">\x20frame</span><span class="o">-</span><span class="s s-Atom">ancesto</span>
+<span class="nv">SF</span><span class="o">:</span><span class="s s-Atom">rs\x20'self'</span><span class="p">;</span><span class="s s-Atom">\x20script</span><span class="o">-</span><span class="s s-Atom">src\x20'self'\x20cdn\.rudderlabs\.com\r\nConten</span>
+<span class="nv">SF</span><span class="o">:</span><span class="s s-Atom">t</span><span class="o">-</span><span class="nv">Type</span><span class="o">:</span><span class="s s-Atom">\x20text</span><span class="o">/</span><span class="s s-Atom">html</span><span class="p">;</span><span class="s s-Atom">\x20charset</span><span class="o">=</span><span class="s s-Atom">utf</span><span class="o">-</span><span class="mi">8</span><span class="s s-Atom">\r\nLast</span><span class="o">-</span><span class="nv">Modified</span><span class="o">:</span><span class="s s-Atom">\x20Sat</span><span class="p">,</span><span class="s s-Atom">\x2009\</span>
+<span class="nv">SF</span><span class="o">:</span><span class="s s-Atom">x20Jan\x202021\x2019</span><span class="o">:</span><span class="mi">00</span><span class="o">:</span><span class="mi">51</span><span class="s s-Atom">\x20GMT\r\nX</span><span class="o">-</span><span class="nv">Frame</span><span class="o">-</span><span class="nv">Options</span><span class="o">:</span><span class="s s-Atom">\x20SAMEORIGIN\r\n</span>
+<span class="nv">SF</span><span class="o">:</span><span class="nv">X</span><span class="o">-</span><span class="nv">Request</span><span class="o">-</span><span class="nv">Id</span><span class="o">:</span><span class="s s-Atom">\x20i3xa8qsmtiyoum5gfzo5bp6h8c\r\nX</span><span class="o">-</span><span class="nv">Version</span><span class="o">-</span><span class="nv">Id</span><span class="o">:</span><span class="s s-Atom">\x205\.</span><span class="mi">30</span><span class="s s-Atom">\.</span>
+<span class="nv">SF</span><span class="o">:</span><span class="mi">0</span><span class="s s-Atom">\.</span><span class="mi">5</span><span class="s s-Atom">\.</span><span class="mi">30</span><span class="s s-Atom">\.</span><span class="mi">1</span><span class="s s-Atom">\.</span><span class="mi">57</span><span class="s s-Atom">fb31b889bf81d99d8af8176d4bbaaa\.false\r\nDate</span><span class="o">:</span><span class="s s-Atom">\x20Sun</span><span class="p">,</span><span class="s s-Atom">\x</span>
+<span class="nv">SF</span><span class="o">:</span><span class="mi">2010</span><span class="s s-Atom">\x20Jan\x202021\x2000</span><span class="o">:</span><span class="mi">26</span><span class="o">:</span><span class="mi">57</span><span class="s s-Atom">\x20GMT\r\n\r\n&lt;</span><span class="p">!</span><span class="s s-Atom">doctype\x20html&gt;&lt;html\x</span>
+<span class="nv">SF</span><span class="o">:</span><span class="mi">20</span><span class="s s-Atom">lang=\</span><span class="err">"</span><span class="s s-Atom">en\</span><span class="err">"</span><span class="s s-Atom">&gt;&lt;head&gt;&lt;meta\x20charset=\</span><span class="err">"</span><span class="s s-Atom">utf</span><span class="o">-</span><span class="mi">8</span><span class="s s-Atom">\</span><span class="err">"</span><span class="s s-Atom">&gt;&lt;meta\x20name=\</span><span class="err">"</span><span class="s s-Atom">viewport</span>
+<span class="nv">SF</span><span class="o">:</span><span class="s s-Atom">\</span><span class="err">"</span><span class="s s-Atom">\x20content=\</span><span class="err">"</span><span class="s s-Atom">width</span><span class="o">=</span><span class="s s-Atom">device</span><span class="o">-</span><span class="s s-Atom">width</span><span class="p">,</span><span class="s s-Atom">initial</span><span class="o">-</span><span class="s s-Atom">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="s s-Atom">maximum</span><span class="o">-</span><span class="s s-Atom">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="nb">user</span>
+<span class="nv">SF</span><span class="o">:-</span><span class="s s-Atom">scalable</span><span class="o">=</span><span class="mi">0</span><span class="s s-Atom">\</span><span class="err">"</span><span class="s s-Atom">&gt;&lt;meta\x20name=\</span><span class="err">"</span><span class="s s-Atom">robots\</span><span class="err">"</span><span class="s s-Atom">\x20content=\</span><span class="err">"</span><span class="s s-Atom">noindex</span><span class="p">,</span><span class="s s-Atom">\x20nofollo</span>
+<span class="nv">SF</span><span class="o">:</span><span class="s s-Atom">w\</span><span class="err">"</span><span class="s s-Atom">&gt;&lt;meta\x20name=\</span><span class="err">"</span><span class="s s-Atom">referrer\</span><span class="err">"</span><span class="s s-Atom">\x20content=\</span><span class="err">"</span><span class="s s-Atom">no</span><span class="o">-</span><span class="s s-Atom">referrer\</span><span class="err">"</span><span class="s s-Atom">&gt;&lt;title</span><span class="o">&gt;</span><span class="nv">Matter</span>
+<span class="nv">SF</span><span class="o">:</span><span class="s s-Atom">most&lt;/title&gt;&lt;meta\x20name=\</span><span class="err">"</span><span class="s s-Atom">mobile</span><span class="o">-</span><span class="s s-Atom">web</span><span class="o">-</span><span class="s s-Atom">app</span><span class="o">-</span><span class="s s-Atom">capable\</span><span class="err">"</span><span class="s s-Atom">\x20content=\</span><span class="err">"</span><span class="s s-Atom">yes\</span><span class="err">"</span>
+<span class="nv">SF</span><span class="o">:</span><span class="s s-Atom">&gt;&lt;meta\x20name=\</span><span class="err">"</span><span class="s s-Atom">application</span><span class="o">-</span><span class="s s-Atom">name\</span><span class="err">"</span><span class="s s-Atom">\x20content=\</span><span class="err">"</span><span class="nv">Mattermost</span><span class="s s-Atom">\</span><span class="err">"</span><span class="s s-Atom">&gt;&lt;meta\x20</span>
+<span class="nv">SF</span><span class="o">:</span><span class="s s-Atom">name=\</span><span class="err">"</span><span class="s s-Atom">format</span><span class="o">-</span><span class="s s-Atom">detection\</span><span class="err">"</span><span class="s s-Atom">\x20content=\</span><span class="err">"</span><span class="s s-Atom">telephone</span><span class="o">=</span><span class="s s-Atom">no\</span><span class="err">"</span><span class="s s-Atom">&gt;&lt;link\x20re</span><span class="s2">")%r(H</span>
+<span class="s2">SF:TTPOptions,5B,"</span><span class="nv">HTTP</span><span class="o">/</span><span class="mi">1</span><span class="s s-Atom">\.</span><span class="mi">0</span><span class="s s-Atom">\x20405\x20Method\x20Not\x20Allowed\r\nDate</span><span class="o">:</span><span class="s s-Atom">\x2</span>
+<span class="nv">SF</span><span class="o">:</span><span class="mi">0</span><span class="nv">Sun</span><span class="p">,</span><span class="s s-Atom">\x2010\x20Jan\x202021\x2000</span><span class="o">:</span><span class="mi">26</span><span class="o">:</span><span class="mi">57</span><span class="s s-Atom">\x20GMT\r\nContent</span><span class="o">-</span><span class="nv">Length</span><span class="o">:</span><span class="s s-Atom">\x200\r</span>
+<span class="nv">SF</span><span class="o">:</span><span class="s s-Atom">\n\r\n</span><span class="s2">")%r(RTSPRequest,67,"</span><span class="nv">HTTP</span><span class="o">/</span><span class="mi">1</span><span class="s s-Atom">\.</span><span class="mi">1</span><span class="s s-Atom">\x20400\x20Bad\x20Request\r\nConten</span>
+<span class="nv">SF</span><span class="o">:</span><span class="s s-Atom">t</span><span class="o">-</span><span class="nv">Type</span><span class="o">:</span><span class="s s-Atom">\x20text</span><span class="o">/</span><span class="s s-Atom">plain</span><span class="p">;</span><span class="s s-Atom">\x20charset</span><span class="o">=</span><span class="s s-Atom">utf</span><span class="o">-</span><span class="mi">8</span><span class="s s-Atom">\r\nConnection</span><span class="o">:</span><span class="s s-Atom">\x20close\r\n\r\n</span>
+<span class="nv">SF</span><span class="o">:</span><span class="mi">400</span><span class="s s-Atom">\x20Bad\x20Request</span><span class="s2">")%r(Help,67,"</span><span class="nv">HTTP</span><span class="o">/</span><span class="mi">1</span><span class="s s-Atom">\.</span><span class="mi">1</span><span class="s s-Atom">\x20400\x20Bad\x20Request\r</span>
+<span class="nv">SF</span><span class="o">:</span><span class="s s-Atom">\nContent</span><span class="o">-</span><span class="nv">Type</span><span class="o">:</span><span class="s s-Atom">\x20text</span><span class="o">/</span><span class="s s-Atom">plain</span><span class="p">;</span><span class="s s-Atom">\x20charset</span><span class="o">=</span><span class="s s-Atom">utf</span><span class="o">-</span><span class="mi">8</span><span class="s s-Atom">\r\nConnection</span><span class="o">:</span><span class="s s-Atom">\x20close</span>
+<span class="nv">SF</span><span class="o">:</span><span class="s s-Atom">\r\n\r\n400\x20Bad\x20Request</span><span class="s2">")%r(SSLSessionReq,67,"</span><span class="nv">HTTP</span><span class="o">/</span><span class="mi">1</span><span class="s s-Atom">\.</span><span class="mi">1</span><span class="s s-Atom">\x20400\x2</span>
+<span class="nv">SF</span><span class="o">:</span><span class="mi">0</span><span class="nv">Bad</span><span class="s s-Atom">\x20Request\r\nContent</span><span class="o">-</span><span class="nv">Type</span><span class="o">:</span><span class="s s-Atom">\x20text</span><span class="o">/</span><span class="s s-Atom">plain</span><span class="p">;</span><span class="s s-Atom">\x20charset</span><span class="o">=</span><span class="s s-Atom">utf</span><span class="o">-</span><span class="mi">8</span><span class="s s-Atom">\r\nCon</span>
+<span class="nv">SF</span><span class="o">:</span><span class="s s-Atom">nection</span><span class="p">:</span><span class="s s-Atom">\x20close\r\n\r\n400\x20Bad\x20Request</span><span class="s2">")%r(TerminalServerCookie</span>
+<span class="s2">SF:,67,"</span><span class="nv">HTTP</span><span class="o">/</span><span class="mi">1</span><span class="s s-Atom">\.</span><span class="mi">1</span><span class="s s-Atom">\x20400\x20Bad\x20Request\r\nContent</span><span class="o">-</span><span class="nv">Type</span><span class="o">:</span><span class="s s-Atom">\x20text</span><span class="o">/</span><span class="s s-Atom">plain</span><span class="p">;</span>
+<span class="nv">SF</span><span class="o">:</span><span class="s s-Atom">\x20charset</span><span class="o">=</span><span class="s s-Atom">utf</span><span class="o">-</span><span class="mi">8</span><span class="s s-Atom">\r\nConnection</span><span class="o">:</span><span class="s s-Atom">\x20close\r\n\r\n400\x20Bad\x20Request</span><span class="err">"</span>
+<span class="nv">SF</span><span class="o">:</span><span class="p">);</span>
+<span class="nv">Service</span> <span class="nv">Info</span><span class="o">:</span> <span class="nv">OS</span><span class="o">:</span> <span class="nv">Linux</span><span class="p">;</span> <span class="nv">CPE</span><span class="o">:</span> <span class="s s-Atom">cpe</span><span class="p">:</span><span class="o">/</span><span class="s s-Atom">o</span><span class="p">:</span><span class="s s-Atom">linux</span><span class="p">:</span><span class="s s-Atom">linux_kernel</span>
 
-Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
-Nmap done: 1 IP address (1 host up) scanned in 92.86 seconds
+<span class="nv">Service</span> <span class="s s-Atom">detection</span> <span class="s s-Atom">performed</span><span class="p">.</span> <span class="nv">Please</span> <span class="s s-Atom">report</span> <span class="s s-Atom">any</span> <span class="s s-Atom">incorrect</span> <span class="s s-Atom">results</span> <span class="s s-Atom">at</span> <span class="s s-Atom">https</span><span class="p">:</span><span class="o">//</span><span class="s s-Atom">nmap</span><span class="p">.</span><span class="s s-Atom">org</span><span class="o">/</span><span class="s s-Atom">submit</span><span class="o">/</span> <span class="p">.</span>
+<span class="nv">Nmap</span> <span class="s s-Atom">done</span><span class="p">:</span> <span class="mi">1</span> <span class="nv">IP</span> <span class="nf">address</span> <span class="p">(</span><span class="mi">1</span> <span class="s s-Atom">host</span> <span class="s s-Atom">up</span><span class="p">)</span> <span class="s s-Atom">scanned</span> <span class="s s-Atom">in</span> <span class="mf">92.86</span> <span class="s s-Atom">seconds</span>
 </code></pre>
+</div>
 <p>
  The first thing that I looked at was the weird web service running on port
  <code>
@@ -304,22 +307,24 @@ Nmap done: 1 IP address (1 host up) scanned in 92.86 seconds
  </code>
  .
 </p>
-<pre class="codehilite"><code>...
-"SqlSettings": {
-        "DriverName": "mysql",
-        "DataSource": "mmuser:Crack_The_MM_Admin_PW@tcp(127.0.0.1:3306)/mattermost?charset=utf8mb4,utf8\u0026readTimeout=30s\u0026writeTimeout=30s",
-        "DataSourceReplicas": [],
-        "DataSourceSearchReplicas": [],
-        "MaxIdleConns": 20,
-        "ConnMaxLifetimeMilliseconds": 3600000,
-        "MaxOpenConns": 300,
-        "Trace": false,
-        "AtRestEncryptKey": "n5uax3d4f919obtsp1pw1k5xetq1enez",
-        "QueryTimeout": 30,
-        "DisableDatabaseSearch": false
-    },
-...
+<div class="codehilite">
+ <pre><span></span><code><span class="p">...</span><span class="w"></span>
+<span class="ss">"SqlSettings"</span><span class="err">:</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+<span class="w">        </span><span class="ss">"DriverName"</span><span class="err">:</span><span class="w"> </span><span class="ss">"mysql"</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="ss">"DataSource"</span><span class="err">:</span><span class="w"> </span><span class="ss">"mmuser:Crack_The_MM_Admin_PW@tcp(127.0.0.1:3306)/mattermost?charset=utf8mb4,utf8\u0026readTimeout=30s\u0026writeTimeout=30s"</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="ss">"DataSourceReplicas"</span><span class="err">:</span><span class="w"> </span><span class="err">[]</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="ss">"DataSourceSearchReplicas"</span><span class="err">:</span><span class="w"> </span><span class="err">[]</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="ss">"MaxIdleConns"</span><span class="err">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="ss">"ConnMaxLifetimeMilliseconds"</span><span class="err">:</span><span class="w"> </span><span class="mi">3600000</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="ss">"MaxOpenConns"</span><span class="err">:</span><span class="w"> </span><span class="mi">300</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="ss">"Trace"</span><span class="err">:</span><span class="w"> </span><span class="k">false</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="ss">"AtRestEncryptKey"</span><span class="err">:</span><span class="w"> </span><span class="ss">"n5uax3d4f919obtsp1pw1k5xetq1enez"</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="ss">"QueryTimeout"</span><span class="err">:</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="ss">"DisableDatabaseSearch"</span><span class="err">:</span><span class="w"> </span><span class="k">false</span><span class="w"></span>
+<span class="w">    </span><span class="err">}</span><span class="p">,</span><span class="w"></span>
+<span class="p">...</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  <em>
   Noooice
@@ -340,39 +345,43 @@ Nmap done: 1 IP address (1 host up) scanned in 92.86 seconds
  </code>
  user on the box. So I connected to the MySQL server and viewed the usernames and passwords of users on the MatterMost website.
 </p>
-<pre class="codehilite"><code>select Username, Password from Users;
-+----------------------------------+--------------------------------------------------------------+
-| Username                         | Password                                                     |
-+----------------------------------+--------------------------------------------------------------+
-| evil                             | $2a$10$L6RAS6nM4l7sBw5ojUC9JO4a06t8cgJf18Nt2//S2gAWxMHaXSAUK |
-| steve                            | $2a$10$x6wsUxMMQqO2.vlKNpmRT.PmsKT/aZxzLc/EuLZ9fz3EkRzWmzFpO |
-| test                             | $2a$10$HDaT0XJjkuUc8aNgYnXh.eEySNf9AgZaYBdXN.XhW3x2JL1jVVksu |
-| surveybot                        |                                                              |
-| c3ecacacc7b94f909d04dbfd308a9b93 | $2a$10$u5815SIBe2Fq1FZlv9S8I.VjU3zeSPBrIEg9wvpiLaS7ImuiItEiK |
-| 5b785171bfb34762a933e127630c4860 | $2a$10$3m0quqyvCE8Z/R1gFcCOWO6tEj6FtqtBn8fRAXQXmaKmg.HDGpS/G |
-| jeffbesos69                      | $2a$10$Oq0IPDIyQ29O86mlB8SxyOBwq8o2e7OymwDct1ARMls/hvArCADe6 |
-| cmacdou                          | $2a$10$ti1zSbdvYHS.CBwKfmuz7u608Dj.AWnJcAW54bZpoEzK1QTn1tCly |
-| steve2                           | $2a$10$KNN/HT.R0B4XKb2rJSWki.FEKUrsvC8ijiwXh8OaYKiBWPabMsSmu |
-| hotdog                           | $2a$10$JAIeLCVpdq.YbR0B0CKKMem.llk9Zuc6vbE.NoHs5N8q2VhdqiL6O |
-| zephra                           | $2a$10$mbxua4y8ZG8tXmDdnUz66OgeGUOuq7ePiLVMlQ0u2.9C6XOWnrwBi |
-| root                             | $2a$10$VM6EeymRxJ29r8Wjkr8Dtev0O.1STWb4.4ScG.anuu7v0EFJwgjjO |
-| ff0a21fc6fc2488195e16ea854c963ee | $2a$10$RnJsISTLc9W3iUcUggl1KOG9vqADED24CQcQ8zvUm1Ir9pxS.Pduq |
-| channelexport                    |                                                              |
-| fart                             | $2a$10$.6t4Aa69z.iX87C/S4KZfu0FW/BD77wuRsoR7UFF3IEllwInoIn6W |
-| tesadtfws                        | $2a$10$TGCmS4n60Bbrrhp9kgyWTe6csbmpgXCsD9UoViGBWq/mvXgtYqshi |
-| 9ecfb4be145d47fda0724f697f35ffaf | $2a$10$s.cLPSjAVgawGOJwB7vrqenPg2lrDtOECRtjwWahOzHfq1CoFyFqm |
-| ghostccamm                       | $2a$10$hu7NxIL3KQeCLPn9antr1.A3yq2zPbIeFVAZeFQzxFisANy5TmB3m |
-| jeffbesos1                       | $2a$10$LpB9bHXeVfSPprUvcRcCyOq.OyhFndji8pEMe7StfLhq5ceilpGFy |
-| evilevil                         | $2a$10$HAVheB5EF9lVYb6Z1U0b/.yByqdLApHYhNHqdTIz73h5ukjc1J58a |
-| jeffbesos                        | $2a$10$gpPhdyR1VNtf8nISnZydL.fxnUhdfbu9MKcz1YN1I2Vw88G8nFBm6 |
-+----------------------------------+--------------------------------------------------------------+
-21 rows in set (0.001 sec)
+<div class="codehilite">
+ <pre><span></span><code><span class="n">select</span><span class="w"> </span><span class="n">Username</span><span class="p">,</span><span class="w"> </span><span class="n">Password</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="n">Users</span><span class="p">;</span><span class="w"></span>
+<span class="o">+----------------------------------+--------------------------------------------------------------+</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="n">Username</span><span class="w">                         </span><span class="o">|</span><span class="w"> </span><span class="n">Password</span><span class="w">                                                     </span><span class="o">|</span><span class="w"></span>
+<span class="o">+----------------------------------+--------------------------------------------------------------+</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="n">evil</span><span class="w">                             </span><span class="o">|</span><span class="w"> </span><span class="o">$</span><span class="mi">2</span><span class="n">a</span><span class="o">$</span><span class="mi">10</span><span class="o">$</span><span class="n">L6RAS6nM4l7sBw5ojUC9JO4a06t8cgJf18Nt2</span><span class="o">//</span><span class="n">S2gAWxMHaXSAUK</span><span class="w"> </span><span class="o">|</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="n">steve</span><span class="w">                            </span><span class="o">|</span><span class="w"> </span><span class="o">$</span><span class="mi">2</span><span class="n">a</span><span class="o">$</span><span class="mi">10</span><span class="o">$</span><span class="n">x6wsUxMMQqO2</span><span class="o">.</span><span class="n">vlKNpmRT</span><span class="o">.</span><span class="n">PmsKT</span><span class="o">/</span><span class="n">aZxzLc</span><span class="o">/</span><span class="n">EuLZ9fz3EkRzWmzFpO</span><span class="w"> </span><span class="o">|</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="n">test</span><span class="w">                             </span><span class="o">|</span><span class="w"> </span><span class="o">$</span><span class="mi">2</span><span class="n">a</span><span class="o">$</span><span class="mi">10</span><span class="o">$</span><span class="n">HDaT0XJjkuUc8aNgYnXh</span><span class="o">.</span><span class="n">eEySNf9AgZaYBdXN</span><span class="o">.</span><span class="n">XhW3x2JL1jVVksu</span><span class="w"> </span><span class="o">|</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="n">surveybot</span><span class="w">                        </span><span class="o">|</span><span class="w">                                                              </span><span class="o">|</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="n">c3ecacacc7b94f909d04dbfd308a9b93</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="o">$</span><span class="mi">2</span><span class="n">a</span><span class="o">$</span><span class="mi">10</span><span class="o">$</span><span class="n">u5815SIBe2Fq1FZlv9S8I</span><span class="o">.</span><span class="n">VjU3zeSPBrIEg9wvpiLaS7ImuiItEiK</span><span class="w"> </span><span class="o">|</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="mi">5</span><span class="n">b785171bfb34762a933e127630c4860</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="o">$</span><span class="mi">2</span><span class="n">a</span><span class="o">$</span><span class="mi">10</span><span class="o">$</span><span class="mi">3</span><span class="n">m0quqyvCE8Z</span><span class="o">/</span><span class="n">R1gFcCOWO6tEj6FtqtBn8fRAXQXmaKmg</span><span class="o">.</span><span class="n">HDGpS</span><span class="o">/</span><span class="n">G</span><span class="w"> </span><span class="o">|</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="n">jeffbesos69</span><span class="w">                      </span><span class="o">|</span><span class="w"> </span><span class="o">$</span><span class="mi">2</span><span class="n">a</span><span class="o">$</span><span class="mi">10</span><span class="o">$</span><span class="n">Oq0IPDIyQ29O86mlB8SxyOBwq8o2e7OymwDct1ARMls</span><span class="o">/</span><span class="n">hvArCADe6</span><span class="w"> </span><span class="o">|</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="n">cmacdou</span><span class="w">                          </span><span class="o">|</span><span class="w"> </span><span class="o">$</span><span class="mi">2</span><span class="n">a</span><span class="o">$</span><span class="mi">10</span><span class="o">$</span><span class="n">ti1zSbdvYHS</span><span class="o">.</span><span class="n">CBwKfmuz7u608Dj</span><span class="o">.</span><span class="n">AWnJcAW54bZpoEzK1QTn1tCly</span><span class="w"> </span><span class="o">|</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="n">steve2</span><span class="w">                           </span><span class="o">|</span><span class="w"> </span><span class="o">$</span><span class="mi">2</span><span class="n">a</span><span class="o">$</span><span class="mi">10</span><span class="o">$</span><span class="n">KNN</span><span class="o">/</span><span class="n">HT</span><span class="o">.</span><span class="n">R0B4XKb2rJSWki</span><span class="o">.</span><span class="n">FEKUrsvC8ijiwXh8OaYKiBWPabMsSmu</span><span class="w"> </span><span class="o">|</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="n">hotdog</span><span class="w">                           </span><span class="o">|</span><span class="w"> </span><span class="o">$</span><span class="mi">2</span><span class="n">a</span><span class="o">$</span><span class="mi">10</span><span class="o">$</span><span class="n">JAIeLCVpdq</span><span class="o">.</span><span class="n">YbR0B0CKKMem</span><span class="o">.</span><span class="n">llk9Zuc6vbE</span><span class="o">.</span><span class="n">NoHs5N8q2VhdqiL6O</span><span class="w"> </span><span class="o">|</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="n">zephra</span><span class="w">                           </span><span class="o">|</span><span class="w"> </span><span class="o">$</span><span class="mi">2</span><span class="n">a</span><span class="o">$</span><span class="mi">10</span><span class="o">$</span><span class="n">mbxua4y8ZG8tXmDdnUz66OgeGUOuq7ePiLVMlQ0u2</span><span class="o">.</span><span class="mi">9</span><span class="n">C6XOWnrwBi</span><span class="w"> </span><span class="o">|</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="n">root</span><span class="w">                             </span><span class="o">|</span><span class="w"> </span><span class="o">$</span><span class="mi">2</span><span class="n">a</span><span class="o">$</span><span class="mi">10</span><span class="o">$</span><span class="n">VM6EeymRxJ29r8Wjkr8Dtev0O</span><span class="o">.</span><span class="mi">1</span><span class="n">STWb4</span><span class="o">.</span><span class="mi">4</span><span class="n">ScG</span><span class="o">.</span><span class="n">anuu7v0EFJwgjjO</span><span class="w"> </span><span class="o">|</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="n">ff0a21fc6fc2488195e16ea854c963ee</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="o">$</span><span class="mi">2</span><span class="n">a</span><span class="o">$</span><span class="mi">10</span><span class="o">$</span><span class="n">RnJsISTLc9W3iUcUggl1KOG9vqADED24CQcQ8zvUm1Ir9pxS</span><span class="o">.</span><span class="n">Pduq</span><span class="w"> </span><span class="o">|</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="n">channelexport</span><span class="w">                    </span><span class="o">|</span><span class="w">                                                              </span><span class="o">|</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="n">fart</span><span class="w">                             </span><span class="o">|</span><span class="w"> </span><span class="o">$</span><span class="mi">2</span><span class="n">a</span><span class="o">$</span><span class="mi">10</span><span class="o">$.</span><span class="mi">6</span><span class="n">t4Aa69z</span><span class="o">.</span><span class="n">iX87C</span><span class="o">/</span><span class="n">S4KZfu0FW</span><span class="o">/</span><span class="n">BD77wuRsoR7UFF3IEllwInoIn6W</span><span class="w"> </span><span class="o">|</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="n">tesadtfws</span><span class="w">                        </span><span class="o">|</span><span class="w"> </span><span class="o">$</span><span class="mi">2</span><span class="n">a</span><span class="o">$</span><span class="mi">10</span><span class="o">$</span><span class="n">TGCmS4n60Bbrrhp9kgyWTe6csbmpgXCsD9UoViGBWq</span><span class="o">/</span><span class="n">mvXgtYqshi</span><span class="w"> </span><span class="o">|</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="mi">9</span><span class="n">ecfb4be145d47fda0724f697f35ffaf</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="o">$</span><span class="mi">2</span><span class="n">a</span><span class="o">$</span><span class="mi">10</span><span class="o">$</span><span class="n">s</span><span class="o">.</span><span class="n">cLPSjAVgawGOJwB7vrqenPg2lrDtOECRtjwWahOzHfq1CoFyFqm</span><span class="w"> </span><span class="o">|</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="n">ghostccamm</span><span class="w">                       </span><span class="o">|</span><span class="w"> </span><span class="o">$</span><span class="mi">2</span><span class="n">a</span><span class="o">$</span><span class="mi">10</span><span class="o">$</span><span class="n">hu7NxIL3KQeCLPn9antr1</span><span class="o">.</span><span class="n">A3yq2zPbIeFVAZeFQzxFisANy5TmB3m</span><span class="w"> </span><span class="o">|</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="n">jeffbesos1</span><span class="w">                       </span><span class="o">|</span><span class="w"> </span><span class="o">$</span><span class="mi">2</span><span class="n">a</span><span class="o">$</span><span class="mi">10</span><span class="o">$</span><span class="n">LpB9bHXeVfSPprUvcRcCyOq</span><span class="o">.</span><span class="n">OyhFndji8pEMe7StfLhq5ceilpGFy</span><span class="w"> </span><span class="o">|</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="n">evilevil</span><span class="w">                         </span><span class="o">|</span><span class="w"> </span><span class="o">$</span><span class="mi">2</span><span class="n">a</span><span class="o">$</span><span class="mi">10</span><span class="o">$</span><span class="n">HAVheB5EF9lVYb6Z1U0b</span><span class="o">/.</span><span class="n">yByqdLApHYhNHqdTIz73h5ukjc1J58a</span><span class="w"> </span><span class="o">|</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="n">jeffbesos</span><span class="w">                        </span><span class="o">|</span><span class="w"> </span><span class="o">$</span><span class="mi">2</span><span class="n">a</span><span class="o">$</span><span class="mi">10</span><span class="o">$</span><span class="n">gpPhdyR1VNtf8nISnZydL</span><span class="o">.</span><span class="n">fxnUhdfbu9MKcz1YN1I2Vw88G8nFBm6</span><span class="w"> </span><span class="o">|</span><span class="w"></span>
+<span class="o">+----------------------------------+--------------------------------------------------------------+</span><span class="w"></span>
+<span class="mi">21</span><span class="w"> </span><span class="n">rows</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">set</span><span class="w"> </span><span class="p">(</span><span class="mf">0.001</span><span class="w"> </span><span class="n">sec</span><span class="p">)</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  There we go! I now got the Bcrypt hash for the root user!
 </p>
-<pre class="codehilite"><code>root:$2a$10$VM6EeymRxJ29r8Wjkr8Dtev0O.1STWb4.4ScG.anuu7v0EFJwgjjO
+<div class="codehilite">
+ <pre><span></span><code>root:$2a$10$VM6EeymRxJ29r8Wjkr8Dtev0O.1STWb4.4ScG.anuu7v0EFJwgjjO
 </code></pre>
+</div>
 <p>
  I then fired up
  <code>
@@ -396,8 +405,10 @@ Nmap done: 1 IP address (1 host up) scanned in 92.86 seconds
  </code>
  user on the MatterMost site said that the passwords were just variations of it. The command I used is shown below.
 </p>
-<pre class="codehilite"><code>.\hashcat.exe -m 3200 -a 0 .\hashes\hackthebox\delivery\root.hash
+<div class="codehilite">
+ <pre><span></span><code>.\hashcat.exe -m 3200 -a 0 .\hashes\hackthebox\delivery\root.hash
 </code></pre>
+</div>
 <p>
  After about 30 seconds I had the root password of
  <code>
@@ -423,7 +434,7 @@ Nmap done: 1 IP address (1 host up) scanned in 92.86 seconds
 </div>
 </div>
 </section>
-<section class="wrapper style3 alt">
+<section class="wrapper style5 alt">
 <div class="inner">
 <div class="content">
 

