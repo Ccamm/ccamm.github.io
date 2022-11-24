@@ -44,10 +44,10 @@
 		    </section>
 
       <section id="wrapper">
-<section class="wrapper style6 ">
+<section class="wrapper style5 ">
 <div class="inner">
 <div class="content">
-<h1 class="major">
+<h1 class="major" id="overview">
  Overview
 </h1>
 <p>
@@ -151,13 +151,79 @@
 </div>
 </div>
 </section>
-<section class="wrapper style1 alt">
+<section class="wrapper style2 alt">
 <div class="inner">
 <div class="content">
 
-<h2 class="major">
+<h1 class="major" id="table-of-contents">
+ Table of Contents
+</h1>
+<div class="toc">
+ <ul>
+  <li>
+   <a href="#overview">
+    Overview
+   </a>
+  </li>
+  <li>
+   <a href="#table-of-contents">
+    Table of Contents
+   </a>
+  </li>
+  <li>
+   <a href="#introduction">
+    Introduction
+   </a>
+  </li>
+  <li>
+   <a href="#writeup-for-xark">
+    Writeup for xark
+   </a>
+  </li>
+  <li>
+   <a href="#how-does-the-vulnerability-work">
+    How does the vulnerability work?
+   </a>
+   <ul>
+    <li>
+     <a href="#how-sqli-using-a-different-column-works">
+      How SQLi Using a Different Column Works
+     </a>
+    </li>
+    <li>
+     <a href="#sqli-using-index-value">
+      SQLi Using Index Value
+     </a>
+    </li>
+   </ul>
+  </li>
+  <li>
+   <a href="#binding-parameters-does-not-prevent-the-sqli">
+    Binding Parameters Does Not Prevent the SQLi
+   </a>
+  </li>
+  <li>
+   <a href="#recommendations">
+    Recommendations
+   </a>
+  </li>
+  <li>
+   <a href="#acknowledgements">
+    Acknowledgements
+   </a>
+  </li>
+ </ul>
+</div>
+</div>
+</div>
+</section>
+<section class="wrapper style4 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="introduction">
  Introduction
-</h2>
+</h1>
 <p>
  <em>
   Before I begin, I do apologise for any grammar mistakes. I had COVID at the time of writing this article and I will fix it up later.
@@ -230,6 +296,7 @@
    The vulnerability was first disclosed in February 2016
   </a>
  </em>
+ <br/>
  <img alt="" class="center" src="/images/blog/knex_sqli/the-first-issue.png"/>
 </p>
 <p>
@@ -241,11 +308,11 @@
 </div>
 </div>
 </section>
-<section class="wrapper style4 ">
+<section class="wrapper style1 alt">
 <div class="inner">
 <div class="content">
 
-<h1 class="major">
+<h1 class="major" id="writeup-for-xark">
  Writeup for
  <a href="https://squarectf.com/2022/xark.html">
   xark
@@ -437,11 +504,11 @@
 </div>
 </div>
 </section>
-<section class="wrapper style3 alt">
+<section class="wrapper style3 ">
 <div class="inner">
 <div class="content">
 
-<h1 class="major">
+<h1 class="major" id="how-does-the-vulnerability-work">
  How does the vulnerability work?
 </h1>
 <p>
@@ -481,7 +548,7 @@ mysql -u root -ppass -e <span class="s2">"SET global log_output = 'FILE'; SET gl
  </code>
  .
 </p>
-<h2 class="major">
+<h2 class="major" id="how-sqli-using-a-different-column-works">
  How SQLi Using a Different Column Works
 </h2>
 <p>
@@ -529,7 +596,7 @@ mysql -u root -ppass -e <span class="s2">"SET global log_output = 'FILE'; SET gl
  <pre><span></span><code><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="o">`</span><span class="n">crushes</span><span class="o">`</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="o">`</span><span class="n">message</span><span class="o">`</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'This is the flag!'</span><span class="w"> </span><span class="k">limit</span><span class="w"> </span><span class="mi">50</span><span class="w"></span>
 </code></pre>
 </div>
-<h2 class="major">
+<h2 class="major" id="sqli-using-index-value">
  SQLi Using Index Value
 </h2>
 <p>
@@ -600,12 +667,12 @@ mysql -u root -ppass -e <span class="s2">"SET global log_output = 'FILE'; SET gl
 </div>
 </div>
 </section>
-<section class="wrapper style2 ">
+<section class="wrapper style6 alt">
 <div class="inner">
 <div class="content">
 
-<h1 class="major">
- But Wait, It Gets Worst
+<h1 class="major" id="binding-parameters-does-not-prevent-the-sqli">
+ Binding Parameters Does Not Prevent the SQLi
 </h1>
 <p>
  Alok's
@@ -810,11 +877,11 @@ mysql -u root -ppass -e <span class="s2">"SET global log_output = 'FILE'; SET gl
 </div>
 </div>
 </section>
-<section class="wrapper style5 alt">
+<section class="wrapper style1 ">
 <div class="inner">
 <div class="content">
 
-<h1 class="major">
+<h1 class="major" id="recommendations">
  Recommendations
 </h1>
 <p>
@@ -925,11 +992,11 @@ mysql -u root -ppass -e <span class="s2">"SET global log_output = 'FILE'; SET gl
 </div>
 </div>
 </section>
-<section class="wrapper style6 ">
+<section class="wrapper style5 alt">
 <div class="inner">
 <div class="content">
 
-<h1 class="major">
+<h1 class="major" id="acknowledgements">
  Acknowledgements
 </h1>
 <p>

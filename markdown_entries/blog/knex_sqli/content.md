@@ -30,7 +30,13 @@ Otherwise, if the column is set as an index the following SQLi payload returns r
 
 ---
 
-## Introduction
+# Table of Contents
+
+[TOC]
+
+---
+
+# Introduction
 
 *Before I begin, I do apologise for any grammar mistakes. I had COVID at the time of writing this article and I will fix it up later.*
 
@@ -258,7 +264,7 @@ It appears that Knex.js does *some filtering* on the user input. So payloads suc
 
 ---
 
-# But Wait, It Gets Worst
+# Binding Parameters Does Not Prevent the SQLi
 
 Alok's `xark` challenge and the [original Github](https://github.com/knex/knex/issues/1227) issue all use the [object syntax for calling `where`](https://knexjs.org/guide/query-builder.html#where). There other methods for calling `where` that weren't tested ([screenshot of the API documentation from Knex.js](https://knexjs.org/guide/query-builder.html#where)).
 
