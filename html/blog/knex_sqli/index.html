@@ -1,0 +1,979 @@
+<html>
+	<head>
+		<title>GhostCcamm's Cyber Misadventures</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="/assets/css/main.css" />
+		<link rel="stylesheet" href="/assets/css/styles.css" />
+		<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Page Wrapper -->
+			<div id="page-wrapper">
+
+			<!-- Header -->
+				<header id="header" class="alt">
+					<h1><a href="index.html">GhostCcamm's Cyber Misadventures</a></h1>
+					<nav>
+						<a href="#menu">Menu</a>
+					</nav>
+				</header>
+
+			<!-- Menu -->
+				<nav id="menu">
+					<div class="inner">
+						<h2>Menu</h2>
+						<ul class="links">
+							<li><a href="/">Home</a></li>
+							<li><a href="/blog">Blog</a></li>
+							<li><a href="/writeups">Write Ups</a></li>
+						</ul>
+						<a href="#" class="close">Close</a>
+					</div>
+				</nav>
+
+			<!-- Banner -->
+		    <section id="banner">
+		      <div class="inner">
+		        <div class="logo"><div class="image"><img src="/images/logo.png" alt="" width="75" height="75" /></div></div>
+		        <h2>6 Year Old SQL Injection Vulnerability in Knex.js</h2>
+						<p class="date">2022-11-24</p>
+		        <p>JavaScript Dynamic Typing Sucks.</p>
+		      </div>
+		    </section>
+
+      <section id="wrapper">
+<section class="wrapper style6 ">
+<div class="inner">
+<div class="content">
+<h1 class="major">
+ Overview
+</h1>
+<p>
+ <a href="https://github.com/knex/knex">
+  Knex.js
+ </a>
+ has a
+ <strong>
+  SQL injection vulnerability
+ </strong>
+ that can be exploited to inject a column name in the
+ <code>
+  WHERE
+ </code>
+ statement of a SQL query. The only prerequisite is that the backend database management system is MySQL. The vulnerability was brought to my attention by
+ <a href="https://www.quaxio.com/">
+  Alok Menghrajani's
+ </a>
+ CTF challenge called
+ <a href="https://squarectf.com/2022/xark.html">
+  <code>
+   xark
+  </code>
+ </a>
+ during
+ <a href="https://squarectf.com/2022/">
+  SquareCTF 2022
+ </a>
+ , that showcased the SQLi vulnerability that was first reported
+ <a href="https://github.com/knex/knex/issues/1227">
+  <strong>
+   6+ years ago
+  </strong>
+ </a>
+ . In Alok's CTF challenge, the latest version of Knex.js was used (version 2.3.0 at the time of writing this article) and the vulnerable code snippet is shown below.
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="nx">app</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">'/data'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">to</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">crushes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">knex</span><span class="p">(</span><span class="s1">'crushes'</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">select</span><span class="p">()</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">where</span><span class="p">({</span><span class="w"></span>
+<span class="w">                </span><span class="nx">to</span><span class="o">:</span><span class="w"> </span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">to</span><span class="w"></span>
+<span class="w">            </span><span class="p">})</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">limit</span><span class="p">(</span><span class="mf">50</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">crushes</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mf">400</span><span class="p">).</span><span class="nx">send</span><span class="p">({});</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ The following screenshot was my payload that I used to exploit the SQLi vulnerability in
+ <code>
+  xark
+ </code>
+ and modify the
+ <code>
+  WHERE
+ </code>
+ statement to query using a column called
+ <code>
+  message
+ </code>
+ (the value of the message with the flag in a different column is provided in the source code) by setting the type to an
+ <code>
+  Object
+ </code>
+ .
+ <strong>
+  Knex.js does not reject
+  <code>
+   Objects
+  </code>
+  or
+  <code>
+   Array
+  </code>
+  variables that get inserted into SQL queries and builds a valid query that alters columns that are queried!
+ </strong>
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/knex_sqli/xark-payload-by-msg.png"/>
+</p>
+<p>
+ Otherwise, if the column is set as an index the following SQLi payload returns rows by index value instead of string comparison.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/knex_sqli/xark-payload-by-index.png"/>
+</p>
+<p>
+ <strong>
+  After further investigating the vulnerability I found that using
+  <code>
+   where
+  </code>
+  from Knex.js is vulnerable to SQLi, even with parameter binding!
+ </strong>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style1 alt">
+<div class="inner">
+<div class="content">
+
+<h2 class="major">
+ Introduction
+</h2>
+<p>
+ <em>
+  Before I begin, I do apologise for any grammar mistakes. I had COVID at the time of writing this article and I will fix it up later.
+ </em>
+</p>
+<p>
+ Last weekend, I participated in the 2022 Square CTF to satiate my crippling addiction hacking websites. It was a pretty fun CTF event and I enjoyed completing the web challenges.
+</p>
+<p>
+ <a href="https://www.quaxio.com/">
+  Alok Menghrajani's
+ </a>
+ challenge named
+ <a href="https://squarectf.com/2022/xark.html">
+  xark
+ </a>
+ piqued my interest since it was a classic NodeJS SQL injection vulnerability,
+ <em>
+  but the code did not look it was using
+  <code>
+   knex
+  </code>
+  insecurely (code snippet below)
+ </em>
+ .
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="nx">app</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">'/data'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">to</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">crushes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">knex</span><span class="p">(</span><span class="s1">'crushes'</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">select</span><span class="p">()</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">where</span><span class="p">({</span><span class="w"></span>
+<span class="w">                </span><span class="nx">to</span><span class="o">:</span><span class="w"> </span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">to</span><span class="w"></span>
+<span class="w">            </span><span class="p">})</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">limit</span><span class="p">(</span><span class="mf">50</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">crushes</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mf">400</span><span class="p">).</span><span class="nx">send</span><span class="p">({});</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ Knex.js version 2.3.0 was used in the challenge that was the latest version for the module, and the last
+ <a href="https://security.snyk.io/package/npm/knex">
+  SQL injection vulnerability for
+  <code>
+   knex
+  </code>
+  was reported for versions
+  <code>
+   &lt;0.19.5
+  </code>
+ </a>
+ .
+</p>
+<p>
+ At first, I thought Alok snuck in a sneaky 0day into their CTF challenge. However, it turns out the vulnerability has been disclosed for
+ <strong>
+  over 6 years
+ </strong>
+ ...
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/knex_sqli/it-was-a-lot-worst-than-it-appears.png"/>
+</p>
+<p>
+ <em>
+  <a href="https://github.com/knex/knex/issues/1227">
+   The vulnerability was first disclosed in February 2016
+  </a>
+ </em>
+ <img alt="" class="center" src="/images/blog/knex_sqli/the-first-issue.png"/>
+</p>
+<p>
+ I was honestly shocked that the vulnerability was never been patched, especially considering that this would be classified as a critical vulnerability.
+</p>
+<p>
+ I felt compelled to write this article to raise awareness about the SQLi vulnerability in Knex.js. The vulnerability has already been publicly disclosed, so attention needs to be drawn to it to have it fixed. That's why I am skipping responsibly disclosing the vulnerability and going straight to public disclosure.
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style4 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major">
+ Writeup for
+ <a href="https://squarectf.com/2022/xark.html">
+  xark
+ </a>
+</h1>
+<p>
+ To explain the SQLi vulnerability in Knex.js, I will begin by doing a writeup for Alok's
+ <code>
+  xark
+ </code>
+ challenge.
+</p>
+<p>
+ Starting the challenge, we are presented with a website for recording and viewing
+ <em>
+  anonymous crushes
+ </em>
+ .
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/knex_sqli/xark-start.png"/>
+</p>
+<p>
+ We were also provided with the following code snippet and can see the flag is inserted into the
+ <code>
+  crushes
+ </code>
+ table.
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">express</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">'express'</span><span class="p">);</span><span class="w"></span>
+<span class="nx">require</span><span class="p">(</span><span class="s1">'express-async-errors'</span><span class="p">);</span><span class="w"></span>
+<span class="nx">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">'config'</span><span class="p">);</span><span class="w"></span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">DATABASE_HOST</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Found custom database host: </span><span class="si">${</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">DATABASE_HOST</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="nx">config</span><span class="p">.</span><span class="nx">knex</span><span class="p">.</span><span class="nx">connection</span><span class="p">.</span><span class="nx">host</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">DATABASE_HOST</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">app</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">express</span><span class="p">();</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">port</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3001</span><span class="p">;</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">knex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">'knex'</span><span class="p">)(</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'knex'</span><span class="p">));</span><span class="w"></span>
+
+<span class="nx">knex</span><span class="p">.</span><span class="nx">schema</span><span class="p">.</span><span class="nx">hasTable</span><span class="p">(</span><span class="s1">'crushes'</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">exists</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">exists</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"crushes table doesn't exist, initializing..."</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="nx">knex</span><span class="p">.</span><span class="nx">schema</span><span class="p">.</span><span class="nx">createTable</span><span class="p">(</span><span class="s1">'crushes'</span><span class="p">,</span><span class="w"> </span><span class="kd">function</span><span class="p">(</span><span class="nx">table</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="nx">table</span><span class="p">.</span><span class="nx">increments</span><span class="p">(</span><span class="s1">'id'</span><span class="p">).</span><span class="nx">primary</span><span class="p">();</span><span class="w"></span>
+<span class="w">            </span><span class="nx">table</span><span class="p">.</span><span class="nx">string</span><span class="p">(</span><span class="s1">'from'</span><span class="p">).</span><span class="nx">notNullable</span><span class="p">();</span><span class="w"></span>
+<span class="w">            </span><span class="nx">table</span><span class="p">.</span><span class="nx">string</span><span class="p">(</span><span class="s1">'to'</span><span class="p">).</span><span class="nx">notNullable</span><span class="p">();</span><span class="w"></span>
+<span class="w">            </span><span class="nx">table</span><span class="p">.</span><span class="nx">string</span><span class="p">(</span><span class="s1">'message'</span><span class="p">).</span><span class="nx">notNullable</span><span class="p">();</span><span class="w"></span>
+<span class="w">            </span><span class="nx">table</span><span class="p">.</span><span class="nx">index</span><span class="p">([</span><span class="s1">'to'</span><span class="p">]);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}).</span><span class="nx">then</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="nx">knex</span><span class="p">(</span><span class="s1">'crushes'</span><span class="p">).</span><span class="nx">insert</span><span class="p">({</span><span class="w"></span>
+<span class="w">            </span><span class="kr">from</span><span class="o">:</span><span class="w"> </span><span class="nx">config</span><span class="p">.</span><span class="nx">init</span><span class="p">.</span><span class="nx">flag</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nx">to</span><span class="o">:</span><span class="w"> </span><span class="nx">config</span><span class="p">.</span><span class="nx">init</span><span class="p">.</span><span class="nx">flag</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nx">message</span><span class="o">:</span><span class="w"> </span><span class="s1">'This is the flag!'</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">}).</span><span class="nx">then</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">express</span><span class="p">.</span><span class="k">static</span><span class="p">(</span><span class="s1">'html'</span><span class="p">));</span><span class="w"></span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">express</span><span class="p">.</span><span class="nx">json</span><span class="p">());</span><span class="w"></span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">express</span><span class="p">.</span><span class="nx">urlencoded</span><span class="p">({</span><span class="w"></span>
+<span class="w">    </span><span class="nx">extended</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="w"></span>
+<span class="p">}));</span><span class="w"></span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'/debug'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// poor man's clone</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'knex'</span><span class="p">)));</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">connection</span><span class="p">.</span><span class="nx">password</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">c</span><span class="p">.</span><span class="nx">connection</span><span class="p">.</span><span class="nx">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"*******"</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mf">200</span><span class="p">).</span><span class="nx">send</span><span class="p">(</span><span class="nx">c</span><span class="p">);</span><span class="w"></span>
+<span class="p">})</span><span class="w"></span>
+
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">'/record'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="kr">from</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">to</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">await</span><span class="w"> </span><span class="nx">knex</span><span class="p">(</span><span class="s1">'crushes'</span><span class="p">).</span><span class="nx">insert</span><span class="p">({</span><span class="w"></span>
+<span class="w">            </span><span class="kr">from</span><span class="o">:</span><span class="w"> </span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="kr">from</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nx">to</span><span class="o">:</span><span class="w"> </span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">to</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="nx">message</span><span class="o">:</span><span class="w"> </span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">message</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">});</span><span class="w"></span>
+<span class="w">        </span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mf">200</span><span class="p">).</span><span class="nx">send</span><span class="p">({});</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mf">400</span><span class="p">).</span><span class="nx">send</span><span class="p">({});</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">'/data'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">to</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">crushes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">knex</span><span class="p">(</span><span class="s1">'crushes'</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">select</span><span class="p">()</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">where</span><span class="p">({</span><span class="w"></span>
+<span class="w">                </span><span class="nx">to</span><span class="o">:</span><span class="w"> </span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">to</span><span class="w"></span>
+<span class="w">            </span><span class="p">})</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">limit</span><span class="p">(</span><span class="mf">50</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">crushes</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mf">400</span><span class="p">).</span><span class="nx">send</span><span class="p">({});</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">((</span><span class="nx">err</span><span class="p">,</span><span class="w"> </span><span class="nx">req</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">,</span><span class="w"> </span><span class="nx">next</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mf">400</span><span class="p">).</span><span class="nx">send</span><span class="p">({</span><span class="w"></span>
+<span class="w">        </span><span class="nx">error</span><span class="o">:</span><span class="w"> </span><span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="w"></span>
+<span class="w">    </span><span class="p">});</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span>
+
+<span class="nx">app</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">port</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Listening on port </span><span class="si">${</span><span class="nx">port</span><span class="si">}</span><span class="sb"> in </span><span class="si">${</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">NODE_ENV</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ So immediately I knew the goal was to exploit an SQL injection vulnerability to trick the web application to return the flag. First I researched vulnerabilities for Knex.js, but found that the last SQLi vulnerability was for versions
+ <code>
+  &lt;0.19.5
+ </code>
+ . So at first I thought the entrypoint was not exploiting Knex.js.
+</p>
+<p>
+ However, the CTF challenge had such limited functionality the only way to retrieve the flag is exploiting some SQLi vulnerability in Knex.js. I saw that the
+ <code>
+  express
+ </code>
+ web application also accepted the
+ <code>
+  application/json
+ </code>
+ content type, so I simply tried modify the
+ <code>
+  to
+ </code>
+ POST parameter to an
+ <code>
+  Object
+ </code>
+ .
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/knex_sqli/xark-error-msg.png"/>
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/knex_sqli/sussy-gorilla.gif"/>
+</p>
+<p>
+ That error message was a
+ <strong>
+  huge indicator that I could modify the WHERE statement of the SQL query built by Knex.js
+ </strong>
+ . I knew from reading the source code that the flag was stored with a
+ <code>
+  message
+ </code>
+ of
+ <code>
+  'This is the flag!'
+ </code>
+ , so I simply modified my payload to inject querying using
+ <code>
+  message
+ </code>
+ column instead of
+ <code>
+  to
+ </code>
+ .
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/knex_sqli/xark-payload-by-msg.png"/>
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/knex_sqli/shocked-monkey.gif"/>
+</p>
+<p>
+ <em>
+  Holy mackerel that is juicy vulnerability!
+ </em>
+</p>
+<p>
+ After the CTF event was done, another competitor pointed out that you can also return a specific rows by index.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/knex_sqli/alternative-method.png"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style3 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major">
+ How does the vulnerability work?
+</h1>
+<p>
+ As noted in the
+ <a href="https://github.com/knex/knex/issues/1227">
+  original Github issue
+ </a>
+ , the vulnerability is only exploitable if Knex.js is used to connect to MySQL and is not exploitable for other database management systems (
+ <em>
+  I have not verified this claim
+ </em>
+ ).
+</p>
+<p>
+ So let's see what the actual queries look like that is being sent to the MySQL database. I will continue using the
+ <code>
+  xark
+ </code>
+ challenge for explaining how the SQLi vulnerability in Knex.js works. First you can configure the MySQL container to log all queries to a file do this by running the following script on the container.
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="ch">#!/bin/bash</span>
+
+mkdir -p /var/log/mysql<span class="p">;</span>
+<span class="k">if</span> <span class="o">[</span> ! -f /var/log/mysql/all.log <span class="o">]</span><span class="p">;</span> <span class="k">then</span>
+    touch /var/log/mysql/all.log
+<span class="k">fi</span>
+
+chmod <span class="m">777</span> /var/log/mysql/all.log
+mysql -u root -ppass -e <span class="s2">"SET global log_output = 'FILE'; SET global general_log_file='/var/log/mysql/all.log'; SET global general_log = 1;"</span>
+</code></pre>
+</div>
+<p>
+ Now all SQL queries will be logged at
+ <code>
+  /var/log/mysql/all.log
+ </code>
+ .
+</p>
+<h2 class="major">
+ How SQLi Using a Different Column Works
+</h2>
+<p>
+ Let's rerun the
+ <code>
+  {"to":{"message":"This is the flag!"}}
+ </code>
+ exploit and see that Knex.js builds the following query that is sent to the MySQL server.
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="o">`</span><span class="n">crushes</span><span class="o">`</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="o">`</span><span class="k">to</span><span class="o">`</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">`</span><span class="n">message</span><span class="o">`</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'This is the flag!'</span><span class="w"> </span><span class="k">limit</span><span class="w"> </span><span class="mi">50</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ Keys in the user input are wrapped with the
+ <code>
+  `
+ </code>
+ character, which is a special character for defining quoted identifiers in MySQL queries. A quoted identifier is a way for wrapping a table, column or database name with quotes. Now the interesting thing with MySQL, is if you remove the quoted identifiers the query fails.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/knex_sqli/qi-with-without.png"/>
+</p>
+<p>
+ <em>
+  Why does this MySQL query work with the quoted identifiers?
+ </em>
+</p>
+<p>
+ To be honest, I don't have a good answer. I speculate it is because the quoted identifiers tells the MySQL server that
+ <code>
+  `to`
+ </code>
+ and
+ <code>
+  `message`
+ </code>
+ are column names not causing a syntax error. Also experimenting with how MySQL will handle the SQL query, it appears that the MySQL server will ignore
+ <code>
+  `to`  =
+ </code>
+ part of the WHERE statement resulting in the following equivalent SQL query:
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="o">`</span><span class="n">crushes</span><span class="o">`</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="o">`</span><span class="n">message</span><span class="o">`</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'This is the flag!'</span><span class="w"> </span><span class="k">limit</span><span class="w"> </span><span class="mi">50</span><span class="w"></span>
+</code></pre>
+</div>
+<h2 class="major">
+ SQLi Using Index Value
+</h2>
+<p>
+ Now let's investigate how the payload
+ <code>
+  {"to":[0]}
+ </code>
+ works by analysing the resulting query that Knex.js builds.
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="o">`</span><span class="n">crushes</span><span class="o">`</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="o">`</span><span class="k">to</span><span class="o">`</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">limit</span><span class="w"> </span><span class="mi">50</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ We can see in the source code for
+ <code>
+  xark
+ </code>
+ that the the table index is set to the
+ <code>
+  to
+ </code>
+ column.
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="p">...</span><span class="w"></span>
+<span class="nx">knex</span><span class="p">.</span><span class="nx">schema</span><span class="p">.</span><span class="nx">createTable</span><span class="p">(</span><span class="s1">'crushes'</span><span class="p">,</span><span class="w"> </span><span class="kd">function</span><span class="p">(</span><span class="nx">table</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">table</span><span class="p">.</span><span class="nx">increments</span><span class="p">(</span><span class="s1">'id'</span><span class="p">).</span><span class="nx">primary</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="nx">table</span><span class="p">.</span><span class="nx">string</span><span class="p">(</span><span class="s1">'from'</span><span class="p">).</span><span class="nx">notNullable</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="nx">table</span><span class="p">.</span><span class="nx">string</span><span class="p">(</span><span class="s1">'to'</span><span class="p">).</span><span class="nx">notNullable</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="nx">table</span><span class="p">.</span><span class="nx">string</span><span class="p">(</span><span class="s1">'message'</span><span class="p">).</span><span class="nx">notNullable</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="nx">table</span><span class="p">.</span><span class="nx">index</span><span class="p">([</span><span class="s1">'to'</span><span class="p">]);</span><span class="w"></span>
+<span class="p">}).</span><span class="nx">then</span><span class="p">();</span><span class="w"></span>
+<span class="p">...</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ Since the
+ <code>
+  to
+ </code>
+ column is also the table index, we can query the
+ <code>
+  to
+ </code>
+ column using
+ <a href="https://dev.mysql.com/doc/refman/8.0/en/mysql-indexes.html">
+  <strong>
+   index values
+  </strong>
+ </a>
+ as well as the string value.
+</p>
+<p>
+ It appears that Knex.js does
+ <em>
+  some filtering
+ </em>
+ on the user input. So payloads such as
+ <code>
+  {"to":[0]}
+ </code>
+ are rejected and trying to query for multiple index values causes a SQL syntax error.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/knex_sqli/syntax-error-multi-index.png"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style2 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major">
+ But Wait, It Gets Worst
+</h1>
+<p>
+ Alok's
+ <code>
+  xark
+ </code>
+ challenge and the
+ <a href="https://github.com/knex/knex/issues/1227">
+  original Github
+ </a>
+ issue all use the
+ <a href="https://knexjs.org/guide/query-builder.html#where">
+  object syntax for calling
+  <code>
+   where
+  </code>
+ </a>
+ . There other methods for calling
+ <code>
+  where
+ </code>
+ that weren't tested (
+ <a href="https://knexjs.org/guide/query-builder.html#where">
+  screenshot of the API documentation from Knex.js
+ </a>
+ ).
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/knex_sqli/calling-where.png"/>
+</p>
+<p>
+ So I decided to modify source code of
+ <code>
+  xark
+ </code>
+ to test if the SQLi vulnerability is only exploitable if the input is an object or if the
+ <code>
+  where
+ </code>
+ method is vulnerable to SQLi no matter how
+ <code>
+  where
+ </code>
+ is used.
+</p>
+<p>
+ <em>
+  Testing key value input
+ </em>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="nx">app</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">'/data'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">to</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">crushes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">knex</span><span class="p">(</span><span class="s1">'crushes'</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">select</span><span class="p">()</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s2">"to"</span><span class="p">,</span><span class="w"> </span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">to</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">limit</span><span class="p">(</span><span class="mf">50</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">crushes</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mf">400</span><span class="p">).</span><span class="nx">send</span><span class="p">({});</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ <em>
+  Testing using key value and operator
+ </em>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="nx">app</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">'/data'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">to</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">crushes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">knex</span><span class="p">(</span><span class="s1">'crushes'</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">select</span><span class="p">()</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="s2">"to"</span><span class="p">,</span><span class="w"> </span><span class="s2">"="</span><span class="p">,</span><span class="w"> </span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">to</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">limit</span><span class="p">(</span><span class="mf">50</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">crushes</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mf">400</span><span class="p">).</span><span class="nx">send</span><span class="p">({});</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ However, I was still able to exploit the SQLi vulnerability.
+</p>
+<p>
+ <strong>
+  Therefore, using
+  <code>
+   where
+  </code>
+  from Knex.js is vulnerable to SQLi, no matter how you use it!
+ </strong>
+</p>
+<p>
+ It did pique my interest if Knex.js does implement parameter binding that
+ <em>
+  should
+ </em>
+ prevent the SQLi vulnerabilities, because if so then this vulnerability would be an issue of bad documentation for explaining how to use Knex.js securely.
+</p>
+<p>
+ <a href="https://knexjs.org/guide/raw.html#raw-parameter-binding">
+  Turns out you can use parameter binding using
+  <code>
+   raw
+  </code>
+  . They even say in the documentation that it prevents SQLi (screenshot below).
+ </a>
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/knex_sqli/raw-docs.png"/>
+</p>
+<p>
+ So let's see if I can still exploit the SQLi vulnerability even with prepared statements.
+</p>
+<p>
+ <em>
+  Testing using prepared statements
+ </em>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="nx">app</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">'/data'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">to</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">crushes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">knex</span><span class="p">(</span><span class="s1">'crushes'</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">select</span><span class="p">()</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="w"></span>
+<span class="w">                </span><span class="nx">knex</span><span class="p">.</span><span class="nx">raw</span><span class="p">(</span><span class="s2">"?? = ?"</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s2">"to"</span><span class="p">,</span><span class="w"> </span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">to</span><span class="p">])</span><span class="w"></span>
+<span class="w">            </span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">limit</span><span class="p">(</span><span class="mf">50</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">crushes</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mf">400</span><span class="p">).</span><span class="nx">send</span><span class="p">({});</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ <strong>
+  THIS IS STILL VULNERABLE TO SQLi!
+ </strong>
+</p>
+<p>
+ I even tried the following implementation to see if it would prevent SQLi.
+ <strong>
+  It didn't...
+ </strong>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="nx">app</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">'/data'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">to</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">whereStatement</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">":column: = :value"</span><span class="w"></span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">crushes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">knex</span><span class="p">(</span><span class="s1">'crushes'</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">select</span><span class="p">()</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="nx">knex</span><span class="p">.</span><span class="nx">raw</span><span class="p">(</span><span class="w"></span>
+<span class="w">                </span><span class="nx">whereStatement</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                        </span><span class="nx">column</span><span class="o">:</span><span class="w"> </span><span class="s2">"to"</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                        </span><span class="nx">value</span><span class="o">:</span><span class="w"> </span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">to</span><span class="w"></span>
+<span class="w">                    </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="p">))</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">limit</span><span class="p">(</span><span class="mf">50</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">crushes</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mf">400</span><span class="p">).</span><span class="nx">send</span><span class="p">({});</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ The only implementation that I found that was not exploitable was when the column name was hardcoded into the query string.
+</p>
+<p>
+ <em>
+  Causes an SQL syntax error since the column name is not wrapped with quoted identifiers.
+ </em>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="nx">app</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">'/data'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">to</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">crushes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">knex</span><span class="p">(</span><span class="s1">'crushes'</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">select</span><span class="p">()</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">where</span><span class="p">(</span><span class="w"></span>
+<span class="w">                </span><span class="nx">knex</span><span class="p">.</span><span class="nx">raw</span><span class="p">(</span><span class="s2">"to = ?"</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">to</span><span class="p">])</span><span class="w"></span>
+<span class="w">            </span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">limit</span><span class="p">(</span><span class="mf">50</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">crushes</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mf">400</span><span class="p">).</span><span class="nx">send</span><span class="p">({});</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ In conclusion...
+</p>
+<p>
+ <strong>
+  Knex.js is vulnerable to SQLi even if you use the raw parameter binding!
+ </strong>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style5 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major">
+ Recommendations
+</h1>
+<p>
+ The key issue that enables exploiting the SQLi vulnerability is that Knex.js does not reject an input if it is an
+ <strong>
+  <code>
+   Array
+  </code>
+ </strong>
+ or an
+ <strong>
+  <code>
+   Object
+  </code>
+ </strong>
+ .
+ <a href="https://cheatsheetseries.owasp.org/cheatsheets/Nodejs_Security_Cheat_Sheet.html#perform-input-validation">
+  JavaScript is a dynamically typed language, so users can manipulate the type of inputs
+ </a>
+ .
+</p>
+<p>
+ So if you are either a maintainer of Knex.js or using the module in your project,
+ <strong>
+  reject all inputs that will be inserted into a SQL query that are either an
+  <code>
+   Array
+  </code>
+  or
+  <code>
+   Object
+  </code>
+  type!
+ </strong>
+</p>
+<p>
+ For an example, you can use the
+ <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof">
+  JavaScript operator
+  <code>
+   typeof
+  </code>
+ </a>
+ to reject any unexpected input types. The below code snippet is an example for only allowing numbers, strings and booleans (
+ <strong>
+  never allow
+  <code>
+   object
+  </code>
+ </strong>
+ ).
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">allowedTypes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<span class="w">    </span><span class="s2">"number"</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="s2">"string"</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="s2">"boolean"</span><span class="w"></span>
+<span class="p">]</span><span class="w"></span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">allowedTypes</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="ow">typeof</span><span class="w"> </span><span class="nx">userInput</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="s2">"Invalid type detected!"</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ For an example, I added the above allow list to
+ <code>
+  xark
+ </code>
+ .
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="p">...</span><span class="w"></span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s1">'/data'</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">to</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">allowedTypes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<span class="w">            </span><span class="s2">"number"</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="s2">"string"</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="s2">"boolean"</span><span class="w"></span>
+<span class="w">        </span><span class="p">]</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">allowedTypes</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="ow">typeof</span><span class="w"> </span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">to</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mf">400</span><span class="p">).</span><span class="nx">send</span><span class="p">({</span><span class="w"></span>
+<span class="w">                </span><span class="nx">error</span><span class="o">:</span><span class="w"> </span><span class="s2">"Bugger off hacker!"</span><span class="w"></span>
+<span class="w">            </span><span class="p">});</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="kd">const</span><span class="w"> </span><span class="nx">crushes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">knex</span><span class="p">(</span><span class="s1">'crushes'</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">select</span><span class="p">()</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">where</span><span class="p">({</span><span class="w"></span>
+<span class="w">                </span><span class="nx">to</span><span class="o">:</span><span class="w"> </span><span class="nx">req</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">to</span><span class="w"></span>
+<span class="w">            </span><span class="p">})</span><span class="w"></span>
+<span class="w">            </span><span class="p">.</span><span class="nx">limit</span><span class="p">(</span><span class="mf">50</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="nx">res</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">crushes</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">res</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mf">400</span><span class="p">).</span><span class="nx">send</span><span class="p">({});</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span>
+<span class="p">...</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ Now when I retry the SQLi exploit it gets rejected.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/knex_sqli/bugger-off-hacker.png"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style6 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major">
+ Acknowledgements
+</h1>
+<p>
+ A huge thank you to
+ <a href="https://www.quaxio.com/">
+  Alok Menghrajani
+ </a>
+ for bringing this vulnerability to my attention and
+ <a href="https://github.com/TheThing">
+  TheThing
+ </a>
+ for originally disclosing the vulnerability.
+</p>
+<p>
+ I wish all of the Knex.js maintainers the best for finding a suitable patch for this vulnerability.
+</p></div>
+</div>
+</section>
+</section>
+
+    	</div>
+
+    <!-- Footer -->
+      <!-- Footer -->
+  <section id="footer">
+    <div class="inner">
+      <ul class="icons">
+        <li><a href="https://twitter.com/GhostCcamm" class="icon brands fa-twitter"><span class="label"></span></a></li>
+        <li><a href="https://github.com/Ccamm" class="icon brands fa-github"><span class="label"></span></a></li>
+      </ul>
+    </div>
+  </section>
+
+		<!-- Particles -->
+			<div id="particles-js"></div>
+
+		<!-- Scripts -->
+			<script src="/assets/js/jquery.min.js"></script>
+			<script src="/assets/js/jquery.scrollex.min.js"></script>
+			<script src="/assets/js/browser.min.js"></script>
+			<script src="/assets/js/breakpoints.min.js"></script>
+			<script src="/assets/js/util.js"></script>
+			<script src="/assets/js/particles.min.js"></script>
+			<script src="/assets/js/main.js"></script>
+      
+	</body>
+</html>
