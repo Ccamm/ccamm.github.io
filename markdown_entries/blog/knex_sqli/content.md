@@ -1,30 +1,42 @@
 # Overview
 
-[Knex.js](https://github.com/knex/knex) has a **SQL injection** that can be exploited to modify a `WHERE` statement. The only prequisite is that the backend database management system is MySQL.
+[Knex.js](https://github.com/knex/knex) has a **SQL injection vulnerability** that can be exploited to inject a column name in the `WHERE` statement of a SQL query. The only prerequisite is that the backend database management system is MySQL. The vulnerability was brought to my attention by [Alok Menghrajani's](https://www.quaxio.com/) CTF challenge called [`xark`](https://squarectf.com/2022/xark.html) during [SquareCTF 2022](https://squarectf.com/2022/), that showcased the SQLi vulnerability that was first reported [**6+ years ago**](https://github.com/knex/knex/issues/1227). In Alok's CTF challenge, the latest version of Knex.js was used (version 2.3.0 at the time of writing this article) and the vulnerable code snippet is shown below.
 
-This vulnerability was brought to my attention by [Alok Menghrajani's](https://www.quaxio.com/) CTF challenge called [`xark`](https://squarectf.com/2022/xark.html).
+```js
+app.post('/data', async (req, res) => {
+    if (req.body.to) {
+        const crushes = await knex('crushes')
+            .select()
+            .where({
+                to: req.body.to
+            })
+            .limit(50);
+        res.send(crushes);
+    } else {
+        res.status(400).send({});
+    }
+});
+```
 
-NodeJS dynamically determines the type of user's input, so an attacker can modify the type of an input to alter the WHERE statement. The following payload performs SQLi by changing the input to an array and returning a row by index value.
-
-![](./images/xark-payload-by-index.png)
-
-Otherwise, an attacker could also send an object and alter the WHERE statement to query using the value in a different column that was defined in the code.
+The following screenshot was my payload that I used to exploit the SQLi vulnerability in `xark` and modify the `WHERE` statement to query using a column called `message` (the value of the message with the flag in a different column is provided in the source code) by setting the type to an `Object`. **Knex.js does not reject `Objects` or `Array` variables that get inserted into SQL queries and builds a valid query that alters columns that are queried!**
 
 ![](./images/xark-payload-by-msg.png)
 
-The vulnerability was [first reported over 6 years ago by the GitHub user TheThing](https://github.com/knex/knex/issues/1227), but is still exploitable for the latest version for Knex.js (2.3.0 at the time of writing this article).
+Otherwise, if the column is set as an index the following SQLi payload returns rows by index value instead of string comparison.
 
-After investigating the vulnerability, I found that using `where` from Knex.js is vulnerable to SQLi, even if parameter binding is used using the `raw` function.
+![](./images/xark-payload-by-index.png)
+
+**After further investigating the vulnerability I found that using `where` from Knex.js is vulnerable to SQLi, even with parameter binding!**
 
 ---
 
 ## Introduction
 
-*Before I begin, I do apologise for any grammar mistakes. I had COVID at the time of writing this article.*
+*Before I begin, I do apologise for any grammar mistakes. I had COVID at the time of writing this article and I will fix it up later.*
 
-Last weekend, I participated in the 2022 Square CTF event to satiate my crippling addiction hacking websites. It was a pretty fun CTF event and I enjoyed completing the web challenges.
+Last weekend, I participated in the 2022 Square CTF to satiate my crippling addiction hacking websites. It was a pretty fun CTF event and I enjoyed completing the web challenges.
 
-[Alok Menghrajani's](https://www.quaxio.com/) challenge named [xark](https://squarectf.com/2022/xark.html) piqued my interest since it was a classic NodeJS sql injection vulnerability, *but the code did not look it was using `knex` insecurely (code snippet below)*.
+[Alok Menghrajani's](https://www.quaxio.com/) challenge named [xark](https://squarectf.com/2022/xark.html) piqued my interest since it was a classic NodeJS SQL injection vulnerability, *but the code did not look it was using `knex` insecurely (code snippet below)*.
 
 ```js
 app.post('/data', async (req, res) => {
@@ -53,15 +65,13 @@ At first, I thought Alok snuck in a sneaky 0day into their CTF challenge. Howeve
 
 I was honestly shocked that the vulnerability was never been patched, especially considering that this would be classified as a critical vulnerability.
 
-I felt compelled to write this article to raise awareness about the SQLi vulnerability in Knex.js. Developers using Knex.js need to know about this vulnerability ASAP to ensure their applications are not vulnerable and the developers for Knex.js need to apply a fix immediately. 
-
-The vulnerability has already been publicly disclosed, so attention needs to be drawn to it to have it fixed. That's why I am skipping responsibly disclosing the vulnerability and going straight to public disclosure.
+I felt compelled to write this article to raise awareness about the SQLi vulnerability in Knex.js. The vulnerability has already been publicly disclosed, so attention needs to be drawn to it to have it fixed. That's why I am skipping responsibly disclosing the vulnerability and going straight to public disclosure.
 
 ---
 
 # Writeup for [xark](https://squarectf.com/2022/xark.html)
 
-To explain the SQLi vulnerability in Knex.js, I will begin by doing a writeup for Alok's `xark` CTF challenge.
+To explain the SQLi vulnerability in Knex.js, I will begin by doing a writeup for Alok's `xark` challenge.
 
 Starting the challenge, we are presented with a website for recording and viewing *anonymous crushes*.
 
@@ -156,15 +166,15 @@ app.listen(port, () => {
 });
 ```
 
-So immediately I knew the goal was to exploit an SQL injection vulnerability to trick the web application to return the flag. First I researched vulnerabilities for Knex.js, but found that the last SQLi vulnerability was for an older version than 2.3.0. So at first I thought the entrypoint was not exploiting Knex.js.
+So immediately I knew the goal was to exploit an SQL injection vulnerability to trick the web application to return the flag. First I researched vulnerabilities for Knex.js, but found that the last SQLi vulnerability was for versions `<0.19.5`. So at first I thought the entrypoint was not exploiting Knex.js.
 
-However, the CTF challenge had such limited functionality the only way to retrieve the flag is exploiting an undisclosed SQLi vulnerability in Knex.js. I saw that the `express` web application also accepted the `application/json` content type, so I simply tried modifying the `to` POST parameter to an object.
+However, the CTF challenge had such limited functionality the only way to retrieve the flag is exploiting some SQLi vulnerability in Knex.js. I saw that the `express` web application also accepted the `application/json` content type, so I simply tried modify the `to` POST parameter to an `Object`.
 
 ![](./images/xark-error-msg.png)
 
 ![](./images/sussy-gorilla.gif)
 
-That error message was a **huge indicator that I could modify the WHERE statement of the SQL query built by Knex.js**. I knew from reading the source code that the flag was stored with a `message` of `'This is the flag!'`, so I simply modified my payload to inject querying using `message` column.
+That error message was a **huge indicator that I could modify the WHERE statement of the SQL query built by Knex.js**. I knew from reading the source code that the flag was stored with a `message` of `'This is the flag!'`, so I simply modified my payload to inject querying using `message` column instead of `to`.
 
 ![](./images/xark-payload-by-msg.png)
 
@@ -180,11 +190,9 @@ After the CTF event was done, another competitor pointed out that you can also r
 
 # How does the vulnerability work?
 
-As noted in the [original Github issue](https://github.com/knex/knex/issues/1227), the vulnerability is only exploitable for MySQL Knex.js client and is not exploitable for other database management systems such as PostgreSQL. 
+As noted in the [original Github issue](https://github.com/knex/knex/issues/1227), the vulnerability is only exploitable if Knex.js is used to connect to MySQL and is not exploitable for other database management systems (*I have not verified this claim*). 
 
-So let's see what the actual queries look like that are being sent to the MySQL database. I will continue using the `xark` challenge for explaining how the vulnerability works.
-
-You can do this by using the `docker exec` on the database container for `xark` to start a `bash` shell as the root user and run the following script.
+So let's see what the actual queries look like that is being sent to the MySQL database. I will continue using the `xark` challenge for explaining how the SQLi vulnerability in Knex.js works. First you can configure the MySQL container to log all queries to a file do this by running the following script on the container.
 
 ```bash
 #!/bin/bash
@@ -200,9 +208,9 @@ mysql -u root -ppass -e "SET global log_output = 'FILE'; SET global general_log_
 
 Now all SQL queries will be logged at `/var/log/mysql/all.log`.
 
-## SQLi Using a Different Column Works
+## How SQLi Using a Different Column Works
 
-Let's rerun the `{"to":{"message":"This is the flag!"}}` exploit, that logs the following MySQL query that Knex.js builds.
+Let's rerun the `{"to":{"message":"This is the flag!"}}` exploit and see that Knex.js builds the following query that is sent to the MySQL server.
 
 ```sql
 select * from `crushes` where `to` = `message` = 'This is the flag!' limit 50
@@ -252,7 +260,7 @@ It appears that Knex.js does *some filtering* on the user input. So payloads suc
 
 # But Wait, It Gets Worst
 
-[Alok's `xark` challenge](https://squarectf.com/2022/xark.html) and the [original Github](https://github.com/knex/knex/issues/1227) issue all use the [object syntax for calling `where`](https://knexjs.org/guide/query-builder.html#where). There other methods for calling `where` that haven't been tested yet.
+Alok's `xark` challenge and the [original Github](https://github.com/knex/knex/issues/1227) issue all use the [object syntax for calling `where`](https://knexjs.org/guide/query-builder.html#where). There other methods for calling `where` that weren't tested ([screenshot of the API documentation from Knex.js](https://knexjs.org/guide/query-builder.html#where)).
 
 ![](./images/calling-where.png)
 
@@ -290,11 +298,11 @@ app.post('/data', async (req, res) => {
 
 However, I was still able to exploit the SQLi vulnerability.
 
-**Therefore, using `where` from `knex` is vulnerable to SQLi, no matter how you use it!**
+**Therefore, using `where` from Knex.js is vulnerable to SQLi, no matter how you use it!**
 
-It did pique my interest if `knex` does implement parameter binding that *should* prevent the SQLi vulnerabilities, because if so then this vulnerability would be an issue of bad documentation for explaining how to use `knex` securely.
+It did pique my interest if Knex.js does implement parameter binding that *should* prevent the SQLi vulnerabilities, because if so then this vulnerability would be an issue of bad documentation for explaining how to use Knex.js securely.
 
-[Turns out you can use parameter binding using `raw`, they even say in the documentation that it prevents SQLi.](https://knexjs.org/guide/raw.html#raw-parameter-binding)
+[Turns out you can use parameter binding using `raw`. They even say in the documentation that it prevents SQLi (screenshot below).](https://knexjs.org/guide/raw.html#raw-parameter-binding)
 
 ![](./images/raw-docs.png)
 
@@ -329,11 +337,10 @@ app.post('/data', async (req, res) => {
             .select()
             .where(knex.raw(
                 whereStatement, {
-                            column: "to", 
-                            value: req.body.to
-                        }
-                    )
-            )
+                        column: "to", 
+                        value: req.body.to
+                    }
+            ))
             .limit(50);
         res.send(crushes);
     } else {
@@ -371,7 +378,7 @@ In conclusion...
 
 The key issue that enables exploiting the SQLi vulnerability is that Knex.js does not reject an input if it is an **`Array`** or an **`Object`**. [JavaScript is a dynamically typed language, so users can manipulate the type of inputs](https://cheatsheetseries.owasp.org/cheatsheets/Nodejs_Security_Cheat_Sheet.html#perform-input-validation).
 
-So if you are either a maintainer of Knex.js or using the module in your project, **reject all inputs that will be inserted into a SQL that are an `Array` or `Object` type!**
+So if you are either a maintainer of Knex.js or using the module in your project, **reject all inputs that will be inserted into a SQL query that are either an `Array` or `Object` type!**
 
 For an example, you can use the [JavaScript operator `typeof`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/typeof) to reject any unexpected input types. The below code snippet is an example for only allowing numbers, strings and booleans (**never allow `object`**).
 
@@ -429,4 +436,4 @@ Now when I retry the SQLi exploit it gets rejected.
 
 A huge thank you to [Alok Menghrajani](https://www.quaxio.com/) for bringing this vulnerability to my attention and [TheThing](https://github.com/TheThing) for originally disclosing the vulnerability.
 
-I wish all of the Knex.js maintainers the best for finding a suitable patch for this vulnerability <3.
+I wish all of the Knex.js maintainers the best for finding a suitable patch for this vulnerability.

@@ -1,7 +1,7 @@
 category: Vulnerabilities
 desc: JavaScript Dynamic Typing Sucks.
 main_image: images/knex-logo.png
-page_name: 6 Year Old SQLi Vulnerability in Knex.js
+page_name: 6 Year Old SQL Injection Vulnerability in Knex.js
 publish: true
-release_date: 
+release_date: 2022-11-24 08:05:09.749374+00:00
 show_header_section: false
