@@ -3,4 +3,6 @@
 {% block desc %}{{ description|safe }}{% endblock %}
 {% block release_date %}{{ date|safe }}{% endblock %}
 
-{% block content %}{{ body|safe }}{% endblock %}}
+<div class="article-content">
+    {% block content %}{{ body|safe }}{% endblock %}}
+</div>
