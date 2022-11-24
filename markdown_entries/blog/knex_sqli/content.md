@@ -69,7 +69,7 @@ At first, I thought Alok snuck in a sneaky 0day into their CTF challenge. Howeve
 *[The vulnerability was first disclosed in February 2016](https://github.com/knex/knex/issues/1227)*
 ![](./images/the-first-issue.png)
 
-I was honestly shocked that the vulnerability was never been patched, especially considering that this would be classified as a critical vulnerability.
+I was honestly shocked that the vulnerability has never been patched, especially considering that this would be classified as a critical vulnerability.
 
 I felt compelled to write this article to raise awareness about the SQLi vulnerability in Knex.js. The vulnerability has already been publicly disclosed, so attention needs to be drawn to it to have it fixed. That's why I am skipping responsibly disclosing the vulnerability and going straight to public disclosure.
 
