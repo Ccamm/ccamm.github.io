@@ -65,7 +65,7 @@ def compile_markdown(name, path, group_name, compiled_folder):
     md_file = os.path.join(path, "content.md")
     with open(md_file, 'r') as f:
         md_raw = f.read()
-    soup = BeautifulSoup(markdown.markdown(md_raw, extensions=["fenced_code", "codehilite", "markdown.extensions.tables"]), "html.parser")
+    soup = BeautifulSoup(markdown.markdown(md_raw, extensions=["fenced_code", "codehilite", "markdown.extensions.tables", "nl2br", "toc"]), "html.parser")
 
     _modify_attrs("h1", {"class":"major"}, soup)
     _modify_attrs("h2", {"class":"major"}, soup)
