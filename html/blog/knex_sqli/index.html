@@ -39,12 +39,12 @@
 		        <div class="logo"><div class="image"><img src="/images/logo.png" alt="" width="75" height="75" /></div></div>
 		        <h2>6 Year Old SQL Injection Vulnerability in Knex.js</h2>
 						<p class="date">2022-11-24</p>
-		        <p>JavaScript Dynamic Typing Sucks.</p>
+		        <p>JavaScript objects and arrays that are inserted into a SQL query can cause funky things</p>
 		      </div>
 		    </section>
 
       <section id="wrapper">
-<section class="wrapper style5 ">
+<section class="wrapper style3 ">
 <div class="inner">
 <div class="content">
 <h1 class="major" id="overview">
@@ -56,13 +56,13 @@
  </a>
  has a
  <strong>
-  SQL injection vulnerability
+  limited SQL injection vulnerability
  </strong>
- that can be exploited to inject a column name in the
+ that can be exploited to ignore the
  <code>
   WHERE
  </code>
- statement of a SQL query. The only prerequisite is that the backend database management system is MySQL. The vulnerability was brought to my attention by
+ clause of a SQL query. The only prerequisite is that the backend database management system is MySQL. The vulnerability was brought to my attention by
  <a href="https://www.quaxio.com/">
   Alok Menghrajani's
  </a>
@@ -78,9 +78,7 @@
  </a>
  , that showcased the SQLi vulnerability that was first reported
  <a href="https://github.com/knex/knex/issues/1227">
-  <strong>
-   6+ years ago
-  </strong>
+  6+ years ago
  </a>
  . In Alok's CTF challenge, the latest version of Knex.js was used (version 2.3.0 at the time of writing this article) and the vulnerable code snippet is shown below.
 </p>
@@ -105,7 +103,7 @@
  <code>
   xark
  </code>
- and modify the
+ to modify the
  <code>
   WHERE
  </code>
@@ -113,7 +111,7 @@
  <code>
   message
  </code>
- (the value of the message with the flag in a different column is provided in the source code) by setting the type to an
+ by setting the type to an
  <code>
   Object
  </code>
@@ -127,7 +125,7 @@
   <code>
    Array
   </code>
-  variables that get inserted into SQL queries and builds a valid query that alters columns that are queried!
+  variables that get inserted into SQL queries and results in a valid MySQL query!
  </strong>
 </p>
 <p>
@@ -147,6 +145,21 @@
   </code>
   from Knex.js is vulnerable to SQLi, even with parameter binding!
  </strong>
+</p>
+<p>
+ This vulnerability affects thousands of NodeJS packages that do not reject
+ <code>
+  Object
+ </code>
+ and
+ <code>
+  Array
+ </code>
+ column values and use
+ <code>
+  knex
+ </code>
+ to build SQL queries.
 </p>
 </div>
 </div>
@@ -176,30 +189,42 @@
    </a>
   </li>
   <li>
-   <a href="#writeup-for-xark">
-    Writeup for xark
-   </a>
-  </li>
-  <li>
-   <a href="#how-does-the-vulnerability-work">
-    How does the vulnerability work?
+   <a href="#explaining-the-sqli-vulnerability">
+    Explaining the SQLi Vulnerability
    </a>
    <ul>
     <li>
-     <a href="#how-sqli-using-a-different-column-works">
-      How SQLi Using a Different Column Works
+     <a href="#writeup-for-xark">
+      Writeup for xark
      </a>
     </li>
     <li>
-     <a href="#sqli-using-index-value">
-      SQLi Using Index Value
+     <a href="#how-does-the-vulnerability-work">
+      How does the vulnerability work?
+     </a>
+     <ul>
+      <li>
+       <a href="#how-sqli-using-a-different-column-works">
+        How SQLi Using a Different Column Works
+       </a>
+      </li>
+      <li>
+       <a href="#sqli-using-index-value">
+        SQLi Using Index Value
+       </a>
+      </li>
+     </ul>
+    </li>
+    <li>
+     <a href="#binding-parameters-does-not-prevent-the-sqli">
+      Binding Parameters Does Not Prevent the SQLi
      </a>
     </li>
    </ul>
   </li>
   <li>
-   <a href="#binding-parameters-does-not-prevent-the-sqli">
-    Binding Parameters Does Not Prevent the SQLi
+   <a href="#impact-to-other-nodejs-packages">
+    Impact to Other NodeJS Packages
    </a>
   </li>
   <li>
@@ -217,7 +242,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style4 ">
+<section class="wrapper style6 ">
 <div class="inner">
 <div class="content">
 
@@ -300,24 +325,24 @@
  <img alt="" class="center" src="/images/blog/knex_sqli/the-first-issue.png"/>
 </p>
 <p>
- I was honestly shocked that the vulnerability was never been patched, especially considering that this would be classified as a critical vulnerability.
-</p>
-<p>
  I felt compelled to write this article to raise awareness about the SQLi vulnerability in Knex.js. The vulnerability has already been publicly disclosed, so attention needs to be drawn to it to have it fixed. That's why I am skipping responsibly disclosing the vulnerability and going straight to public disclosure.
 </p>
 </div>
 </div>
 </section>
-<section class="wrapper style1 alt">
+<section class="wrapper style4 alt">
 <div class="inner">
 <div class="content">
 
-<h1 class="major" id="writeup-for-xark">
+<h1 class="major" id="explaining-the-sqli-vulnerability">
+ Explaining the SQLi Vulnerability
+</h1>
+<h2 class="major" id="writeup-for-xark">
  Writeup for
  <a href="https://squarectf.com/2022/xark.html">
   xark
  </a>
-</h1>
+</h2>
 <p>
  To explain the SQLi vulnerability in Knex.js, I will begin by doing a writeup for Alok's
  <code>
@@ -342,8 +367,14 @@
  </code>
  table.
 </p>
-<div class="codehilite">
- <pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">express</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">'express'</span><span class="p">);</span><span class="w"></span>
+<details>
+ <summary>
+  <b>
+   Source Code Provided with the Challenged
+  </b>
+ </summary>
+ <div class="codehilite">
+  <pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">express</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">'express'</span><span class="p">);</span><span class="w"></span>
 <span class="nx">require</span><span class="p">(</span><span class="s1">'express-async-errors'</span><span class="p">);</span><span class="w"></span>
 <span class="nx">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">'config'</span><span class="p">);</span><span class="w"></span>
 
@@ -428,7 +459,11 @@
 <span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Listening on port </span><span class="si">${</span><span class="nx">port</span><span class="si">}</span><span class="sb"> in </span><span class="si">${</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">NODE_ENV</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span><span class="w"></span>
 <span class="p">});</span><span class="w"></span>
 </code></pre>
-</div>
+ </div>
+</details>
+<p>
+ <br/>
+</p>
 <p>
  So immediately I knew the goal was to exploit an SQL injection vulnerability to trick the web application to return the flag. First I researched vulnerabilities for Knex.js, but found that the last SQLi vulnerability was for versions
  <code>
@@ -464,17 +499,17 @@
 <p>
  That error message was a
  <strong>
-  huge indicator that I could modify the WHERE statement of the SQL query built by Knex.js
+  huge indicator that I could do something funky with the filter in the
+  <code>
+   WHERE
+  </code>
+  clause
  </strong>
- . I knew from reading the source code that the flag was stored with a
+ . I knew from reading the source code that the flag was another column named
  <code>
   message
  </code>
- of
- <code>
-  'This is the flag!'
- </code>
- , so I simply modified my payload to inject querying using
+ , so I simply modified my payload to try querying using
  <code>
   message
  </code>
@@ -492,7 +527,7 @@
 </p>
 <p>
  <em>
-  Holy mackerel that is juicy vulnerability!
+  Wot...
  </em>
 </p>
 <p>
@@ -504,13 +539,13 @@
 </div>
 </div>
 </section>
-<section class="wrapper style3 ">
+<section class="wrapper style5 ">
 <div class="inner">
 <div class="content">
 
-<h1 class="major" id="how-does-the-vulnerability-work">
+<h2 class="major" id="how-does-the-vulnerability-work">
  How does the vulnerability work?
-</h1>
+</h2>
 <p>
  As noted in the
  <a href="https://github.com/knex/knex/issues/1227">
@@ -548,15 +583,15 @@ mysql -u root -ppass -e <span class="s2">"SET global log_output = 'FILE'; SET gl
  </code>
  .
 </p>
-<h2 class="major" id="how-sqli-using-a-different-column-works">
+<h3 class="major" id="how-sqli-using-a-different-column-works">
  How SQLi Using a Different Column Works
-</h2>
+</h3>
 <p>
  Let's rerun the
  <code>
   {"to":{"message":"This is the flag!"}}
  </code>
- exploit and see that Knex.js builds the following query that is sent to the MySQL server.
+ exploit and see the following query that is sent to the MySQL server.
 </p>
 <div class="codehilite">
  <pre><span></span><code><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="o">`</span><span class="n">crushes</span><span class="o">`</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="o">`</span><span class="k">to</span><span class="o">`</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">`</span><span class="n">message</span><span class="o">`</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'This is the flag!'</span><span class="w"> </span><span class="k">limit</span><span class="w"> </span><span class="mi">50</span><span class="w"></span>
@@ -586,19 +621,27 @@ mysql -u root -ppass -e <span class="s2">"SET global log_output = 'FILE'; SET gl
  <code>
   `message`
  </code>
- are column names not causing a syntax error. Also experimenting with how MySQL will handle the SQL query, it appears that the MySQL server will ignore
+ are column names, and since the
  <code>
-  `to`  =
+  crushes
  </code>
- part of the WHERE statement resulting in the following equivalent SQL query:
+ table has those columns it does not cause an SQL error. Also experimenting with how MySQL will handle the SQL query, it appears that the MySQL server behaves
+ <em>
+  weirdly
+ </em>
+ when a filter has multiple
+ <code>
+  =
+ </code>
+ characters. For the
+ <code>
+  xark
+ </code>
+ challenge I found that the first row is returned, but when I tested using a different script then the entire table was dumped. If you have a good explaination for this, please let me know.
 </p>
-<div class="codehilite">
- <pre><span></span><code><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="o">`</span><span class="n">crushes</span><span class="o">`</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="o">`</span><span class="n">message</span><span class="o">`</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'This is the flag!'</span><span class="w"> </span><span class="k">limit</span><span class="w"> </span><span class="mi">50</span><span class="w"></span>
-</code></pre>
-</div>
-<h2 class="major" id="sqli-using-index-value">
+<h3 class="major" id="sqli-using-index-value">
  SQLi Using Index Value
-</h2>
+</h3>
 <p>
  Now let's investigate how the payload
  <code>
@@ -667,13 +710,13 @@ mysql -u root -ppass -e <span class="s2">"SET global log_output = 'FILE'; SET gl
 </div>
 </div>
 </section>
-<section class="wrapper style6 alt">
+<section class="wrapper style1 alt">
 <div class="inner">
 <div class="content">
 
-<h1 class="major" id="binding-parameters-does-not-prevent-the-sqli">
+<h2 class="major" id="binding-parameters-does-not-prevent-the-sqli">
  Binding Parameters Does Not Prevent the SQLi
-</h1>
+</h2>
 <p>
  Alok's
  <code>
@@ -760,13 +803,11 @@ mysql -u root -ppass -e <span class="s2">"SET global log_output = 'FILE'; SET gl
  However, I was still able to exploit the SQLi vulnerability.
 </p>
 <p>
- <strong>
-  Therefore, using
-  <code>
-   where
-  </code>
-  from Knex.js is vulnerable to SQLi, no matter how you use it!
- </strong>
+ Therefore, using
+ <code>
+  where
+ </code>
+ from Knex.js is vulnerable to SQLi.
 </p>
 <p>
  It did pique my interest if Knex.js does implement parameter binding that
@@ -812,9 +853,9 @@ mysql -u root -ppass -e <span class="s2">"SET global log_output = 'FILE'; SET gl
 </code></pre>
 </div>
 <p>
- <strong>
-  THIS IS STILL VULNERABLE TO SQLi!
- </strong>
+ <em>
+  This is still vulnerable to SQLi...
+ </em>
 </p>
 <p>
  I even tried the following implementation to see if it would prevent SQLi.
@@ -877,7 +918,221 @@ mysql -u root -ppass -e <span class="s2">"SET global log_output = 'FILE'; SET gl
 </div>
 </div>
 </section>
-<section class="wrapper style1 ">
+<section class="wrapper style6 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="impact-to-other-nodejs-packages">
+ Impact to Other NodeJS Packages
+</h1>
+<p>
+ Knex.js is a tool for NodeJS developers to easily build SQL queries for multiple DBMS and the responsibility for security is also on those developers to ensure that they are securely using Knex.js.
+</p>
+<p>
+ <strong>
+  This leads to the next question, are NodeJS Object Relational Mappers (ORM) securely using Knex.js?
+ </strong>
+</p>
+<p>
+ In collaboration with Alok and my friend
+ <a href="https://github.com/anvbis">
+  sradley
+ </a>
+ , we tested the following NodeJS ORMs and found that most were vulnerable to the SQLi vulnerability.
+</p>
+<table>
+ <thead>
+  <tr>
+   <th>
+    ORM Package
+   </th>
+   <th>
+    Version
+   </th>
+   <th>
+    Is Currently Maintained
+   </th>
+   <th>
+    Vulnerable to SQLi
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    <a href="https://bookshelfjs.org/">
+     Bookshelf.js
+    </a>
+   </td>
+   <td>
+    v1.2.0
+   </td>
+   <td>
+    False
+   </td>
+   <td>
+    <strong>
+     TRUE
+    </strong>
+   </td>
+  </tr>
+  <tr>
+   <td>
+    <a href="https://vincit.github.io/objection.js/">
+     Objection.js
+    </a>
+   </td>
+   <td>
+    v3.0.1
+   </td>
+   <td>
+    False
+   </td>
+   <td>
+    <strong>
+     TRUE
+    </strong>
+   </td>
+  </tr>
+  <tr>
+   <td>
+    <a href="https://github.com/mikro-orm/mikro-orm">
+     mikro-orm
+    </a>
+   </td>
+   <td>
+    v5.5.3
+   </td>
+   <td>
+    True
+   </td>
+   <td>
+    False
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ For each of the tests, we had already created a table called
+ <code>
+  users
+ </code>
+ with the following rows.
+</p>
+<table>
+ <thead>
+  <tr>
+   <th>
+    <code>
+     name
+    </code>
+   </th>
+   <th>
+    <code>
+     secret
+    </code>
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    admin
+   </td>
+   <td>
+    you should not be able to return this!
+   </td>
+  </tr>
+  <tr>
+   <td>
+    guest
+   </td>
+   <td>
+    hello world
+   </td>
+  </tr>
+ </tbody>
+</table>
+<details>
+ <summary>
+  <b>
+   Confirming the Vulnerability in
+   <a href="https://bookshelfjs.org/">
+    Bookshelf.js
+   </a>
+  </b>
+ </summary>
+ <div class="codehilite">
+  <pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">knex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">'knex'</span><span class="p">)({</span><span class="w"></span>
+<span class="w">    </span><span class="nx">client</span><span class="o">:</span><span class="w"> </span><span class="s1">'mysql2'</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nx">connection</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">host</span><span class="o">:</span><span class="w"> </span><span class="s1">'127.0.0.1'</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nx">user</span><span class="o">:</span><span class="w"> </span><span class="s1">'root'</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nx">password</span><span class="o">:</span><span class="w"> </span><span class="s1">'topsecret'</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nx">database</span><span class="o">:</span><span class="w"> </span><span class="s1">'testdb'</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nx">charset</span><span class="o">:</span><span class="w"> </span><span class="s1">'utf8'</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">})</span><span class="w"></span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">bookshelf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">'bookshelf'</span><span class="p">)(</span><span class="nx">knex</span><span class="p">)</span><span class="w"></span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">User</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">bookshelf</span><span class="p">.</span><span class="nx">model</span><span class="p">(</span><span class="s1">'User'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">tableName</span><span class="o">:</span><span class="w"> </span><span class="s1">'users'</span><span class="w"></span>
+<span class="p">})</span><span class="w"></span>
+
+<span class="ow">new</span><span class="w"> </span><span class="nx">User</span><span class="p">({</span><span class="nx">secret</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="s2">"name"</span><span class="o">:</span><span class="w"> </span><span class="s2">"admin"</span><span class="p">}}).</span><span class="nx">fetch</span><span class="p">().</span><span class="nx">then</span><span class="p">((</span><span class="nx">user</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">user</span><span class="p">)</span><span class="w"></span>
+<span class="p">})</span><span class="w"></span>
+</code></pre>
+ </div>
+</details>
+<details>
+ <summary>
+  <b>
+   Confirming the Vulnerability in
+   <a href="https://vincit.github.io/objection.js/">
+    Objection.js
+   </a>
+  </b>
+ </summary>
+ <div class="codehilite">
+  <pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Model</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">'objection'</span><span class="p">);</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">knex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">'knex'</span><span class="p">)({</span><span class="w"></span>
+<span class="w">    </span><span class="nx">client</span><span class="o">:</span><span class="w"> </span><span class="s1">'mysql2'</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nx">connection</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">host</span><span class="o">:</span><span class="w"> </span><span class="s1">'127.0.0.1'</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nx">user</span><span class="o">:</span><span class="w"> </span><span class="s1">'root'</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nx">password</span><span class="o">:</span><span class="w"> </span><span class="s1">'topsecret'</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nx">database</span><span class="o">:</span><span class="w"> </span><span class="s1">'testdb'</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nx">charset</span><span class="o">:</span><span class="w"> </span><span class="s1">'utf8'</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">})</span><span class="w"></span>
+
+<span class="nx">Model</span><span class="p">.</span><span class="nx">knex</span><span class="p">(</span><span class="nx">knex</span><span class="p">)</span><span class="w"></span>
+
+<span class="kd">class</span><span class="w"> </span><span class="nx">User</span><span class="w"> </span><span class="k">extends</span><span class="w"> </span><span class="nx">Model</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="nx">get</span><span class="w"> </span><span class="nx">tableName</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="s1">'users'</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="nx">User</span><span class="p">.</span><span class="nx">query</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="nx">where</span><span class="p">({</span><span class="nx">secret</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="s2">"name"</span><span class="o">:</span><span class="w"> </span><span class="s2">"admin"</span><span class="p">}})</span><span class="w"></span>
+<span class="w">    </span><span class="p">.</span><span class="nx">then</span><span class="p">((</span><span class="nx">user</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">user</span><span class="p">))</span><span class="w"></span>
+</code></pre>
+ </div>
+</details>
+<p>
+ The above approaches provides an easy way to test if you are securely handling
+ <code>
+  Objects
+ </code>
+ while using Knex.js.
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style3 alt">
 <div class="inner">
 <div class="content">
 
@@ -992,7 +1247,7 @@ mysql -u root -ppass -e <span class="s2">"SET global log_output = 'FILE'; SET gl
 </div>
 </div>
 </section>
-<section class="wrapper style5 alt">
+<section class="wrapper style5 ">
 <div class="inner">
 <div class="content">
 
@@ -1008,10 +1263,18 @@ mysql -u root -ppass -e <span class="s2">"SET global log_output = 'FILE'; SET gl
  <a href="https://github.com/TheThing">
   TheThing
  </a>
- for originally disclosing the vulnerability.
+ for originally disclosing the vulnerability. Also thank you to
+ <a href="https://github.com/anvbis">
+  <code>
+   sradley
+  </code>
+ </a>
+ for investigating the impact of this vulnerability in other NodeJS packages that use Knex.js.
 </p>
 <p>
- I wish all of the Knex.js maintainers the best for finding a suitable patch for this vulnerability.
+ <strong>
+  I wish all of the Knex.js maintainers the best for finding a suitable patch for this vulnerability.
+ </strong>
 </p></div>
 </div>
 </section>

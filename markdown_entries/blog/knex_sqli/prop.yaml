@@ -1,5 +1,5 @@
 category: Vulnerabilities
-desc: JavaScript Dynamic Typing Sucks.
+desc: JavaScript objects and arrays that are inserted into a SQL query can cause funky things
 main_image: images/knex-logo.png
 page_name: 6 Year Old SQL Injection Vulnerability in Knex.js
 publish: true
