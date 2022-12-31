@@ -162,3 +162,4 @@ cython_debug/
 # Ignore the generated templates so auto build works
 templates/blog/**
 templates/writeups/**
+.vscode/**
