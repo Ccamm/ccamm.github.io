@@ -1,0 +1,8 @@
+category: Vulnerabilities
+desc: Double check your IP block lists
+main_image: images/directus-logo.png
+page_name: 'CVE-2023-26492: Server-Side Request Forgery Vulnerability in Directus
+  <= 9.22.4'
+publish: true
+release_date: 2023-03-04 08:43:29.086380+00:00
+show_header_section: false

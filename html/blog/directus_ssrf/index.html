@@ -1,0 +1,678 @@
+<html>
+	<head>
+		<title>GhostCcamm's Cyber Misadventures</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="/assets/css/main.css" />
+		<link rel="stylesheet" href="/assets/css/styles.css" />
+		<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Page Wrapper -->
+			<div id="page-wrapper">
+
+			<!-- Header -->
+				<header id="header" class="alt">
+					<h1><a href="index.html">GhostCcamm's Cyber Misadventures</a></h1>
+					<nav>
+						<a href="#menu">Menu</a>
+					</nav>
+				</header>
+
+			<!-- Menu -->
+				<nav id="menu">
+					<div class="inner">
+						<h2>Menu</h2>
+						<ul class="links">
+							<li><a href="/">Home</a></li>
+							<li><a href="/blog">Blog</a></li>
+							<li><a href="/writeups">Write Ups</a></li>
+						</ul>
+						<a href="#" class="close">Close</a>
+					</div>
+				</nav>
+
+			<!-- Banner -->
+		    <section id="banner">
+		      <div class="inner">
+		        <div class="logo"><div class="image"><img src="/images/logo.png" alt="" width="75" height="75" /></div></div>
+		        <h2>CVE-2023-26492: Server-Side Request Forgery Vulnerability in Directus <= 9.22.4</h2>
+						<p class="date">2023-03-04</p>
+		        <p>Double check your IP block lists</p>
+		      </div>
+		    </section>
+
+      <section id="wrapper">
+<section class="wrapper style2 ">
+<div class="inner">
+<div class="content">
+<h1 class="major" id="overview">
+ Overview
+</h1>
+<p>
+ <a href="https://github.com/directus/directus">
+  Directus
+ </a>
+ is a popular NodeJS API CMS, that had a fun Server-Side Request Forgery (SSRF) vulnerability. Directus had a
+ <em>
+  patched
+ </em>
+ SSRF vulnerability (
+ <a href="https://security.snyk.io/vuln/SNYK-JS-DIRECTUS-2934713">
+  CVE-2022-23080
+ </a>
+ ), but I realised that you could bypass the validations for CVE-2022-23080 to perform a
+ <strong>
+  [DNS rebinding attack]
+ </strong>
+ .
+</p>
+<p>
+ This vulnerability has been assigned with the CVE-ID of
+ <a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2023-26492">
+  <strong>
+   CVE-2023-26492
+  </strong>
+ </a>
+ . I will explain how the vulnerability can be exploited and how developers at Directus patched it in more detail than in the
+ <a href="https://github.com/directus/directus/security/advisories/GHSA-j3rg-3rgm-537h">
+  GitHub advisory
+ </a>
+ .
+</p>
+<p>
+ A huge thank you to
+ <a href="https://github.com/rijkvanzanten">
+  Rijk van Zanten
+ </a>
+ for coordinating the vulnerability patching and disclosure at Directus.
+</p>
+<p>
+ Now enjoy this short vulnerability disclosure.
+</p>
+<div class="toc">
+ <ul>
+  <li>
+   <a href="#overview">
+    Overview
+   </a>
+  </li>
+  <li>
+   <a href="#disclosure-timeline">
+    Disclosure Timeline
+   </a>
+  </li>
+  <li>
+   <a href="#the-ssrf-vulnerability">
+    The SSRF Vulnerability
+   </a>
+   <ul>
+    <li>
+     <a href="#dns-rebinding-this-vulnerability">
+      DNS Rebinding This Vulnerability
+     </a>
+    </li>
+    <li>
+     <a href="#the-exploit">
+      The Exploit
+     </a>
+    </li>
+    <li>
+     <a href="#a-note-about-using-redirection-to-bypass-the-ssrf-validation">
+      A Note About Using Redirection to Bypass the SSRF Validation
+     </a>
+    </li>
+   </ul>
+  </li>
+  <li>
+   <a href="#how-directus-patched-this-vulnerability">
+    How Directus Patched this Vulnerability
+   </a>
+  </li>
+  <li>
+   <a href="#conclusion">
+    Conclusion
+   </a>
+  </li>
+ </ul>
+</div>
+</div>
+</div>
+</section>
+<section class="wrapper style1 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="disclosure-timeline">
+ Disclosure Timeline
+</h1>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Time
+   </th>
+   <th>
+    Event
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    2023/02/10 03:03
+   </td>
+   <td>
+    Reported the vulnerability using GitHub private disclosure (
+    <em>
+     very cool feature
+    </em>
+    ) to Directus
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/02/10 04:04
+   </td>
+   <td>
+    Rijk from Directus acknowledged my report and started working on a patch.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/02/28 17:52
+   </td>
+   <td>
+    Directus released
+    <a href="https://github.com/directus/directus/releases/tag/v9.23.0">
+     <code>
+      v9.23.0
+     </code>
+    </a>
+    that patched this vulnerability.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/03/03 18:22
+   </td>
+   <td>
+    The
+    <a href="https://github.com/directus/directus/security/advisories/GHSA-j3rg-3rgm-537h">
+     GitHub advisory
+    </a>
+    was published.
+   </td>
+  </tr>
+ </tbody>
+</table>
+</div>
+</div>
+</section>
+<section class="wrapper style4 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="the-ssrf-vulnerability">
+ The SSRF Vulnerability
+</h1>
+<p>
+ The key issue for this vulnerability was that the route
+ <code>
+  /files/import
+ </code>
+ on Directus downloads and saves the response from a URL that is provided by the user. The original SSRF vulnerability (
+ <a href="https://security.snyk.io/vuln/SNYK-JS-DIRECTUS-2934713">
+  CVE-2022-23080
+ </a>
+ ) was exploiting this feature to download sensitive content from restricted IP addresses (eg.
+ <code>
+  127.0.0.1
+ </code>
+ ). In response, Directus added a validation check for the
+ <code>
+  importOne
+ </code>
+ function in
+ <a href="https://github.com/directus/directus/blob/v9.22.4/api/src/services/files.ts">
+  <code>
+   /api/src/services/file.ts
+  </code>
+ </a>
+ to reject all URLs that resolve to an IP address within a block list (setting
+ <code>
+  IMPORT_IP_DENY_LIST
+ </code>
+ ). The following JavaScript code was the code snippet from
+ <code>
+  importOne
+ </code>
+ in version
+ <code>
+  v9.22.4
+ </code>
+ .
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="kd">let</span><span class="w"> </span><span class="nx">ip</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">resolvedUrl</span><span class="p">.</span><span class="nx">hostname</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">net</span><span class="p">.</span><span class="nx">isIP</span><span class="p">(</span><span class="nx">ip</span><span class="p">)</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="mf">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">ip</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="k">await</span><span class="w"> </span><span class="nx">lookupDNS</span><span class="p">(</span><span class="nx">ip</span><span class="p">)).</span><span class="nx">address</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">err</span><span class="o">:</span><span class="w"> </span><span class="nx">any</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">logger</span><span class="p">.</span><span class="nx">warn</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span><span class="w"> </span><span class="sb">`Couldn't lookup the DNS for url </span><span class="si">${</span><span class="nx">importURL</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">ServiceUnavailableException</span><span class="p">(</span><span class="sb">`Couldn't fetch file from url "</span><span class="si">${</span><span class="nx">importURL</span><span class="si">}</span><span class="sb">"`</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="nx">service</span><span class="o">:</span><span class="w"> </span><span class="s1">'external-file'</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="p">});</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">env</span><span class="p">.</span><span class="nx">IMPORT_IP_DENY_LIST</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="s1">'0.0.0.0'</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">networkInterfaces</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">os</span><span class="p">.</span><span class="nx">networkInterfaces</span><span class="p">();</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">networkInfo</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nb">Object</span><span class="p">.</span><span class="nx">values</span><span class="p">(</span><span class="nx">networkInterfaces</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">networkInfo</span><span class="p">)</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">info</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">networkInfo</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">info</span><span class="p">.</span><span class="nx">address</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="nx">ip</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="nx">logger</span><span class="p">.</span><span class="nx">warn</span><span class="p">(</span><span class="sb">`Requested URL </span><span class="si">${</span><span class="nx">importURL</span><span class="si">}</span><span class="sb"> resolves to localhost.`</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">ServiceUnavailableException</span><span class="p">(</span><span class="sb">`Couldn't fetch file from url "</span><span class="si">${</span><span class="nx">importURL</span><span class="si">}</span><span class="sb">"`</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                    </span><span class="nx">service</span><span class="o">:</span><span class="w"> </span><span class="s1">'external-file'</span><span class="p">,</span><span class="w"></span>
+<span class="w">                </span><span class="p">});</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">env</span><span class="p">.</span><span class="nx">IMPORT_IP_DENY_LIST</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="nx">ip</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">logger</span><span class="p">.</span><span class="nx">warn</span><span class="p">(</span><span class="sb">`Requested URL </span><span class="si">${</span><span class="nx">importURL</span><span class="si">}</span><span class="sb"> resolves to a denied IP address.`</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">ServiceUnavailableException</span><span class="p">(</span><span class="sb">`Couldn't fetch file from url "</span><span class="si">${</span><span class="nx">importURL</span><span class="si">}</span><span class="sb">"`</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">service</span><span class="o">:</span><span class="w"> </span><span class="s1">'external-file'</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">});</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ Simplifying what the above code does:
+</p>
+<ol>
+ <li>
+  If the hostname is a domain it
+  <strong>
+   resolves the IP address for the domain
+  </strong>
+  (foreshadowing).
+ </li>
+ <li>
+  Checks if the resolved IP address is within a block list to prevent accessing restricted IPs (eg.
+  <code>
+   127.0.0.1
+  </code>
+  ).
+ </li>
+ <li>
+  If the resolved IP address is allowed, then it will send a request using
+  <code>
+   axios
+  </code>
+  and saves the response.
+ </li>
+</ol>
+<p>
+ The issue with this process is that domain names are
+ <strong>
+  resolved twice
+ </strong>
+ . The first time for validating the destination IP address and when
+ <strong>
+  <code>
+   axios
+  </code>
+  sends a request
+ </strong>
+ . Therefore, we can bypass the SSRF validation by resolving a domain to an allowed address then resolving to a blocked IP address!
+</p>
+<p>
+ <em>
+  But how on earth can you do that?
+ </em>
+</p>
+<h2 class="major" id="dns-rebinding-this-vulnerability">
+ DNS Rebinding This Vulnerability
+</h2>
+<p>
+ DNS rebinding is an attack method that manipulates the resolution of domains. Broadly explaining how it works, the attacker can configure a DNS server with a short time to live (TTL) record that prevents resolved domains being cached and switching the IP addresses.
+</p>
+<p>
+ For this vulnerability, an attacker can bypass the SSRF validation by resolving to an allowed IP address for the first DNS query then to a blocked one when
+ <code>
+  axios
+ </code>
+ sends a request to access sensitive content.
+</p>
+<h2 class="major" id="the-exploit">
+ The Exploit
+</h2>
+<p>
+ I was way too lazy to configure my own DNS server. So I just used
+ <a href="https://lock.cmpxchg8b.com/rebinder.html">
+  <code>
+   rebinder
+  </code>
+ </a>
+ that generates a domain that randomly resolves to two different IP addresses. For an example,
+ <code>
+  7f000001.8efa468e.rbndr.us
+ </code>
+ will resolve to either
+ <code>
+  142.250.70.142
+ </code>
+ or
+ <strong>
+  <code>
+   127.0.0.1
+  </code>
+ </strong>
+ randomly.
+</p>
+<p>
+ To demonstrate the vulnerability, I ran a static web server listening on
+ <code>
+  127.0.0.1
+ </code>
+ on my Directus server that had a
+ <em>
+  secret file
+ </em>
+ at
+ <code>
+  http://127.0.0.1/secret.txt
+ </code>
+ . Then spammed the following request with the domain
+ <code>
+  7f000001.8efa468e.rbndr.us
+ </code>
+ until I was lucky enough to have the domain resolve to
+ <code>
+  142.250.70.142
+ </code>
+ first then
+ <code>
+  127.0.0.1
+ </code>
+ to access
+ <code>
+  http://127.0.0.1/secret.txt
+ </code>
+ .
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/directus_ssrf/successful-bypass.png"/>
+</p>
+<p>
+ To confirm the SSRF bypass was successful, the following screenshot shows that request to
+ <code>
+  http://127.0.0.1/secret.txt
+ </code>
+ was sent by Directus (IP address
+ <code>
+  127.0.0.1
+ </code>
+ ).
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/directus_ssrf/confirm.png"/>
+</p>
+<p>
+ You can then download the response as a file from Directus to steal the sensitive data.
+</p>
+<p>
+ <em>
+  Noice
+ </em>
+</p>
+<h2 class="major" id="a-note-about-using-redirection-to-bypass-the-ssrf-validation">
+ A Note About Using Redirection to Bypass the SSRF Validation
+</h2>
+<p>
+ Now some of you might of noticed that DNS rebinding was a
+ <em>
+  little bit overkill
+ </em>
+ for bypassing the SSRF validation check. Another method to bypass the SSRF vulnerability would be simply redirecting the
+ <code>
+  axios
+ </code>
+ request to the blocked IP address.
+</p>
+<p>
+ <em>
+  Yes redirection would have bypassed the SSRF validation.
+ </em>
+</p>
+<p>
+ However, I decided to demonstrate a DNS rebinding attack over redirection to reduce the risk that the patch would still have a bypass. If the developers just patched the redirection SSRF bypass, then there is a possibility that DNS rebinding could still work to bypass the SSRF validation. However, if the DNS rebinding method was prevented it would also prevent redirection attacks since a fix for DNS rebinding would also patch redirection attacks.
+</p>
+<p>
+ <em>
+  Speaking of which...
+ </em>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style5 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="how-directus-patched-this-vulnerability">
+ How Directus Patched this Vulnerability
+</h1>
+<p>
+ In my initial report, I recommended that Directus needs to also validate the resolved IP address after
+ <code>
+  axios
+ </code>
+ sends the request and explained the reasoning to fix the issue.
+</p>
+<p>
+ When
+ <code>
+  axios
+ </code>
+ completes the request, the returned value has a
+ <code>
+  request
+ </code>
+ attribute that is an instance of
+ <code>
+  ClientRequest
+ </code>
+ . Reading the
+ <a href="https://nodejs.org/api/http.html#class-httpclientrequest">
+  NodeJS documentation for the
+  <code>
+   ClientRequest
+  </code>
+  class
+ </a>
+ , the
+ <code>
+  ClientRequest
+ </code>
+ has the
+ <code>
+  socket
+ </code>
+ attribute that is an instance of
+ <code>
+  net.Socket
+ </code>
+ . From the
+ <code>
+  socket
+ </code>
+ attribute, you can retrieve the final destination IP address from the
+ <code>
+  socket
+ </code>
+ attribute
+ <code>
+  remoteAddress
+ </code>
+ .
+</p>
+<p>
+ <em>
+  Okay I went a bit technical there...
+ </em>
+</p>
+<p>
+ The very simple explanation, when
+ <code>
+  axios
+ </code>
+ is done check that
+ <code>
+  fileResponse.request.socket.remoteAddress
+ </code>
+ is not a blocked IP address. This approach prevents both the DNS rebinding and redirection bypass methods for SSRF.
+</p>
+<p>
+ Rijk from Directus really liked this simple method for fixing the vulnerability, but noted that additional work would be needed fully fix the issue across the CMS. This is because the Webhooks and Request Operation for Workflows within Directus were also vulnerable to SSRF. However, they are not as severe as the
+ <code>
+  /files/import
+ </code>
+ route since you require administrator privileges to exploit.
+</p>
+<p>
+ After a few days, Rijk got back to me with a patch with a really neat fix (
+ <a href="https://github.com/directus/directus/commit/ff53d3e69a602d05342e15d9bb616884833ddbff">
+  commit ff53d3
+ </a>
+ ). A
+ <code>
+  responseInterceptor
+ </code>
+ was added to intercept
+ <code>
+  axios
+ </code>
+ results to verify that the final IP destination is not in the IP block list (code below).
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="k">import</span><span class="w"> </span><span class="nx">type</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">AxiosResponse</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'axios'</span><span class="p">;</span><span class="w"></span>
+<span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">validateIP</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'./validate-ip'</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">export</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">responseInterceptor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">config</span><span class="o">:</span><span class="w"> </span><span class="nx">AxiosResponse</span><span class="o">&lt;</span><span class="nx">any</span><span class="p">,</span><span class="w"> </span><span class="nx">any</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="nx">validateIP</span><span class="p">(</span><span class="nx">config</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">socket</span><span class="p">.</span><span class="nx">remoteAddress</span><span class="p">,</span><span class="w"> </span><span class="nx">config</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">url</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">config</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ The
+ <code>
+  validateIP
+ </code>
+ function just verifies that the final destination is not in the
+ <code>
+  IMPORT_IP_DENY_LIST
+ </code>
+ IP block list.
+</p>
+<p>
+ However, I did have two concerns with this patch.
+</p>
+<p>
+ Firstly if a user did not follow the recommended Dockerised deployment of Directus, then there was a possibility to bypass
+ <code>
+  localhost
+ </code>
+ checks by using alias IP addresses from the
+ <code>
+  /etc/hosts
+ </code>
+ configuration file. For an example, most debian hosts have the alias IP address
+ <code>
+  127.0.1.1
+ </code>
+ within the
+ <code>
+  /etc/hosts
+ </code>
+ configuration file that can access HTTP servers listening on
+ <code>
+  127.0.0.1
+ </code>
+ . However, Directus and I decided that since host deployment is not recommended the responsibility is on the user to ensure that the setting
+ <code>
+  IMPORT_IP_DENY_LIST
+ </code>
+ is properly configured for their environment.
+</p>
+<p>
+ Secondly, the patch that Rijk originally introduced only added a response interceptor to prevent saving responses from blocked destinations and did not prevent Directus from sending requests. This is known as blind SSRF and in my opinion not really a vulnerability (if anything a low severity vulnerability). The impact of SSRF vulnerabilities is from the ability to view the responses from internal systems. Blind SSRF is a nothing burger in most cases, since to cause any significant impact the blind SSRF needs to trigger a different vulnerability in an internal system (which is very unlikely).
+</p>
+<p>
+ However, I did recommend to Rijk that a request interceptor should be added to validate hostnames before requests are sent mitigate the exploitation of blind SSRF. It still means that DNS rebinding and redirection methods can be still exploit the blind SSRF vulnerability. However, the only way to way to completely eliminate the blind SSRF vulnerability would be to delete the request features in Directus, which is a bit silly since the risk level for blind SSRF is low. Rijk agreed with my recommendation and added the request interceptor in commit
+ <a href="https://github.com/directus/directus/commit/6dce1a2f8a3c3c2fdb44e65704d5d985fa7d2e51">
+  6dce1a2
+ </a>
+ .
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style6 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="conclusion">
+ Conclusion
+</h1>
+<p>
+ This was a nice little vulnerability and hope you enjoyed reading this article. I want to give a huge shot out to Rijk at Directus for patching this vulnerability quickly! I hope you learnt something new about SSRF vulnerabilities and have a deeper understanding about exploiting/preventing SSRF vulnerabilities.
+</p>
+<p>
+ <em>
+  Thanks for reading this short vulnerability disclosure! If you are interested about my vulnerability disclosures or CTF write ups,
+  <a href="https://github.com/Ccamm/ccamm.github.io">
+   please watch my GitHub repository for new articles
+  </a>
+  . I will be back soon with a spicy disclosure for several vulnerabilities soon!
+ </em>
+</p></div>
+</div>
+</section>
+</section>
+
+    	</div>
+
+    <!-- Footer -->
+      <!-- Footer -->
+  <section id="footer">
+    <div class="inner">
+      <ul class="icons">
+        <li><a href="https://twitter.com/GhostCcamm" class="icon brands fa-twitter"><span class="label"></span></a></li>
+        <li><a href="https://github.com/Ccamm" class="icon brands fa-github"><span class="label"></span></a></li>
+      </ul>
+    </div>
+  </section>
+
+		<!-- Particles -->
+			<div id="particles-js"></div>
+
+		<!-- Scripts -->
+			<script src="/assets/js/jquery.min.js"></script>
+			<script src="/assets/js/jquery.scrollex.min.js"></script>
+			<script src="/assets/js/browser.min.js"></script>
+			<script src="/assets/js/breakpoints.min.js"></script>
+			<script src="/assets/js/util.js"></script>
+			<script src="/assets/js/particles.min.js"></script>
+			<script src="/assets/js/main.js"></script>
+      
+	</body>
+</html>
