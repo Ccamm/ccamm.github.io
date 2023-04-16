@@ -1,6 +1,14 @@
 <html>
 	<head>
-		<title>GhostCcamm's Cyber Misadventures</title>
+		<title>Multiple Critical Vulnerabilities in Strapi Versions <=4.7.1</title>
+		<meta name="description" content="Strapi had multiple critical vulnerabilities that could be chained together to gain Unauthenticated Remote Code Execution. This is my public disclosure of the vulnerabilities I found in Strapi, how they were patched and some nonsensical ramblings." />
+		<meta name="robots" content="index, follow" />
+		<meta property="og:title" content="Multiple Critical Vulnerabilities in Strapi Versions <=4.7.1" />
+		<meta property="og:site_name" content="GhostCcamm's Cyber Misadventures" />
+		<meta property="og:description" content="Strapi had multiple critical vulnerabilities that could be chained together to gain Unauthenticated Remote Code Execution. This is my public disclosure of the vulnerabilities I found in Strapi, how they were patched and some nonsensical ramblings." />
+		
+        <meta property="og:image" content="/images/blog/multi_strapi_vulns/strapi-logo.png" />
+    
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="/assets/css/main.css" />
@@ -39,12 +47,12 @@
 		        <div class="logo"><div class="image"><img src="/images/logo.png" alt="" width="75" height="75" /></div></div>
 		        <h2>Multiple Critical Vulnerabilities in Strapi Versions <=4.7.1</h2>
 						<p class="date">2023-04-17</p>
-		        <p>A story about the vulnerabilities I discovered in Strapi that include Server-Side Template Injection, hijacking admin accounts and bypassing authentication.</p>
+		        <p>Strapi had multiple critical vulnerabilities that could be chained together to gain Unauthenticated Remote Code Execution. This is my public disclosure of the vulnerabilities I found in Strapi, how they were patched and some nonsensical ramblings."</p>
 		      </div>
 		    </section>
 
       <section id="wrapper">
-<section class="wrapper style4 ">
+<section class="wrapper style1 ">
 <div class="inner">
 <div class="content">
 <h1 class="major" id="overview">
@@ -337,7 +345,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style1 alt">
+<section class="wrapper style3 alt">
 <div class="inner">
 <div class="content">
 
@@ -372,7 +380,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style6 ">
+<section class="wrapper style2 ">
 <div class="inner">
 <div class="content">
 
@@ -396,7 +404,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style2 alt">
+<section class="wrapper style5 alt">
 <div class="inner">
 <div class="content">
 
@@ -463,7 +471,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style3 ">
+<section class="wrapper style6 ">
 <div class="inner">
 <div class="content">
 
@@ -525,7 +533,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style5 alt">
+<section class="wrapper style4 alt">
 <div class="inner">
 <div class="content">
 
@@ -941,7 +949,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style4 alt">
+<section class="wrapper style3 alt">
 <div class="inner">
 <div class="content">
 
@@ -998,7 +1006,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style3 ">
+<section class="wrapper style4 ">
 <div class="inner">
 <div class="content">
 
@@ -1358,7 +1366,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style4 alt">
+<section class="wrapper style3 alt">
 <div class="inner">
 <div class="content">
 
@@ -2038,7 +2046,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style6 ">
+<section class="wrapper style2 ">
 <div class="inner">
 <div class="content">
 
@@ -2140,7 +2148,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style3 alt">
+<section class="wrapper style5 alt">
 <div class="inner">
 <div class="content">
 
@@ -2631,7 +2639,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style2 ">
+<section class="wrapper style6 ">
 <div class="inner">
 <div class="content">
 
@@ -2691,7 +2699,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style5 alt">
+<section class="wrapper style4 alt">
 <div class="inner">
 <div class="content">
 
@@ -2753,7 +2761,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style5 ">
+<section class="wrapper style2 ">
 <div class="inner">
 <div class="content">
 
@@ -2868,7 +2876,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style1 alt">
+<section class="wrapper style5 alt">
 <div class="inner">
 <div class="content">
 
@@ -3356,7 +3364,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style4 alt">
+<section class="wrapper style3 alt">
 <div class="inner">
 <div class="content">
 
@@ -3457,7 +3465,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style3 ">
+<section class="wrapper style1 ">
 <div class="inner">
 <div class="content">
 
@@ -3526,7 +3534,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style2 alt">
+<section class="wrapper style4 alt">
 <div class="inner">
 <div class="content">
 
@@ -3605,7 +3613,7 @@
 </div>
 </div>
 </section>
-<section class="wrapper style6 ">
+<section class="wrapper style5 ">
 <div class="inner">
 <div class="content">
 
@@ -3639,8 +3647,22 @@
  </code>
  .
 </p>
+<p>
+ <strong>
+  Strapi v4
+ </strong>
+</p>
 <div class="codehilite">
  <pre><span></span><code><span class="sr">/\/api\/auth\/cognito\/callback\?[\s\S]*id_token=\s*([\S]*)/</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ <strong>
+  Strapi v3
+ </strong>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="sr">/auth\/cognito\/callback\?[\s\S]*id_token=\s*([\S]*)/</span><span class="w"></span>
 </code></pre>
 </div>
 <p>
@@ -3690,8 +3712,22 @@
  </strong>
  is easily detectable, since the payload is within the GET parameters and are normally included in request logs. The following regex pattern will extract requests that are exploiting this vulnerability to leak user's email, password and password reset token columns.
 </p>
+<p>
+ <strong>
+  Strapi v4
+ </strong>
+</p>
 <div class="codehilite">
  <pre><span></span><code><span class="sr">/(\[|%5B)\s*(email|password|reset_password_token|resetPasswordToken)\s*(\]|%5D)/</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ <strong>
+  Strapi v3
+ </strong>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="sr">/(\.|%2E)\s*(email|password|reset_password_token|resetPasswordToken)\s*(\_|%5F)/</span><span class="w"></span>
 </code></pre>
 </div>
 <p>
@@ -3701,8 +3737,22 @@
  </code>
  command.
 </p>
+<p>
+ <strong>
+  Strapi v4
+ </strong>
+</p>
 <div class="codehilite">
  <pre><span></span><code>grep -iE <span class="s1">'(\[|%5B)\s*(email|password|reset_password_token|resetPasswordToken)\s*(\]|%5D)'</span> <span class="nv">$PATH_TO_LOG_FILE</span>
+</code></pre>
+</div>
+<p>
+ <strong>
+  Strapi v3
+ </strong>
+</p>
+<div class="codehilite">
+ <pre><span></span><code>grep -iE <span class="s1">'(\.|%2E)\s*(email|password|reset_password_token|resetPasswordToken)\s*(\_|%5F)'</span> <span class="nv">$PATH_TO_LOG_FILE</span>
 </code></pre>
 </div>
 <p>
@@ -3760,14 +3810,14 @@
  Conclusion
 </h1>
 <p>
- I hope you enjoyed this deep dive into these vulnerabilities that I discovered in Strapi. These types of vulnerabilities are really my type of jam and it was a lot of fun taking on the challenge of bypassing Strapi's email template validation, dumping sensitive user information and bypassing authentication.
+ I hope you enjoyed this deep dive into these vulnerabilities that I discovered in Strapi. It was a lot of fun taking on the challenge of bypassing Strapi's email template validation, dumping sensitive user information and bypassing authentication.
 </p>
 <p>
  Once again, I want to give the Strapi security team a massive thank you for how they handled responding to my security reports. I seldomly see vulnerability disclosure done correctly by an organisation, and this experience was a huge breath of fresh air for me. I wish that other organisations look towards Strapi as an example on how vulnerability disclosure should be handled, because as we always say in the security world...
 </p>
 <p>
  <em>
-  The poop will eventually hit the fan
+  We have anxiety for a reason.
  </em>
 </p>
 <p>
