@@ -1,5 +1,5 @@
 category: Vulnerabilities
-desc: A story about the vulnerabilities I discovered in Strapi CMS that include Server-Side Template Injection, hijacking admin accounts and bypassing authentication.
+desc: Strapi had multiple critical vulnerabilities that could be chained together to gain Unauthenticated Remote Code Execution. This is my public disclosure of the vulnerabilities I found in Strapi, how they were patched and some nonsensical ramblings.
 main_image: images/strapi-logo.png
 page_name: "Multiple Critical Vulnerabilities in Strapi Versions <=4.7.1"
 publish: true
