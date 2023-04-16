@@ -34,7 +34,8 @@ class PageControl:
                 name = page_config["page_name"],
                 description = page_config["desc"],
                 date = release_date,
-                body = page_config["html"]
+                body = page_config["html"],
+                image = page_config["main_image"] if "main_image" in page_config else None
             )
             with open(html_path, "w") as f:
                 f.write(template_str)

@@ -1,8 +1,15 @@
 {% extends 'base.html' %}
 {% block page_name %}{{ name|safe }}{% endblock %}
 {% block desc %}{{ description|safe }}{% endblock %}
+{% block social_title %}{{ name|safe }}{% endblock %}
+{% block social_desc %}{{ description|safe }}{% endblock %}
 {% block release_date %}{{ date|safe }}{% endblock %}
+{% if image is not none %}
+    {% block extra_meta %}
+        <meta property="og:image" content="{{ image }}" />
+    {% endblock %}
+{% endif %}
 
 <div class="article-content">
-    {% block content %}{{ body|safe }}{% endblock %}}
+    {% block content %}{{ body|safe }}{% endblock %}
 </div>
