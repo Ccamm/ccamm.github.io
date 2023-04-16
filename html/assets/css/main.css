@@ -2481,6 +2481,10 @@ input, select, textarea {
 		padding-left: 1em;
 	}
 
+		ul ul {
+			margin: 0;
+		}
+
 		ul li {
 			padding-left: 0.5em;
 		}
