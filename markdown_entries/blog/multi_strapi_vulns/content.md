@@ -1267,8 +1267,14 @@ One of my primary concerns about finding all of these vulnerabilities in Strapi 
 
 The following regex pattern will extract all of the ID tokens sent to `/api/auth/cognito/callback`.
 
+**Strapi v4**
 ```js
 /\/api\/auth\/cognito\/callback\?[\s\S]*id_token=\s*([\S]*)/
+```
+
+**Strapi v3**
+```js
+/auth\/cognito\/callback\?[\s\S]*id_token=\s*([\S]*)/
 ```
 
 Once you have a list of the ID tokens, you will need to verify each token using the **public key file for your AWS Cognito user pool** that you can download from `https://cognito-idp.{region}.amazonaws.com/{userPoolId}/.well-known/jwks.json`. If there are any JWT tokens that cannot be verified using the correct public key, then you need to inspect the JWT body and see if it contains the `email` and `cognito:username` claims (example below).
@@ -1286,14 +1292,26 @@ If there are any JWTs that have this body, verify when the account with the emai
 
 The exploitation of **CVE-2023-22894** is easily detectable, since the payload is within the GET parameters and are normally included in request logs. The following regex pattern will extract requests that are exploiting this vulnerability to leak user's email, password and password reset token columns.
 
+**Strapi v4**
 ```js
 /(\[|%5B)\s*(email|password|reset_password_token|resetPasswordToken)\s*(\]|%5D)/
 ```
 
+**Strapi v3**
+```js
+/(\.|%2E)\s*(email|password|reset_password_token|resetPasswordToken)\s*(\_|%5F)/
+```
+
 You can search log files for this IoC by using the following `grep` command.
 
+**Strapi v4**
 ```bash
 grep -iE '(\[|%5B)\s*(email|password|reset_password_token|resetPasswordToken)\s*(\]|%5D)' $PATH_TO_LOG_FILE
+```
+
+**Strapi v3**
+```bash
+grep -iE '(\.|%2E)\s*(email|password|reset_password_token|resetPasswordToken)\s*(\_|%5F)' $PATH_TO_LOG_FILE
 ```
 
 If the above regex patterns matches any lines in your log files, take extra precaution to look out for multiple requests that include `password`, `reset_password_token` or `resetPasswordToken`. **This would indicate that an attacker has leaked the password hashes and reset tokens on you Strapi server and you need to immediately start incident response!**
@@ -1306,10 +1324,10 @@ Using just the request log files, the only IoC to search for is a `PUT` request 
 
 # Conclusion
 
-I hope you enjoyed this deep dive into these vulnerabilities that I discovered in Strapi. These types of vulnerabilities are really my type of jam and it was a lot of fun taking on the challenge of bypassing Strapi's email template validation, dumping sensitive user information and bypassing authentication.
+I hope you enjoyed this deep dive into these vulnerabilities that I discovered in Strapi. It was a lot of fun taking on the challenge of bypassing Strapi's email template validation, dumping sensitive user information and bypassing authentication.
 
 Once again, I want to give the Strapi security team a massive thank you for how they handled responding to my security reports. I seldomly see vulnerability disclosure done correctly by an organisation, and this experience was a huge breath of fresh air for me. I wish that other organisations look towards Strapi as an example on how vulnerability disclosure should be handled, because as we always say in the security world...
 
-*The poop will eventually hit the fan*
+*We have anxiety for a reason.*
 
 *Thank you for reading!*
