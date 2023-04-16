@@ -1,0 +1,7 @@
+category: Vulnerabilities
+desc: A story about the vulnerabilities I discovered in Strapi that include Server-Side Template Injection, hijacking admin accounts and bypassing authentication.
+main_image: images/strapi-logo.png
+page_name: "Multiple Critical Vulnerabilities in Strapi Versions <=4.7.1"
+publish: true
+release_date: 2023-04-17 09:00:00.000000+00:00
+show_header_section: false
