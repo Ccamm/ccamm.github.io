@@ -1,0 +1,8 @@
+category: Vulnerabilities
+desc: Another juicy vulnerability disclosure about CSRF to RCE and XSS, plus a bonus
+  IDOR finding in Cockpit CMS.
+main_image: images/cockpit-logo.png
+page_name: Multiple Vulnerabilities in Cockpit CMS <= v2.5.2
+publish: true
+release_date: 2023-06-30 08:00:00.000000+00:00
+show_header_section: false

