@@ -1,0 +1,9 @@
+category: Vulnerabilities
+desc: A story about Boegie19's sneaky bypass of Strapi's filter protections that were
+  implemented to patch CVE-2023-22894. It was a great finding by Boegie19, so Strapi
+  in for another fun technical deep dive.
+main_image: images/strapi-logo.png
+page_name: 'CVE-2023-34235: Bypassing Filter Validation in Strapi <= v4.10.7'
+publish: true
+release_date: 2023-07-25 13:00:00.000000+00:00
+show_header_section: false

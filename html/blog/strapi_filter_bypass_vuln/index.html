@@ -1,0 +1,1677 @@
+<html>
+	<head>
+		<title>CVE-2023-34235: Bypassing Filter Validation in Strapi <= v4.10.7</title>
+		<meta name="description" content="A story about Boegie19's sneaky bypass of Strapi's filter protections that were implemented to patch CVE-2023-22894. It was a great finding by Boegie19, so Strapi in for another fun technical deep dive." />
+		<meta name="robots" content="index, follow" />
+		<meta property="og:title" content="CVE-2023-34235: Bypassing Filter Validation in Strapi <= v4.10.7" />
+		<meta property="og:site_name" content="GhostCcamm's Cyber Misadventures" />
+		<meta property="og:description" content="A story about Boegie19's sneaky bypass of Strapi's filter protections that were implemented to patch CVE-2023-22894. It was a great finding by Boegie19, so Strapi in for another fun technical deep dive." />
+		
+        <meta property="og:image" content="/images/blog/strapi_filter_bypass_vuln/strapi-logo.png" />
+    
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="/assets/css/main.css" />
+		<link rel="stylesheet" href="/assets/css/styles.css" />
+		<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Page Wrapper -->
+			<div id="page-wrapper">
+
+			<!-- Header -->
+				<header id="header" class="alt">
+					<h1><a href="index.html">GhostCcamm's Cyber Misadventures</a></h1>
+					<nav>
+						<a href="#menu">Menu</a>
+					</nav>
+				</header>
+
+			<!-- Menu -->
+				<nav id="menu">
+					<div class="inner">
+						<h2>Menu</h2>
+						<ul class="links">
+							<li><a href="/">Home</a></li>
+							<li><a href="/blog">Blog</a></li>
+							<li><a href="/writeups">Write Ups</a></li>
+						</ul>
+						<a href="#" class="close">Close</a>
+					</div>
+				</nav>
+
+			<!-- Banner -->
+		    <section id="banner">
+		      <div class="inner">
+		        <div class="logo"><div class="image"><img src="/images/logo.png" alt="" width="75" height="75" /></div></div>
+		        <h2>CVE-2023-34235: Bypassing Filter Validation in Strapi <= v4.10.7</h2>
+						<p class="date">2023-07-25</p>
+		        <p>A story about Boegie19's sneaky bypass of Strapi's filter protections that were implemented to patch CVE-2023-22894. It was a great finding by Boegie19, so Strapi in for another fun technical deep dive."</p>
+		      </div>
+		    </section>
+
+      <section id="wrapper">
+<section class="wrapper style3 ">
+<div class="inner">
+<div class="content">
+<h1 class="major" id="overview">
+ Overview
+</h1>
+<p>
+ <strong>
+  The Strapi story continues!
+ </strong>
+</p>
+<p>
+ After I did
+ <a href="https://www.ghostccamm.com/blog/multi_strapi_vulns/">
+  my research into Strapi CMS earlier this year
+ </a>
+ , it inspired a wizard Javascript developer (
+ <a href="https://github.com/Boegie19">
+  Boegie19
+ </a>
+ ) that was heavily involved in the Strapi development community to dig into issues I reported. They discovered that both Strapi and I missed an edge case that bypassed the filter protection to patch
+ <a href="https://www.ghostccamm.com/blog/multi_strapi_vulns/#cve-2023-22894-leaking-sensitive-user-information-by-filtering-on-private-fields-in-strapi-versions-471">
+  CVE-2023-22894
+ </a>
+ by abusing
+ <em>
+  table aliases that were being inserted into queries.
+ </em>
+</p>
+<p>
+ The purpose of this blog is to bring awareness about
+ <a href="https://github.com/Boegie19">
+  Boegie19
+ </a>
+ 's cool finding that they found in Strapi, plus do my usual ramblings as I do a deep technical dive into the issue.
+</p>
+<p>
+ <em>
+  So Strapi in again for another wild ride!
+ </em>
+</p>
+<p>
+ <strong>
+  Table of Contents
+ </strong>
+</p>
+<div class="toc">
+ <ul>
+  <li>
+   <a href="#overview">
+    Overview
+   </a>
+  </li>
+  <li>
+   <a href="#vulnerability-disclosure-timeline">
+    Vulnerability Disclosure Timeline
+   </a>
+  </li>
+  <li>
+   <a href="#cve-2023-34235-bypass-of-cve-2023-22894-by-abusing-sql-table-aliases">
+    CVE-2023-34235: Bypass of CVE-2023-22894 by Abusing SQL Table Aliases
+   </a>
+   <ul>
+    <li>
+     <a href="#cve-2023-22894-refresher">
+      CVE-2023-22894 Refresher
+     </a>
+    </li>
+    <li>
+     <a href="#what-did-i-miss-during-my-previous-vulnerability-disclosure">
+      What did I miss during my previous vulnerability disclosure?
+     </a>
+     <ul>
+      <li>
+       <a href="#populatecreatorfields-option-being-enabled-for-collections">
+        populateCreatorFields Option being Enabled for Collections
+       </a>
+      </li>
+      <li>
+       <a href="#custom-relational-fields-to-the-admin-users-on-the-admin-api">
+        Custom Relational Fields to the Admin Users on the Admin API
+       </a>
+      </li>
+      <li>
+       <a href="#entity-service-api">
+        Entity Service API
+       </a>
+      </li>
+     </ul>
+    </li>
+    <li>
+     <a href="#scenarios-where-the-bypass-occurred">
+      Scenarios Where the Bypass Occurred
+     </a>
+    </li>
+   </ul>
+  </li>
+  <li>
+   <a href="#code-deep-dive">
+    Code Deep Dive
+   </a>
+  </li>
+  <li>
+   <a href="#how-did-strapi-patch-this-vulnerability">
+    How did Strapi patch this vulnerability?
+   </a>
+  </li>
+  <li>
+   <a href="#potential-impact-to-other-object-relational-mappers">
+    Potential Impact to Other Object Relational Mappers
+   </a>
+  </li>
+  <li>
+   <a href="#indicators-of-compromise-for-cve-2023-34235">
+    Indicators of Compromise for CVE-2023-34235
+   </a>
+  </li>
+  <li>
+   <a href="#conclusion">
+    Conclusion
+   </a>
+  </li>
+ </ul>
+</div>
+</div>
+</div>
+</section>
+<section class="wrapper style4 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="vulnerability-disclosure-timeline">
+ Vulnerability Disclosure Timeline
+</h1>
+<p>
+ <em>
+  The following timeline was provided to me by Derrick Mehaffy at Strapi and was verified by Boegie19
+ </em>
+</p>
+<table>
+ <thead>
+  <tr>
+   <th>
+    Time
+   </th>
+   <th>
+    Event
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td>
+    2023/05/02 5:46pm GMT
+   </td>
+   <td>
+    Report of the vulnerability received by the Strapi Security Team
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/05/05 8:15am GMT
+   </td>
+   <td>
+    Vulnerability report was accepted by the Strapi Team
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/05/05 11:27am GMT
+   </td>
+   <td>
+    The Strapi Engineering Team communicated to the reporter our planned changes to get their feedback
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/05/07 5:30pm GMT
+   </td>
+   <td>
+    The reporter acknowledged and agreed with our planned changes
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/06/07 8:12am GMT
+   </td>
+   <td>
+    An experimental release was made with the changes communicated previously for testing
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/06/07 3:42pm GMT
+   </td>
+   <td>
+    GitHub issued CVE-2023-34235 per our request
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/06/07 1:08pm GMT
+   </td>
+   <td>
+    Patch was released in Strapi version
+    <a href="https://github.com/strapi/strapi/releases/tag/v4.10.8">
+     v4.10.8
+    </a>
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/06/07 3:00pm GMT
+   </td>
+   <td>
+    Disclosure communication placed on hold due to internal requirements and other vulnerability work being performed
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/07/10 7:25pm GMT
+   </td>
+   <td>
+    Initial warning email was sent out to all Strapi Enterprise and Cloud Customers including Strapi partners with active enterprise contracts
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/07/10 7:25pm GMT
+   </td>
+   <td>
+    Mandatory waiting period of 2 weeks initiated
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/07/25 1:01pm GMT
+   </td>
+   <td>
+    Released the full disclosure of the vulnerability and published GitHub Advisories
+   </td>
+  </tr>
+  <tr>
+   <td>
+    2023/07/25 1:01pm GMT
+   </td>
+   <td>
+    Disclosure email was sent out to all Strapi Enterprise and Cloud Customers, including Strapi partners with active enterprise contracts
+   </td>
+  </tr>
+ </tbody>
+</table>
+</div>
+</div>
+</section>
+<section class="wrapper style6 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="cve-2023-34235-bypass-of-cve-2023-22894-by-abusing-sql-table-aliases">
+ CVE-2023-34235: Bypass of CVE-2023-22894 by Abusing SQL Table Aliases
+</h1>
+<h2 class="major" id="cve-2023-22894-refresher">
+ CVE-2023-22894 Refresher
+</h2>
+<p>
+ Before we jump into the juicy details about this vulnerability, we need todo a quick refresher about
+ <a href="https://www.ghostccamm.com/blog/multi_strapi_vulns/#cve-2023-22894-leaking-sensitive-user-information-by-filtering-on-private-fields-in-strapi-versions-471">
+  CVE-2023-22894
+ </a>
+ .
+</p>
+<p>
+ <a href="https://www.ghostccamm.com/blog/multi_strapi_vulns/#cve-2023-22894-leaking-sensitive-user-information-by-filtering-on-private-fields-in-strapi-versions-471">
+  CVE-2023-22894
+ </a>
+ abused Strapi's Object Relational Mapper (ORM) that was exposed by Strapi's REST API to query on sensitive fields. It enabled an unauthenticated attacker to be able to filter by the
+ <strong>
+  password reset token of administrator users that create content on Strapi and highjack their account
+ </strong>
+ ! The attack was done by filtering by either the
+ <code>
+  createdBy
+ </code>
+ or
+ <code>
+  updatedBy
+ </code>
+ attribute that is a relational field to the corresponding administrator user entry. This enabled using either the
+ <code>
+  $startsWith
+ </code>
+ or
+ <code>
+  $contains
+ </code>
+ query operations to leak the full value of sensitive fields character by character.
+</p>
+<p>
+ For further details,
+ <a href="https://www.ghostccamm.com/blog/multi_strapi_vulns/">
+  check out my previous blog article
+ </a>
+ or appreciate the pretty cool GIF chaining
+ <strong>
+  CVE-2023-22894
+ </strong>
+ and
+ <strong>
+  CVE-2023-22621
+ </strong>
+ together to achieve
+ <strong>
+  unauthenticated RCE
+ </strong>
+ .
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/strapi_filter_bypass_vuln/old-popping-unauth-shell.gif"/>
+</p>
+<p>
+ It took Strapi over 2 months to update over 280+ files to patch this original vulnerability, that I verified fixed my
+ <em>
+  initial issue
+ </em>
+ .
+</p>
+<p>
+ <em>
+  However, I made a grave mistake and missed an edge case scenario that bypassed the protections that Strapi implemented.
+ </em>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style5 alt">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="what-did-i-miss-during-my-previous-vulnerability-disclosure">
+ What did I miss during my previous vulnerability disclosure?
+</h2>
+<p>
+ When I was verifying Strapi's patch for CVE-2023-22894, I tested what happened if I queried by a non-existent attribute for the user field. The following screenshot shows that it appeared that the patch for CVE-2023-22894 ignored trying to query by the relational fields
+ <code>
+  createdBy
+ </code>
+ and
+ <code>
+  updatedBy
+ </code>
+ .
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/strapi_filter_bypass_vuln/test-patch0.png"/>
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/strapi_filter_bypass_vuln/test-patch1.png"/>
+</p>
+<p>
+ However, I missed testing what occurred by a non-existent attribute
+ <strong>
+  that was not a relational field
+ </strong>
+ . For an example, if I queried by some non-existent attribute for my test
+ <code>
+  Article
+ </code>
+ collection I got a
+ <code>
+  500
+ </code>
+ response.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/strapi_filter_bypass_vuln/hmm-500.png"/>
+</p>
+<p>
+ <em>
+  Hmm, that is pretty whack.
+ </em>
+ Let's take a look at the error message on my server console.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/strapi_filter_bypass_vuln/error-msg.png"/>
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/strapi_filter_bypass_vuln/hmmmm.gif"/>
+</p>
+<p>
+ <em>
+  Hmmmmm
+ </em>
+ , we can see in that error message that the following SQL query fails to execute since
+ <code>
+  fakeattr
+ </code>
+ was not a valid column for the table named
+ <code>
+  articles
+ </code>
+ .
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="k">select</span><span class="w"> </span><span class="ss">"t0"</span><span class="p">.</span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="ss">"articles"</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="ss">"t0"</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="p">((</span><span class="ss">"t0"</span><span class="p">.</span><span class="ss">"fakeattr"</span><span class="w"> </span><span class="k">like</span><span class="w"> </span><span class="err">$</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="ss">"t0"</span><span class="p">.</span><span class="ss">"published_at"</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="p">)</span><span class="w"> </span><span class="k">limit</span><span class="w"> </span><span class="err">$</span><span class="mi">2</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ However,
+ <strong>
+  what on earth is that
+  <code>
+   "t0"
+  </code>
+  table alias being whacked into query?
+ </strong>
+</p>
+<p>
+ This was what I missed when I originally verified Strapi's patch.
+ <a href="https://github.com/Boegie19">
+  Boegie19
+ </a>
+ discovered that if a user had the
+ <code>
+  find
+ </code>
+ permission to a collection, then they can populate the other collection into the query and use the inserted
+ <strong>
+  table alias to bypass Strapi's column filter to access sensitive column
+ </strong>
+ .
+</p>
+<p>
+ Sounds a bit confusing, let's go through an example. Let's say that we have enabled public users to have the
+ <code>
+  find
+ </code>
+ permission for users of the user &amp; permissions plugin. We can see from the resulting SQL query that we cannot directly filter user's by their
+ <code>
+  password
+ </code>
+ or
+ <code>
+  reset_password_token
+ </code>
+ (which was the original issue in my initial report), since now it is being stripped from the filter.
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="k">select</span><span class="w"> </span><span class="ss">"t0"</span><span class="p">.</span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="ss">"up_users"</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="ss">"t0"</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ However, if we query by a column that does not exist in the
+ <code>
+  up_users
+ </code>
+ table we can see that it bypasses Strapi's filter gets inserted into the query.
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="k">select</span><span class="w"> </span><span class="ss">"t0"</span><span class="p">.</span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="ss">"up_users"</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="ss">"t0"</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="p">(</span><span class="ss">"t0"</span><span class="p">.</span><span class="ss">"fakecolumn"</span><span class="w"> </span><span class="k">like</span><span class="w"> </span><span class="err">$</span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ Therefore, if we use the table alias
+ <code>
+  t0
+ </code>
+ to access the password column we can
+ <strong>
+  access the
+  <code>
+   password
+  </code>
+  column
+ </strong>
+ (REST API URL path
+ <code>
+  /api/users?filters[t0.password][$startsWith]=$2a$10$
+ </code>
+ ). This is confirmed by checking the resulting query.
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="k">select</span><span class="w"> </span><span class="ss">"t0"</span><span class="p">.</span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="ss">"up_users"</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="ss">"t0"</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="p">(</span><span class="ss">"t0"</span><span class="p">.</span><span class="ss">"password"</span><span class="w"> </span><span class="k">like</span><span class="w"> </span><span class="err">$</span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ <img alt="" class="center" src="/images/blog/strapi_filter_bypass_vuln/gorilla-stare.gif"/>
+</p>
+<p>
+ <em>
+  Woah that is pretty cool!
+ </em>
+</p>
+<p>
+ However, this scenario was only exploitable since we had the
+ <code>
+  find
+ </code>
+ permission for viewing users. Let's explore other scenarios where this bypass works!
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style2 ">
+<div class="inner">
+<div class="content">
+
+<h3 class="major" id="populatecreatorfields-option-being-enabled-for-collections">
+ <code>
+  populateCreatorFields
+ </code>
+ Option being Enabled for Collections
+</h3>
+<p>
+ So the key to this is bypass is that table with the sensitive columns needs to be included into the resulting SQL query. This only occurs had the
+ <code>
+  find
+ </code>
+ permission and data from the target table is
+ <strong>
+  populated
+ </strong>
+ in the result.
+</p>
+<p>
+ <a href="https://github.com/Boegie19">
+  Boegie19
+ </a>
+ pointed out that there is a funny little option called
+ <code>
+  populateCreatorFields
+ </code>
+ that populated the
+ <code>
+  createdBy
+ </code>
+ and
+ <code>
+  updatedBy
+ </code>
+ fields in the query even if the user does not have the
+ <code>
+  find
+ </code>
+ permission for the
+ <code>
+  admin_users
+ </code>
+ table! This can be enabled by modifying the
+ <code>
+  content-types/{collection-name}/schema.json
+ </code>
+ to include this option, as I did below for my
+ <code>
+  article
+ </code>
+ collection.
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nt">"kind"</span><span class="p">:</span><span class="w"> </span><span class="s2">"collectionType"</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">"collectionName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"articles"</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">"info"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">"singularName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"article"</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">"pluralName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"articles"</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">"displayName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Article"</span><span class="w"></span>
+<span class="w">  </span><span class="p">},</span><span class="w"></span>
+<span class="w">  </span><span class="nt">"options"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">"draftAndPublish"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">"populateCreatorFields"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
+<span class="w">  </span><span class="p">},</span><span class="w"></span>
+<span class="w">  </span><span class="nt">"pluginOptions"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w"></span>
+<span class="w">  </span><span class="nt">"attributes"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">"Title"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+<span class="w">    </span><span class="nt">"Body"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"richtext"</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ Now let's see if we can access the
+ <code>
+  password
+ </code>
+ column by using
+ <code>
+  t0.password
+ </code>
+ and the
+ <code>
+  createdBy
+ </code>
+ and
+ <code>
+  updatedBy
+ </code>
+ attributes again.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/strapi_filter_bypass_vuln/attempt_bypass_populate1.png"/>
+</p>
+<p>
+ <em>
+  Hm okay we got a 500 response, let's check the resulting query.
+ </em>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="k">select</span><span class="w"> </span><span class="k">distinct</span><span class="w"> </span><span class="ss">"t0"</span><span class="p">.</span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="ss">"articles"</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="ss">"t0"</span><span class="w"> </span><span class="k">left</span><span class="w"> </span><span class="k">join</span><span class="w"> </span><span class="ss">"admin_users"</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="ss">"t1"</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="ss">"t0"</span><span class="p">.</span><span class="ss">"created_by_id"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">"t1"</span><span class="p">.</span><span class="ss">"id"</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="p">(</span><span class="ss">"t0"</span><span class="p">.</span><span class="ss">"password"</span><span class="w"> </span><span class="k">like</span><span class="w"> </span><span class="err">$</span><span class="mi">1</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="ss">"t0"</span><span class="p">.</span><span class="ss">"published_at"</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="p">)</span><span class="w"> </span><span class="k">limit</span><span class="w"> </span><span class="err">$</span><span class="mi">2</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ As we can see, the
+ <code>
+  admin_users
+ </code>
+ table is assigned the table alias
+ <code>
+  t1
+ </code>
+ instead of
+ <code>
+  t0
+ </code>
+ so we just need to change our payload to
+ <code>
+  t1.password
+ </code>
+ instead.
+</p>
+<p>
+ <em>
+  Invalid attempt that should return an empty list since password hashes didn't start with
+  <code>
+   $2a$10X
+  </code>
+ </em>
+ <br/>
+ <img alt="" class="center" src="/images/blog/strapi_filter_bypass_vuln/invalid_attempt.png"/>
+</p>
+<p>
+ <em>
+  Response length is now 1 since password hashes do start with
+  <code>
+   $2a$10$
+  </code>
+  !
+ </em>
+ <br/>
+ <img alt="" class="center" src="/images/blog/strapi_filter_bypass_vuln/valid_attempt.png"/>
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/strapi_filter_bypass_vuln/monke-shock.gif"/>
+</p>
+<p>
+ <em>
+  That is pretty cool, let's explore other scenarios where this bypass occurs.
+ </em>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style1 alt">
+<div class="inner">
+<div class="content">
+
+<h3 class="major" id="custom-relational-fields-to-the-admin-users-on-the-admin-api">
+ Custom Relational Fields to the Admin Users on the Admin API
+</h3>
+<p>
+ This bypass did not work on relational fields when you are using Strapi's publicly accessible API (
+ <code>
+  /api/*
+ </code>
+ ) except if the
+ <code>
+  populateCreatorFields
+ </code>
+ option had been enabled for the collection. This is because relational mappings to the Strapi administrators were being ignored since my user did not have the
+ <code>
+  find
+ </code>
+ permission for administrator users. For an example, I created another collection name
+ <code>
+  WithUserRelation
+ </code>
+ that had a relational mapping to admin users named
+ <code>
+  admin_user
+ </code>
+ and I could not cause Strapi to filter by the sensitive field.
+</p>
+<p>
+ <em>
+  Attempting to filter by the custom relational field
+  <code>
+   /api/with-user-relations?filters[$and][0][admin_user][t2.reset_password_token][$startsWith]=907
+  </code>
+ </em>
+ <br/>
+ <img alt="" class="center" src="/images/blog/strapi_filter_bypass_vuln/strapi_api_admin_user_attempt.png"/>
+</p>
+<p>
+ <em>
+  Attempting to filter by using the
+  <code>
+   updatedBy
+  </code>
+  field
+  <code>
+   /api/with-user-relations?filters[$and][0][updatedBy][t1.reset_password_token][$startsWith]=907
+  </code>
+ </em>
+ <br/>
+ <img alt="" class="center" src="/images/blog/strapi_filter_bypass_vuln/strapi_api_updatedby_attempt.png"/>
+</p>
+<p>
+ We can confirm that the filters I was attempting to inject were being ignored as shown by the generated queries when I set the
+ <code>
+  DEBUG=knex:query
+ </code>
+ environment variable while running Strapi.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/strapi_filter_bypass_vuln/strapi_api_attempt_queries.png"/>
+</p>
+<p>
+ However, if I used the Strapi admin API the relational mapping to the admin users was
+ <strong>
+  not
+ </strong>
+ being ignored for custom relational fields! This can be confirmed by first trying to query for a non-existent attribute for my custom relational field and seeing that the 500 response returns.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/strapi_filter_bypass_vuln/error_on_admin.png"/>
+</p>
+<p>
+ Checking the console logs, the following SQL query was executed and failed.
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="k">select</span><span class="w"> </span><span class="k">distinct</span><span class="w"> </span><span class="ss">"t0"</span><span class="p">.</span><span class="ss">"id"</span><span class="p">,</span><span class="w"> </span><span class="ss">"t0"</span><span class="p">.</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="ss">"t0"</span><span class="p">.</span><span class="ss">"id"</span><span class="p">,</span><span class="w"> </span><span class="ss">"t0"</span><span class="p">.</span><span class="ss">"created_by_id"</span><span class="p">,</span><span class="w"> </span><span class="ss">"t0"</span><span class="p">.</span><span class="ss">"updated_by_id"</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="ss">"with_user_relations"</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="ss">"t0"</span><span class="w"> </span><span class="k">left</span><span class="w"> </span><span class="k">join</span><span class="w"> </span><span class="ss">"with_user_relations_admin_user_links"</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="ss">"t1"</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="ss">"t0"</span><span class="p">.</span><span class="ss">"id"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">"t1"</span><span class="p">.</span><span class="ss">"with_user_relation_id"</span><span class="w"> </span><span class="k">left</span><span class="w"> </span><span class="k">join</span><span class="w"> </span><span class="ss">"admin_users"</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="ss">"t2"</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="ss">"t1"</span><span class="p">.</span><span class="ss">"user_id"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">"t2"</span><span class="p">.</span><span class="ss">"id"</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="p">(((</span><span class="ss">"t2"</span><span class="p">.</span><span class="ss">"noattr"</span><span class="w"> </span><span class="k">like</span><span class="w"> </span><span class="err">$</span><span class="mi">1</span><span class="p">)))</span><span class="w"> </span><span class="k">order</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="ss">"t0"</span><span class="p">.</span><span class="ss">"id"</span><span class="w"> </span><span class="k">ASC</span><span class="w"> </span><span class="k">limit</span><span class="w"> </span><span class="err">$</span><span class="mi">2</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ Notice the
+ <code>
+  left join "admin_users" as "t2"
+ </code>
+ in the generated query? This means we can use the table alias
+ <code>
+  t2
+ </code>
+ to access the sensitive columns in the
+ <code>
+  admin_users
+ </code>
+ table!
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style3 ">
+<div class="inner">
+<div class="content">
+
+<h3 class="major" id="entity-service-api">
+ Entity Service API
+</h3>
+<p>
+ Let's say you are a cool hip JavaScript developer and you wanted to use Strapi for its content management, but write your own code for the REST API (eg. use the
+ <code>
+  POST
+ </code>
+ method instead of
+ <code>
+  GET
+ </code>
+ ). You can use
+ <a href="https://docs.strapi.io/dev-docs/api/entity-service">
+  Strapi's Entity Service API
+ </a>
+ and write your own custom API code (as I did below in the following controller code for
+ <code>
+  /api/coolQuery
+ </code>
+ ).
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="s1">'use strict'</span><span class="p">;</span><span class="w"></span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nx">queryArticles</span><span class="o">:</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">(</span><span class="nx">ctx</span><span class="p">,</span><span class="w"> </span><span class="nx">next</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="kd">let</span><span class="w"> </span><span class="nx">articles</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">strapi</span><span class="p">.</span><span class="nx">entityService</span><span class="p">.</span><span class="nx">findMany</span><span class="p">(</span><span class="s1">'api::article.article'</span><span class="p">,{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">filters</span><span class="o">:</span><span class="w"> </span><span class="nx">ctx</span><span class="p">.</span><span class="nx">request</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">filters</span><span class="w"></span>
+<span class="w">      </span><span class="p">})</span><span class="w"></span>
+<span class="w">      </span><span class="nx">ctx</span><span class="p">.</span><span class="nx">body</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">articles</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="nx">ctx</span><span class="p">.</span><span class="nx">body</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="nx">msg</span><span class="o">:</span><span class="s2">"Yo something goofed!"</span><span class="p">};</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ You would think that using the
+ <code>
+  entityService
+ </code>
+ would prevent filtering by the
+ <code>
+  createdBy
+ </code>
+ and
+ <code>
+  updatedBy
+ </code>
+ attributes when the
+ <code>
+  populateCreatorFields
+ </code>
+ option has been disabled for the collection...
+ <em>
+  Right
+ </em>
+ ?
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/strapi_filter_bypass_vuln/wronganswer.gif"/>
+</p>
+<p>
+ The
+ <code>
+  entityService
+ </code>
+ is not provided the context of the user's permissions,
+ <strong>
+  so it just allows querying by the relation anyway
+ </strong>
+ !
+</p>
+<p>
+ <em>
+  Returns a non-empty list since password hashes start with
+  <code>
+   $2a$10$
+  </code>
+ </em>
+ <br/>
+ <img alt="" class="center" src="/images/blog/strapi_filter_bypass_vuln/entityService_valid.png"/>
+</p>
+<p>
+ <em>
+  Returns an empty list since password hashes do not start with
+  <code>
+   $2a$10X
+  </code>
+ </em>
+ <br/>
+ <img alt="" class="center" src="/images/blog/strapi_filter_bypass_vuln/serviceEntity-invalid.png"/>
+</p>
+<p>
+ <em>
+  Jeez that ain't good
+ </em>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style1 alt">
+<div class="inner">
+<div class="content">
+
+<h2 class="major" id="scenarios-where-the-bypass-occurred">
+ Scenarios Where the Bypass Occurred
+</h2>
+<p>
+ To summarise, the scenarios where this bypass could occur are when:
+</p>
+<ul>
+ <li>
+  The user can access the REST API for a collection with the private fields.
+ </li>
+ <li>
+  Using the REST API if the
+  <code>
+   populateCreatorFields
+  </code>
+  option has been manually set in a collection's
+  <code>
+   schema.json
+  </code>
+  file.
+ </li>
+ <li>
+  Using a Strapi administrator account that has the
+  <code>
+   find
+  </code>
+  permission on other collections.
+ </li>
+ <li>
+  Allowing unfiltered user inputs into the Entity Service API within custom API or plugin code.
+ </li>
+</ul>
+<p>
+ This is an awesome finding by
+ <a href="https://github.com/Boegie19">
+  Boegie19
+ </a>
+ ! However, I could not help but ask
+ <em>
+  why on earth are those table aliases being inserted into those SQL queries
+ </em>
+ ?
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style6 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="code-deep-dive">
+ Code Deep Dive
+</h1>
+<p>
+ <em>
+  Time for the technical deep dive into figuring out what is going on here.
+ </em>
+</p>
+<p>
+ We begin by first looking at the source code for the
+ <code>
+  findMany
+ </code>
+ operation in the Entity Service API. For reference, I will be referring to Strapi v4.8.2 codebase in the following code snippets.
+</p>
+<p>
+ <a href="https://github.com/strapi/strapi/blob/v4.8.2/packages/core/strapi/lib/services/entity-service/index.js#L78-L90">
+  <code>
+   findMany
+  </code>
+  in
+  <code>
+   packages/core/strapi/lib/services/entity-service/index.js
+  </code>
+ </a>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="w">  </span><span class="k">async</span><span class="w"> </span><span class="nx">findMany</span><span class="p">(</span><span class="nx">uid</span><span class="p">,</span><span class="w"> </span><span class="nx">opts</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">kind</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">strapi</span><span class="p">.</span><span class="nx">getModel</span><span class="p">(</span><span class="nx">uid</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">wrappedParams</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">wrapParams</span><span class="p">(</span><span class="nx">opts</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">uid</span><span class="p">,</span><span class="w"> </span><span class="nx">action</span><span class="o">:</span><span class="w"> </span><span class="s1">'findMany'</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
+
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">transformParamsToQuery</span><span class="p">(</span><span class="nx">uid</span><span class="p">,</span><span class="w"> </span><span class="nx">wrappedParams</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">kind</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'singleType'</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="nx">db</span><span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="nx">uid</span><span class="p">).</span><span class="nx">findOne</span><span class="p">(</span><span class="nx">query</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">db</span><span class="p">.</span><span class="nx">query</span><span class="p">(</span><span class="nx">uid</span><span class="p">).</span><span class="nx">findMany</span><span class="p">(</span><span class="nx">query</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">},</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ The
+ <code>
+  findMany
+ </code>
+ operation is a wrapper for directly accessing the
+ <code>
+  db
+ </code>
+ object that builds the query (
+ <code>
+  db.query(uid).findMany(query)
+ </code>
+ ). Let's take a closer look at
+ <code>
+  db.query(uid)
+ </code>
+ .
+</p>
+<p>
+ <a href="https://github.com/strapi/strapi/blob/v4.8.2/packages/core/database/lib/index.js#L46-L52">
+  <code>
+   query
+  </code>
+  in
+  <code>
+   packages/core/database/lib/index.js
+  </code>
+ </a>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="w">  </span><span class="nx">query</span><span class="p">(</span><span class="nx">uid</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">metadata</span><span class="p">.</span><span class="nx">has</span><span class="p">(</span><span class="nx">uid</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="sb">`Model </span><span class="si">${</span><span class="nx">uid</span><span class="si">}</span><span class="sb"> not found`</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">entityManager</span><span class="p">.</span><span class="nx">getRepository</span><span class="p">(</span><span class="nx">uid</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ It now calls
+ <code>
+  getRepository
+ </code>
+ that is created by
+ <code>
+  createdEntityManager
+ </code>
+ (yeah get ready for a lot of jumping around source code). Jumping to
+ <a href="https://github.com/strapi/strapi/blob/v4.8.2/packages/core/database/lib/entity-manager/index.js#L171">
+  <code>
+   packages/core/database/lib/entity-manager/index.js
+  </code>
+ </a>
+ we can see that
+ <code>
+  createEntityManager
+ </code>
+ is a function that returns an object containing database querying methods and
+ <code>
+  getRepository(uid)
+ </code>
+ targets these operations to a specific collection on the database. It's here that we can see that the
+ <code>
+  findMany
+ </code>
+ method is a wrapper around the method
+ <code>
+  createQueryBuilder
+ </code>
+ .
+</p>
+<p>
+ <a href="https://github.com/strapi/strapi/blob/v4.8.2/packages/core/database/lib/entity-manager/index.js#L186-L194">
+  <code>
+   findMany
+  </code>
+  in
+  <code>
+   packages/core/database/lib/entity-manager/index.js
+  </code>
+ </a>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="w">    </span><span class="k">async</span><span class="w"> </span><span class="nx">findMany</span><span class="p">(</span><span class="nx">uid</span><span class="p">,</span><span class="w"> </span><span class="nx">params</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">states</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">db</span><span class="p">.</span><span class="nx">lifecycles</span><span class="p">.</span><span class="nx">run</span><span class="p">(</span><span class="s1">'beforeFindMany'</span><span class="p">,</span><span class="w"> </span><span class="nx">uid</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">params</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
+
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">createQueryBuilder</span><span class="p">(</span><span class="nx">uid</span><span class="p">).</span><span class="nx">init</span><span class="p">(</span><span class="nx">params</span><span class="p">).</span><span class="nx">execute</span><span class="p">();</span><span class="w"></span>
+
+<span class="w">      </span><span class="k">await</span><span class="w"> </span><span class="nx">db</span><span class="p">.</span><span class="nx">lifecycles</span><span class="p">.</span><span class="nx">run</span><span class="p">(</span><span class="s1">'afterFindMany'</span><span class="p">,</span><span class="w"> </span><span class="nx">uid</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">params</span><span class="p">,</span><span class="w"> </span><span class="nx">result</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="nx">states</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="nx">result</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">},</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ The interesting part in the above snippet is
+ <code>
+  this.createQueryBuilder(uid).init(params).execute()
+ </code>
+ that first creates a query builder, initialises the parameters then executes the query. Let's take a look at that
+ <a href="https://github.com/strapi/strapi/blob/v4.8.2/packages/core/database/lib/query/query-builder.js#L9">
+  <code>
+   createQueryBuilder
+  </code>
+  method in
+  <code>
+   packages/core/database/lib/query/query-builder.js
+  </code>
+ </a>
+ . It is here we see where the sneaky table aliases are being defined in
+ <code>
+  getAlias
+ </code>
+ .
+</p>
+<p>
+ <a href="https://github.com/strapi/strapi/blob/v4.8.2/packages/core/database/lib/query/query-builder.js#L40-L46">
+  <code>
+   getAlias
+  </code>
+  in
+  <code>
+   packages/core/database/lib/query/query-builder.js
+  </code>
+ </a>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">getAlias</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">alias</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`t</span><span class="si">${</span><span class="nx">state</span><span class="p">.</span><span class="nx">aliasCounter</span><span class="si">}</span><span class="sb">`</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="nx">state</span><span class="p">.</span><span class="nx">aliasCounter</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mf">1</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">alias</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="p">};</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ <em>
+  Now we are getting to the heart of the problem!
+ </em>
+</p>
+<p>
+ In the same source code we can see that
+ <code>
+  execute
+ </code>
+ calls
+ <code>
+  getKnexQuery
+ </code>
+ which applies the table joins by calling
+ <code>
+  applyJoin
+ </code>
+ .
+</p>
+<p>
+ <a href="https://github.com/strapi/strapi/blob/v4.8.2/packages/core/database/lib/query/helpers/join.js#L59-L87">
+  <code>
+   applyJoin
+  </code>
+  in
+  <code>
+   packages/core/database/lib/query/helpers/join.js
+  </code>
+ </a>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">applyJoin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">qb</span><span class="p">,</span><span class="w"> </span><span class="nx">join</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'leftJoin'</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nx">alias</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nx">referencedTable</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nx">referencedColumn</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nx">rootColumn</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nx">rootTable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">qb</span><span class="p">.</span><span class="nx">alias</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nx">on</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nx">orderBy</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">join</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">  </span><span class="nx">qb</span><span class="p">[</span><span class="nx">method</span><span class="p">](</span><span class="sb">`</span><span class="si">${</span><span class="nx">referencedTable</span><span class="si">}</span><span class="sb"> as </span><span class="si">${</span><span class="nx">alias</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">inner</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">inner</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="sb">`</span><span class="si">${</span><span class="nx">rootTable</span><span class="si">}</span><span class="sb">.</span><span class="si">${</span><span class="nx">rootColumn</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nx">alias</span><span class="si">}</span><span class="sb">.</span><span class="si">${</span><span class="nx">referencedColumn</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">on</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">key</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">on</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">inner</span><span class="p">.</span><span class="nx">onVal</span><span class="p">(</span><span class="sb">`</span><span class="si">${</span><span class="nx">alias</span><span class="si">}</span><span class="sb">.</span><span class="si">${</span><span class="nx">key</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span><span class="w"> </span><span class="nx">on</span><span class="p">[</span><span class="nx">key</span><span class="p">]);</span><span class="w"></span>
+<span class="w">      </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">});</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">orderBy</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">orderBy</span><span class="p">).</span><span class="nx">forEach</span><span class="p">((</span><span class="nx">column</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">direction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">orderBy</span><span class="p">[</span><span class="nx">column</span><span class="p">];</span><span class="w"></span>
+<span class="w">      </span><span class="nx">qb</span><span class="p">.</span><span class="nx">orderBy</span><span class="p">(</span><span class="sb">`</span><span class="si">${</span><span class="nx">alias</span><span class="si">}</span><span class="sb">.</span><span class="si">${</span><span class="nx">column</span><span class="si">}</span><span class="sb">`</span><span class="p">,</span><span class="w"> </span><span class="nx">direction</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">});</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ There we are at the end of this source code chain to find where the joins were occurring. We can see that Strapi's own query builder on top of Knex.js inserts the table aliases and the fact that you could query by non-existing attributes made this bypass possible.
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style5 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="how-did-strapi-patch-this-vulnerability">
+ How did Strapi patch this vulnerability?
+</h1>
+<p>
+ Jumping to Strapi v4.10.8 when this patch was released, we can run Strapi using a debugger and track when the invalid fields are being stripped from the filter. In the
+ <code>
+  findMany
+ </code>
+ method within the Entity Service API, we can see that our filter input is being stripped by
+ <code>
+  transformParamsToQuery
+ </code>
+ .
+</p>
+<p>
+ <em>
+  After
+  <code>
+   transformParamsToQuery
+  </code>
+  is called the result
+  <code>
+   query
+  </code>
+  no longer contains our filter.
+ </em>
+ <br/>
+ <img alt="" class="center" src="/images/blog/strapi_filter_bypass_vuln/debugger1.png"/>
+</p>
+<p>
+ The source code for
+ <code>
+  transformParamsToQuery
+ </code>
+ shows that if the
+ <code>
+  filters
+ </code>
+ parameter is non-empty, then it calls
+ <code>
+  convertFiltersQueryParams(filters, schema)
+ </code>
+ where
+ <code>
+  schema
+ </code>
+ is the schema of the model that is being queried.
+</p>
+<p>
+ <a href="https://github.com/strapi/strapi/blob/v4.10.8/packages/core/utils/lib/convert-query-params.js#L526-L575">
+  <code>
+   transformParamsToQuery
+  </code>
+  in
+  <code>
+   packages/core/utils/lib/convert-query-params.js
+  </code>
+ </a>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">transformParamsToQuery</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">uid</span><span class="p">,</span><span class="w"> </span><span class="nx">params</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// NOTE: can be a CT, a Compo or nothing in the case of polymorphism (DZ &amp; morph relations)</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">strapi</span><span class="p">.</span><span class="nx">getModel</span><span class="p">(</span><span class="nx">uid</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">query</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{};</span><span class="w"></span>
+
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">_q</span><span class="p">,</span><span class="w"> </span><span class="nx">sort</span><span class="p">,</span><span class="w"> </span><span class="nx">filters</span><span class="p">,</span><span class="w"> </span><span class="nx">fields</span><span class="p">,</span><span class="w"> </span><span class="nx">populate</span><span class="p">,</span><span class="w"> </span><span class="nx">page</span><span class="p">,</span><span class="w"> </span><span class="nx">pageSize</span><span class="p">,</span><span class="w"> </span><span class="nx">start</span><span class="p">,</span><span class="w"> </span><span class="nx">limit</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">params</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">isNil</span><span class="p">(</span><span class="nx">_q</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">query</span><span class="p">.</span><span class="nx">_q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">_q</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">isNil</span><span class="p">(</span><span class="nx">sort</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">query</span><span class="p">.</span><span class="nx">orderBy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">convertSortQueryParams</span><span class="p">(</span><span class="nx">sort</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">isNil</span><span class="p">(</span><span class="nx">filters</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">query</span><span class="p">.</span><span class="nx">where</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">convertFiltersQueryParams</span><span class="p">(</span><span class="nx">filters</span><span class="p">,</span><span class="w"> </span><span class="nx">schema</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">isNil</span><span class="p">(</span><span class="nx">fields</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">query</span><span class="p">.</span><span class="nx">select</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">convertFieldsQueryParams</span><span class="p">(</span><span class="nx">fields</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">isNil</span><span class="p">(</span><span class="nx">populate</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">query</span><span class="p">.</span><span class="nx">populate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">convertPopulateQueryParams</span><span class="p">(</span><span class="nx">populate</span><span class="p">,</span><span class="w"> </span><span class="nx">schema</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="nx">validatePaginationParams</span><span class="p">(</span><span class="nx">page</span><span class="p">,</span><span class="w"> </span><span class="nx">pageSize</span><span class="p">,</span><span class="w"> </span><span class="nx">start</span><span class="p">,</span><span class="w"> </span><span class="nx">limit</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">isNil</span><span class="p">(</span><span class="nx">page</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">query</span><span class="p">.</span><span class="nx">page</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">convertPageQueryParams</span><span class="p">(</span><span class="nx">page</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">isNil</span><span class="p">(</span><span class="nx">pageSize</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">query</span><span class="p">.</span><span class="nx">pageSize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">convertPageSizeQueryParams</span><span class="p">(</span><span class="nx">pageSize</span><span class="p">,</span><span class="w"> </span><span class="nx">page</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">isNil</span><span class="p">(</span><span class="nx">start</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">query</span><span class="p">.</span><span class="nx">offset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">convertStartQueryParams</span><span class="p">(</span><span class="nx">start</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">isNil</span><span class="p">(</span><span class="nx">limit</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nx">query</span><span class="p">.</span><span class="nx">limit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">convertLimitQueryParams</span><span class="p">(</span><span class="nx">limit</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="nx">convertPublicationStateParams</span><span class="p">(</span><span class="nx">schema</span><span class="p">,</span><span class="w"> </span><span class="nx">params</span><span class="p">,</span><span class="w"> </span><span class="nx">query</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">query</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ Looking at
+ <code>
+  convertFiltersQueryParams
+ </code>
+ function, we can see that the filter is sanitised by a method named
+ <code>
+  convertAndSanitizeFilters
+ </code>
+ .
+</p>
+<p>
+ <a href="https://github.com/strapi/strapi/blob/v4.10.8/packages/core/utils/lib/convert-query-params.js#L414-L425">
+  <code>
+   convertFiltersQueryParams
+  </code>
+  in
+  <code>
+   packages/core/utils/lib/convert-query-params.js
+  </code>
+ </a>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">convertFiltersQueryParams</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">filters</span><span class="p">,</span><span class="w"> </span><span class="nx">schema</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Filters need to be either an array or an object</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Here we're only checking for 'object' type since typeof [] =&gt; object and typeof {} =&gt; object</span><span class="w"></span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">isObject</span><span class="p">(</span><span class="nx">filters</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="s1">'The filters parameter must be an object or an array'</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Don't mutate the original object</span><span class="w"></span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">filtersCopy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">cloneDeep</span><span class="p">(</span><span class="nx">filters</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">convertAndSanitizeFilters</span><span class="p">(</span><span class="nx">filtersCopy</span><span class="p">,</span><span class="w"> </span><span class="nx">schema</span><span class="p">);</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ The code for
+ <code>
+  convertAndSanitizeFilters
+ </code>
+ is shown below.
+</p>
+<p>
+ <a href="https://github.com/strapi/strapi/blob/v4.10.8/packages/core/utils/lib/convert-query-params.js#L427-L501">
+  <code>
+   convertAndSanitizeFilters
+  </code>
+  in
+  <code>
+   packages/core/utils/lib/convert-query-params.js
+  </code>
+ </a>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">convertAndSanitizeFilters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">filters</span><span class="p">,</span><span class="w"> </span><span class="nx">schema</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">Array</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">filters</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="w"></span>
+<span class="w">      </span><span class="nx">filters</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// Sanitize each filter</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">filter</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">convertAndSanitizeFilters</span><span class="p">(</span><span class="nx">filter</span><span class="p">,</span><span class="w"> </span><span class="nx">schema</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// Filter out empty filters</span><span class="w"></span>
+<span class="w">        </span><span class="p">.</span><span class="nx">filter</span><span class="p">((</span><span class="nx">filter</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="o">!</span><span class="nx">isObject</span><span class="p">(</span><span class="nx">filter</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="nx">isEmpty</span><span class="p">(</span><span class="nx">filter</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// This must come after check for Array or else arrays are not filtered</span><span class="w"></span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">isPlainObject</span><span class="p">(</span><span class="nx">filters</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nx">filters</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">removeOperator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">operator</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="ow">delete</span><span class="w"> </span><span class="nx">filters</span><span class="p">[</span><span class="nx">operator</span><span class="p">];</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Here, `key` can either be an operator or an attribute name</span><span class="w"></span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">key</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="p">]</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nb">Object</span><span class="p">.</span><span class="nx">entries</span><span class="p">(</span><span class="nx">filters</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">attribute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">get</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span><span class="w"> </span><span class="nx">schema</span><span class="o">?</span><span class="p">.</span><span class="nx">attributes</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">validKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">isOperator</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">isValidSchemaAttribute</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span><span class="w"> </span><span class="nx">schema</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">validKey</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="nx">removeOperator</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Handle attributes</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">attribute</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="c1">// Relations</span><span class="w"></span>
+<span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">attribute</span><span class="p">.</span><span class="nx">type</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'relation'</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">filters</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">convertAndSanitizeFilters</span><span class="p">(</span><span class="nx">value</span><span class="p">,</span><span class="w"> </span><span class="nx">strapi</span><span class="p">.</span><span class="nx">getModel</span><span class="p">(</span><span class="nx">attribute</span><span class="p">.</span><span class="nx">target</span><span class="p">));</span><span class="w"></span>
+<span class="w">      </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">      </span><span class="c1">// Components</span><span class="w"></span>
+<span class="w">      </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">attribute</span><span class="p">.</span><span class="nx">type</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'component'</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">filters</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">convertAndSanitizeFilters</span><span class="p">(</span><span class="nx">value</span><span class="p">,</span><span class="w"> </span><span class="nx">strapi</span><span class="p">.</span><span class="nx">getModel</span><span class="p">(</span><span class="nx">attribute</span><span class="p">.</span><span class="nx">component</span><span class="p">));</span><span class="w"></span>
+<span class="w">      </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">      </span><span class="c1">// Media</span><span class="w"></span>
+<span class="w">      </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">attribute</span><span class="p">.</span><span class="nx">type</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'media'</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">filters</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">convertAndSanitizeFilters</span><span class="p">(</span><span class="nx">value</span><span class="p">,</span><span class="w"> </span><span class="nx">strapi</span><span class="p">.</span><span class="nx">getModel</span><span class="p">(</span><span class="s1">'plugin::upload.file'</span><span class="p">));</span><span class="w"></span>
+<span class="w">      </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">      </span><span class="c1">// Dynamic Zones</span><span class="w"></span>
+<span class="w">      </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">attribute</span><span class="p">.</span><span class="nx">type</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'dynamiczone'</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">removeOperator</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span><span class="w"></span>
+<span class="w">      </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">      </span><span class="c1">// Password attributes</span><span class="w"></span>
+<span class="w">      </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">attribute</span><span class="p">.</span><span class="nx">type</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'password'</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// Always remove password attributes from filters object</span><span class="w"></span>
+<span class="w">        </span><span class="nx">removeOperator</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span><span class="w"></span>
+<span class="w">      </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">      </span><span class="c1">// Scalar attributes</span><span class="w"></span>
+<span class="w">      </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nx">filters</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">convertAndSanitizeFilters</span><span class="p">(</span><span class="nx">value</span><span class="p">,</span><span class="w"> </span><span class="nx">schema</span><span class="p">);</span><span class="w"></span>
+<span class="w">      </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Handle operators</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">([</span><span class="s1">'$null'</span><span class="p">,</span><span class="w"> </span><span class="s1">'$notNull'</span><span class="p">].</span><span class="nx">includes</span><span class="p">(</span><span class="nx">key</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="nx">filters</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">parseType</span><span class="p">({</span><span class="w"> </span><span class="nx">type</span><span class="o">:</span><span class="w"> </span><span class="s1">'boolean'</span><span class="p">,</span><span class="w"> </span><span class="nx">value</span><span class="o">:</span><span class="w"> </span><span class="nx">filters</span><span class="p">[</span><span class="nx">key</span><span class="p">],</span><span class="w"> </span><span class="nx">forceCast</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="p">});</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">isObject</span><span class="p">(</span><span class="nx">value</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="nx">filters</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">convertAndSanitizeFilters</span><span class="p">(</span><span class="nx">value</span><span class="p">,</span><span class="w"> </span><span class="nx">schema</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Remove empty objects &amp; arrays</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">isPlainObject</span><span class="p">(</span><span class="nx">filters</span><span class="p">[</span><span class="nx">key</span><span class="p">])</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">isEmpty</span><span class="p">(</span><span class="nx">filters</span><span class="p">[</span><span class="nx">key</span><span class="p">]))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">      </span><span class="nx">removeOperator</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">filters</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ We can see that for each key in the filter, the following line of code is executed that checks if either the key is an operator or within the schema of the model.
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">validKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">isOperator</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">isValidSchemaAttribute</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span><span class="w"> </span><span class="nx">schema</span><span class="p">);</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ Looking at the source code for
+ <code>
+  isValidSchemaAttribute
+ </code>
+ , we can see that Strapi now checks if the key in the filter is actually an attribute of the model schema by executing
+ <code>
+  Object.keys(schema.attributes).includes(key)
+ </code>
+ .
+</p>
+<p>
+ <a href="https://github.com/strapi/strapi/blob/v4.10.8/packages/core/utils/lib/convert-query-params.js#L402-L412">
+  <code>
+   isValidSchemaAttribute
+  </code>
+  in
+  <code>
+   packages/core/utils/lib/convert-query-params.js
+  </code>
+ </a>
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">isValidSchemaAttribute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">key</span><span class="p">,</span><span class="w"> </span><span class="nx">schema</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">key</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">'id'</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">schema</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">schema</span><span class="p">.</span><span class="nx">attributes</span><span class="p">).</span><span class="nx">includes</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</code></pre>
+</div>
+<p>
+ We can confirm that this
+ <code>
+  isValidSchemaAttribute
+ </code>
+ validation check by going back to Strapi v4.8.2 and seeing that there was no check if an attribute was in the schema for a model.
+</p>
+<p>
+ <a href="https://github.com/strapi/strapi/blob/v4.8.2/packages/core/utils/lib/convert-query-params.js#L423">
+  The validation check is missing in
+  <code>
+   convertAndSanitizeFilters
+  </code>
+  in Strapi v4.8.2
+ </a>
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/strapi_filter_bypass_vuln/missing-validation.png"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style4 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="potential-impact-to-other-object-relational-mappers">
+ Potential Impact to Other Object Relational Mappers
+</h1>
+<p>
+ When
+ <a href="https://github.com/Boegie19">
+  Boegie19
+ </a>
+ first told me about this bypass that they discovered, my spidey senses were tingling thinking about the potential impact to other Object Relational Mappers (ORMs).
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/strapi_filter_bypass_vuln/spidey-senses.gif"/>
+</p>
+<p>
+ This bypass method would work against other ORMs that performed a string comparison to validate that private fields aren't being queried if:
+</p>
+<ol>
+ <li>
+  The ORM allows querying by non-existing attributes for a model.
+ </li>
+ <li>
+  The ORM inserts table aliases into the query.
+ </li>
+</ol>
+<p>
+ However, I haven't had the time to fully explore this issue in other software. This is why I wanted to share this knowledge with the world that table alias can be a potential vector to bypass private attribute filters in ORMs.
+</p>
+<p>
+ <img alt="" class="center" src="/images/blog/strapi_filter_bypass_vuln/nojleg.jpeg"/>
+</p>
+</div>
+</div>
+</section>
+<section class="wrapper style2 alt">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="indicators-of-compromise-for-cve-2023-34235">
+ Indicators of Compromise for CVE-2023-34235
+</h1>
+<p>
+ To help with performing incident response, I have modified the previous regex pattern for searching for Indicators of Compromise to account for the
+ <code>
+  t\d+
+ </code>
+ table prefix.
+</p>
+<div class="codehilite">
+ <pre><span></span><code><span class="sr">/filters.*(\[|%5B)\s*t\d+\.(email|password|reset_password_token|resetPasswordToken)\s*(\]|%5D)/</span><span class="w"></span>
+</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section class="wrapper style5 ">
+<div class="inner">
+<div class="content">
+
+<h1 class="major" id="conclusion">
+ Conclusion
+</h1>
+<p>
+ <em>
+  What an awesome bypass!
+ </em>
+</p>
+<p>
+ I am proud that my previous research into Strapi helped
+ <a href="https://github.com/Boegie19">
+  Boegie19
+ </a>
+ identify this bypass in Strapi's patch of
+ <a href="https://www.ghostccamm.com/blog/multi_strapi_vulns/#cve-2023-22894-leaking-sensitive-user-information-by-filtering-on-private-fields-in-strapi-versions-471">
+  CVE-2023-22894
+ </a>
+ . Security is an iterative process and I am a firm believer that we should share what we know to continually improve the security of systems.
+</p>
+<p>
+ However, what I am even more proud of is observing the shift in culture regarding security among Strapi developers and its community.
+ <a href="https://github.com/Boegie19">
+  Boegie19
+ </a>
+ was a huge success story in my eyes, who was a passionate JavaScript developer in the Strapi community that is now going through the CMS with a finer tooth comb than I did and reporting vulnerabilities to Strapi (
+ <em>
+  stay tuned for more wild stuff from
+  <a href="https://github.com/Boegie19">
+   Boegie19
+  </a>
+  in the future
+ </em>
+ ). I also talked with Derrick Mehaffy at Strapi who mentioned that since my previous report they have now started biweekly security training sessions and are eager to dig into cool vulnerability reports.
+</p>
+<p>
+ I am glad to be a part of this journey with Strapi. Thank you for reading and learning about this cool bypass technique that
+ <a href="https://github.com/Boegie19">
+  Boegie19
+ </a>
+ discovered.
+</p></div>
+</div>
+</section>
+</section>
+
+    	</div>
+
+    <!-- Footer -->
+      <!-- Footer -->
+  <section id="footer">
+    <div class="inner">
+      <ul class="icons">
+        <li><a href="https://twitter.com/GhostCcamm" class="icon brands fa-twitter"><span class="label"></span></a></li>
+        <li><a href="https://github.com/Ccamm" class="icon brands fa-github"><span class="label"></span></a></li>
+      </ul>
+    </div>
+  </section>
+
+		<!-- Particles -->
+			<div id="particles-js"></div>
+
+		<!-- Scripts -->
+			<script src="/assets/js/jquery.min.js"></script>
+			<script src="/assets/js/jquery.scrollex.min.js"></script>
+			<script src="/assets/js/browser.min.js"></script>
+			<script src="/assets/js/breakpoints.min.js"></script>
+			<script src="/assets/js/util.js"></script>
+			<script src="/assets/js/particles.min.js"></script>
+			<script src="/assets/js/main.js"></script>
+      
+	</body>
+</html>
